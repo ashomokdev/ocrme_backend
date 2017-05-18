@@ -5,12 +5,12 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" 
          version="2.5">
   <servlet>
-    <servlet-name>HelloAppEngine</servlet-name>
-    <servlet-class>ocrme_backend.HelloAppEngine</servlet-class>
+    <servlet-name>OCRServlet</servlet-name>
+    <servlet-class>ocrme_backend.OCRServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>HelloAppEngine</servlet-name>
-    <url-pattern>/hello</url-pattern>
+    <servlet-name>OCRServlet</servlet-name>
+    <url-pattern>/upload</url-pattern>
   </servlet-mapping>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
