@@ -1,5 +1,7 @@
 package ocrme_backend;
 
+import ocrme_backend.ocr.OCRProcessor;
+import ocrme_backend.ocr.OCRProcessorImpl;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;

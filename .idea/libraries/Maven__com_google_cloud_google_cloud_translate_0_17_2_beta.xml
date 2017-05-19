@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.google.cloud:google-cloud-translate:0.17.2-beta">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/cloud/google-cloud-translate/0.17.2-beta/google-cloud-translate-0.17.2-beta.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/cloud/google-cloud-translate/0.17.2-beta/google-cloud-translate-0.17.2-beta-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/cloud/google-cloud-translate/0.17.2-beta/google-cloud-translate-0.17.2-beta-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

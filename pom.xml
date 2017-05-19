@@ -8,7 +8,6 @@
     <groupId>com.ashomok.ocrme</groupId>
     <artifactId>ocrmeGVisionAppEngine</artifactId>
 
-    
     <properties>
         <app.id>imagetotext-149919</app.id>
         <app.version>1</app.version>
@@ -16,8 +15,8 @@
         <gcloud.plugin.version>2.0.9.133.v201611104</gcloud.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <archiveClasses>true</archiveClasses>
     </properties>
@@ -87,6 +86,13 @@
             <version>1.21.0</version>
         </dependency>
 
+        <!--Google Translate API-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-translate</artifactId>
+            <version>0.17.2-beta</version>
+        </dependency>
+
         <!-- Test Dependencies -->
         <dependency>
             <groupId>com.google.appengine</groupId>
@@ -105,6 +111,11 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <version>0.32</version>
         </dependency>
     </dependencies>
 
