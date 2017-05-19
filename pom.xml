@@ -8,6 +8,7 @@
     <groupId>com.ashomok.ocrme</groupId>
     <artifactId>ocrmeGVisionAppEngine</artifactId>
 
+    
     <properties>
         <app.id>imagetotext-149919</app.id>
         <app.version>1</app.version>
