@@ -1,1 +1,3 @@
 ocrme_backend/OCRServlet.class
+ocrme_backend/TranslateServlet.class
+ocrme_backend/translate/RequestBean.class
