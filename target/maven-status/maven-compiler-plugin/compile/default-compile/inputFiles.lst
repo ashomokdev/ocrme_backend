@@ -1,3 +1,5 @@
-/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/main/java/ocrme_backend/OCRProcessorImpl.java
-/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/main/java/ocrme_backend/OCRProcessor.java
 /home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/main/java/ocrme_backend/OCRServlet.java
+/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/main/java/ocrme_backend/ocr/OCRProcessorImpl.java
+/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/main/java/ocrme_backend/ocr/OCRProcessor.java
+/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/main/java/ocrme_backend/translate/TranslatorImpl.java
+/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/main/java/ocrme_backend/translate/Translator.java

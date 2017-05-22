@@ -44,6 +44,13 @@
             <version>1.2</version>
         </dependency>
 
+        <!--Google Translate API-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-translate</artifactId>
+            <version>0.17.2-beta</version>
+        </dependency>
+
         <!--google vision api-->
         <dependency>
             <groupId>com.google.cloud</groupId>
@@ -86,13 +93,6 @@
             <version>1.21.0</version>
         </dependency>
 
-        <!--Google Translate API-->
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-translate</artifactId>
-            <version>0.17.2-beta</version>
-        </dependency>
-
         <!-- Test Dependencies -->
         <dependency>
             <groupId>com.google.appengine</groupId>
@@ -113,9 +113,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>21.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.truth</groupId>
             <artifactId>truth</artifactId>
             <version>0.32</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
