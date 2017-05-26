@@ -8,6 +8,7 @@ import com.google.api.services.vision.v1.VisionScopes;
 import com.google.api.services.vision.v1.model.*;
 import com.google.common.collect.ImmutableList;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
@@ -15,13 +16,13 @@ import java.util.List;
 /**
  * Created by iuliia on 5/17/17.
  */
-public class OCRProcessorImpl implements OCRProcessor{
+public class OCRProcessorImpl implements OCRProcessor {
     private final Vision vision;
     private static final String APPLICATION_NAME = "ashomokdev-ocr_me/1.0";
 
     public OCRProcessorImpl() throws IOException, GeneralSecurityException {
 
-        vision =  getVisionService();
+        vision = getVisionService();
     }
 
     /**
@@ -36,8 +37,15 @@ public class OCRProcessorImpl implements OCRProcessor{
                 .build();
     }
 
+
     @Override
     public String doOCR(byte[] image) throws IOException {
+       return doOCR(image, null);
+    }
+
+    @Override
+    public String doOCR(byte[] image, @Nullable List<String> languages) throws IOException {
+
         AnnotateImageRequest request =
                 new AnnotateImageRequest()
                         .setImage(new Image().encodeContent(image))
@@ -45,6 +53,14 @@ public class OCRProcessorImpl implements OCRProcessor{
                                 new Feature()
                                         .setType("TEXT_DETECTION")
                                         .setMaxResults(1)));
+
+        //add languages if needed
+        if (languages != null && languages.size() > 0) {
+            ImageContext imageContext = new ImageContext();
+            imageContext.setLanguageHints(languages);
+            request.setImageContext(imageContext);
+        }
+
         Vision.Images.Annotate annotate =
                 vision.images()
                         .annotate(new BatchAnnotateImagesRequest().setRequests(ImmutableList.of(request)));

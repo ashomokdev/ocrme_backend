@@ -55,7 +55,7 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-vision</artifactId>
-            <version>0.11.1-beta</version>
+            <version>0.17.2-beta</version>
         </dependency>
         <dependency>
             <groupId>com.google.apis</groupId>

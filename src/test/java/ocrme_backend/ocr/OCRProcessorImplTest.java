@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -34,6 +35,29 @@ public class OCRProcessorImplTest {
         String result = ocrProcessor.doOCR(file);
         assertNotNull(result);
         assertTrue(result.length()>0);
+    }
+
+    @Test
+    public void OCRRussian() throws Exception {
+        byte[] file = getRusFile();
+        ArrayList<String> languages = new ArrayList<>();
+        languages.add("ru");
+        String result = ocrProcessor.doOCR(file, languages);
+        assertNotNull(result);
+        assertTrue(result.length()>0);
+        assertTrue(result.toLowerCase().contains("барышня"));
+    }
+
+    private byte[] getRusFile() throws Exception{
+        URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/rus.jpg");
+        File file = new File(url.getPath());
+        Path path = Paths.get(file.getPath());
+        byte[] data = Files.readAllBytes(path);
+        if (data != null) {
+            return data;
+        } else {
+            throw new Exception("file was not obtained");
+        }
     }
 
     private byte[] getFile() throws Exception {
