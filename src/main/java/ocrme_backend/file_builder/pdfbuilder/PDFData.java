@@ -2,9 +2,7 @@ package ocrme_backend.file_builder.pdfbuilder;
 
 import com.itextpdf.text.PageSize;
 
-import java.util.ArrayList;
 import java.util.List;
-import ocrme_backend.file_builder.pdfbuilder.FileData;
 
 /**
  * Created by iuliia on 6/7/17.

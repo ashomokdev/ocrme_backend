@@ -16,47 +16,7 @@ import java.util.List;
  */
 //todo
 // https://stackoverflow.com/questions/7355025/create-pdf-with-java
-//    http://www.techsagar.com/top-3-open-source-java-libraries-for-creating-and-manipulating-pdf-documents/
-
-//    Paragraph:
-//            YKPAIHAUKRAINE
-//            Bounds:
-//            vertices {
-//            x: 221
-//            y: 903
-//            }
-//            vertices {
-//            x: 1058
-//            y: 896
-//            }
-//            vertices {
-//            x: 1059
-//            y: 962
-//            }
-//            vertices {
-//            x: 222
-//            y: 969
-//            }
-
-
-//    Text: PETIT
-//            Position : vertices {
-//            x: 1212
-//            y: 209
-//            }
-//            vertices {
-//            x: 1453
-//            y: 206
-//            }
-//            vertices {
-//            x: 1454
-//            y: 284
-//            }
-//            vertices {
-//            x: 1213
-//            y: 287
-//            }
-
+// http://www.techsagar.com/top-3-open-source-java-libraries-for-creating-and-manipulating-pdf-documents/
 
 public class PDFBuilderImpl implements PDFBuilder {
 

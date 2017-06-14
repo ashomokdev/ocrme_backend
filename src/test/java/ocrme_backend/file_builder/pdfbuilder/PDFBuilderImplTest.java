@@ -68,6 +68,17 @@ public class PDFBuilderImplTest {
         buildPDF(a4FileName);
     }
 
+    @Test
+    public void buildRussianPDF() throws Exception {
+        //todo
+    }
+
+    @Test
+    public void buildSmallPDF() throws Exception {
+       //todo
+    }
+
+
 //
 //    @Test
 //    public void addSimpleContent() {

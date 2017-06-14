@@ -7,6 +7,7 @@ import com.google.api.services.vision.v1.Vision;
 import com.google.api.services.vision.v1.VisionScopes;
 import com.google.cloud.vision.spi.v1.ImageAnnotatorClient;
 import com.google.cloud.vision.v1.*;
+import com.google.cloud.vision.v1.TextAnnotation.DetectedBreak;
 import com.google.protobuf.ByteString;
 import ocrme_backend.file_builder.pdfbuilder.PDFData;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
@@ -101,6 +102,12 @@ public class OCRProcessorImpl implements OCRProcessor {
                                 StringBuilder wordText = new StringBuilder();
                                 for (Symbol symbol : word.getSymbolsList()) {
                                     wordText.append(symbol.getText());
+                                    if (symbol.getProperty().hasDetectedBreak()) {
+                                        if (symbol.getProperty().getDetectedBreak().getType().
+                                                equals(DetectedBreak.BreakType.SPACE)) {
+                                            wordText.append(" ");
+                                        }
+                                    }
                                 }
                                 paraText.append(wordText);
                             }
@@ -191,6 +198,13 @@ public class OCRProcessorImpl implements OCRProcessor {
                                 StringBuilder wordText = new StringBuilder();
                                 for (Symbol symbol : word.getSymbolsList()) {
                                     wordText.append(symbol.getText());
+                                    if (symbol.getProperty().hasDetectedBreak()) {
+                                        if (symbol.getProperty().getDetectedBreak().getType().
+                                                equals(DetectedBreak.BreakType.SPACE)) {
+                                            wordText.append(" ");
+                                        }
+
+                                    }
                                 }
                                 paraText.append(wordText);
                             }
