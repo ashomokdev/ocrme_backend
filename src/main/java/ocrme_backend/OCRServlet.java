@@ -39,15 +39,16 @@ public class OCRServlet extends HttpServlet {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     Streams.copy(fieldValue, out, true);
                     byte[] bytes = out.toByteArray();
+
                     OCRProcessor processor = new OCRProcessorImpl();
 
                     String jsonResult;
                     String[] languages = req.getParameterValues("language");
                     if (languages == null || languages.length <= 0) //run without languages - auto language will be used
                     {
-                        jsonResult = processor.doOCR(bytes);
+                        jsonResult = processor.ocrForText(bytes);
                     } else {
-                        jsonResult = processor.doOCR(bytes, Arrays.asList(languages));
+                        jsonResult = processor.ocrForText(bytes, Arrays.asList(languages));
                     }
                     response.setContentType("text/html;charset=UTF-8");
                     response.getWriter().write(jsonResult);

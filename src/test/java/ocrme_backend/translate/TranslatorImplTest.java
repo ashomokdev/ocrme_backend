@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.security.GeneralSecurityException;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**

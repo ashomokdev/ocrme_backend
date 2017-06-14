@@ -32,10 +32,11 @@ public class TranslateServlet extends HttpServlet {
                     requestBean.getTargetLang(),
                     requestBean.getSourceText());
 
-                    response.getWriter().write(translated);
-                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().write(translated);
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
 
-            } catch (Exception e) {
+        } catch (Exception e) {
             try {
                 response.getWriter().write(e.getMessage());
             } catch (IOException e1) {

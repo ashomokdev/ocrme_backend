@@ -1,9 +1,12 @@
 package ocrme_backend.ocr;
 
-import ocrme_backend.ocr.OCRProcessorImpl;
+import ocrme_backend.file_builder.pdfbuilder.PDFData;
+import ocrme_backend.file_builder.pdfbuilder.TextUnit;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -12,8 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -31,49 +34,82 @@ public class OCRProcessorImplTest {
 
     @Test
     public void doOCR() throws Exception {
-        byte[] file = getFile();
-        String result = ocrProcessor.doOCR(file);
+        byte[] file = getFile().getFile();
+        String result = ocrProcessor.ocrForText(file);
         assertNotNull(result);
-        assertTrue(result.length()>0);
+        assertTrue(result.length() > 0);
     }
 
     @Test
     public void OCRRussian() throws Exception {
-        byte[] file = getRusFile();
+        byte[] file = getRusFile().getFile();
         ArrayList<String> languages = new ArrayList<>();
         languages.add("ru");
-        String result = ocrProcessor.doOCR(file, languages);
+        String result = ocrProcessor.ocrForText(file, languages);
         assertNotNull(result);
-        assertTrue(result.length()>0);
+        assertTrue(result.length() > 0);
         assertTrue(result.toLowerCase().contains("барышня"));
     }
 
-    private byte[] getRusFile() throws Exception{
-        URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/rus.jpg");
-        File file = new File(url.getPath());
-        Path path = Paths.get(file.getPath());
-        byte[] data = Files.readAllBytes(path);
-        if (data != null) {
-            return data;
-        } else {
-            throw new Exception("file was not obtained");
-        }
-    }
-
-    private byte[] getFile() throws Exception {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/img.jpg");
-        File file = new File(url.getPath());
-        Path path = Paths.get(file.getPath());
-        byte[] data = Files.readAllBytes(path);
-        if (data != null) {
-            return data;
-        } else {
-            throw new Exception("file was not obtained");
-        }
+    @Test
+    public void ocrForData() throws Exception {
+        ImageFile file = getFile();
+        PDFData data = ocrProcessor.ocrForData(file.getFile(), file.getHeight(), file.getWidth());
+        assertTrue(data.getText().size() > 0);
     }
 
     @Test
-    public void testAddition() {
-        assertEquals(4, 2 + 2);
+    public void ocrForRussianData() throws Exception {
+        ImageFile file = getRusFile();
+        List<String> languages = new ArrayList<>();
+        languages.add("ru");
+        PDFData data = ocrProcessor.ocrForData(file.getFile(), file.getHeight(), file.getWidth(), languages);
+        List<TextUnit> text = data.getText();
+        assertTrue(text.size() > 0);
+
+
+        boolean containsRus = false;
+        for (TextUnit unit : text) {
+            if (unit.getText().toLowerCase().contains("барышня")) {
+                containsRus = true;
+                return;
+            }
+        }
+        assertTrue(containsRus);
+    }
+
+
+    private ImageFile getRusFile() throws Exception {
+        URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/rus.jpg");
+        File file = new File(url.getPath());
+        Path path = Paths.get(file.getPath());
+        BufferedImage bimg = ImageIO.read(new File(file.getPath()));
+        int sourceWidth = bimg.getWidth();
+        int sourceHeight = bimg.getHeight();
+        byte[] data = Files.readAllBytes(path);
+        ImageFile image = null;
+        if (data != null) {
+            image = new ImageFile(data, sourceWidth, sourceHeight);
+        } else {
+            throw new Exception("file was not obtained");
+        }
+        return image;
+    }
+
+    private ImageFile getFile() throws Exception {
+        URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/img.jpg");
+        File file = new File(url.getPath());
+        Path path = Paths.get(file.getPath());
+        BufferedImage bimg = ImageIO.read(new File(file.getPath()));
+        int sourceWidth = bimg.getWidth();
+        int sourceHeight = bimg.getHeight();
+        byte[] data = Files.readAllBytes(path);
+        ImageFile image = null;
+        if (data != null) {
+            image = new ImageFile(data, sourceWidth, sourceHeight);
+        } else {
+            throw new Exception("file was not obtained");
+        }
+        return image;
     }
 }
