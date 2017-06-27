@@ -37,8 +37,6 @@ public class PDFBuilderImplTest {
     String defaultFileName = "img.jpg";
     String a4FileName = "a4.jpg";
     String columnsFileName = "columns.png";
-    String oneWordFileName = "one_word.jpg";
-
     @Before
     public void init() throws IOException, GeneralSecurityException {
         request = mock(HttpServletRequest.class);
@@ -79,14 +77,13 @@ public class PDFBuilderImplTest {
     }
 
 
-//
-//    @Test
-//    public void addSimpleContent() {
-//        String path = createTempFile("filename");
-//        doReturn(path).when(pdfBuilder).createTempFile(anyString());
-//
-//        pdfBuilder.addSimpleContent(path);
-//    }
+    @Test
+    public void addSimpleContent() {
+        String path = createTempFile("filename");
+        doReturn(path).when(pdfBuilder).createTempFile(anyString());
+
+        pdfBuilder.addSimpleContent(path);
+    }
 
     private void buildPDF(String fileName) throws Exception {
         //preparation
