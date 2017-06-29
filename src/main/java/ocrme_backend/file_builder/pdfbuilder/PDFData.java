@@ -18,7 +18,6 @@ public class PDFData extends FileData {
     public static final float maxWidthAllowed = PageSize.A4.getWidth();
 
     private float mHeight;
-
     private float mWidth;
 
     /**
@@ -27,7 +26,6 @@ public class PDFData extends FileData {
     private List<TextUnit> text;
 
     private boolean hasError;
-
     private String errorMessage;
 
     /**
@@ -49,7 +47,13 @@ public class PDFData extends FileData {
         this.text = invertSymmetrically(this.text, mHeight);
     }
 
-
+    public String getSimpleText() {
+        StringBuilder simpleText = new StringBuilder();
+        for (TextUnit unit : text) {
+            simpleText.append(unit.getText());
+        }
+        return simpleText.toString();
+    }
 
     public List<TextUnit> getText() {
         return text;

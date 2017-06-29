@@ -15,6 +15,7 @@ import ocrme_backend.file_builder.pdfbuilder.TextUnit;
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  * Created by iuliia on 5/17/17.
  */
-public class OCRProcessorImpl implements OCRProcessor {
+public class OCRProcessorImpl implements OCRProcessor{
     private final Vision vision;
     private static final String APPLICATION_NAME = "ashomokdev-ocr_me/1.0";
 

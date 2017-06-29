@@ -60,7 +60,7 @@ public class OcrRequestDaoImplTest {
 
     @Test
     public void readOCRRequest() throws Exception {
-        String inputImageUrlExpected = "";
+        String inputImageUrlExpected = "https://www.googleapis.com/download/storage/v1/b/bucket-fromtesta8d4835c-7b99-4a22-8458-f915b63bb4ac/o/2017-06-27-071400998-img.jpg?generation=1498547642256093&alt=media";
         String textResultExpected = "dummy text result";
 
         OcrRequestDao dao = new OcrRequestDaoImpl();
@@ -119,7 +119,7 @@ public class OcrRequestDaoImplTest {
     }
 
     private Long addRequestToDb() throws SQLException {
-        String inputImageUrl = "";
+        String inputImageUrl = "https://www.googleapis.com/download/storage/v1/b/bucket-fromtesta8d4835c-7b99-4a22-8458-f915b63bb4ac/o/2017-06-27-071400998-img.jpg?generation=1498547642256093&alt=media";
         String textResult = "dummy text result";
 
         OcrRequest request = new OcrRequest.Builder()

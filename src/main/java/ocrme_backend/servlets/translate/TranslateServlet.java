@@ -1,4 +1,4 @@
-package ocrme_backend;
+package ocrme_backend.servlets.translate;
 
 import com.google.gson.Gson;
 import ocrme_backend.translate.RequestBean;

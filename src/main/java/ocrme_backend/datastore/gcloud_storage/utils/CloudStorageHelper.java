@@ -17,6 +17,7 @@
 package ocrme_backend.datastore.gcloud_storage.utils;
 
 import com.google.api.gax.paging.Page;
+import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
 import com.google.cloud.storage.Acl.Role;
 import com.google.cloud.storage.Acl.User;
@@ -28,8 +29,14 @@ import org.joda.time.format.DateTimeFormatter;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,10 +57,8 @@ public class CloudStorageHelper {
             throws IOException, ServletException {
         checkFileExtension(fileStream.getName());
 
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("YYYY-MM-dd-HHmmssSSS-");
-        DateTime dt = DateTime.now(DateTimeZone.UTC);
-        String dtString = dt.toString(dtf);
-        final String fileName = dtString + fileStream.getName();
+        String timeStamp = getTimeStamp();
+        final String fileName = timeStamp + fileStream.getName();
 
         // the inputstream is closed by default, so we don't need to close it here
         BlobInfo blobInfo =
@@ -68,6 +73,47 @@ public class CloudStorageHelper {
                 fileStream.getName(), fileName});
         // return the public download link
         return blobInfo.getMediaLink();
+    }
+
+    public String uploadFile(Path uploadFrom, final String bucketName) throws IOException, ServletException {
+
+        String originalFilename = uploadFrom.getFileName().toString();
+        checkFileExtension(originalFilename);
+
+        String timeStamp = getTimeStamp();
+        final String destinationFilename = timeStamp + originalFilename;
+
+        BlobInfo blobInfo = BlobInfo
+                .newBuilder(bucketName, destinationFilename)
+                // Modify access list to allow all users with link to read file
+                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
+                .build();
+
+        if (Files.size(uploadFrom) > 1_000_000) {
+            // When content is not available or large (1MB or more) it is recommended
+            // to write it in chunks via the blob's channel writer.
+            try (WriteChannel writer = storage.writer(blobInfo)) {
+                byte[] buffer = new byte[1024];
+                try (InputStream input = Files.newInputStream(uploadFrom)) {
+                    int limit;
+                    while ((limit = input.read(buffer)) >= 0) {
+                        try {
+                            writer.write(ByteBuffer.wrap(buffer, 0, limit));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            }
+        } else {
+            byte[] bytes = Files.readAllBytes(uploadFrom);
+            // create the blob in one request.
+            storage.create(blobInfo, bytes);
+        }
+        logger.log(Level.INFO, "File {0} uploaded as {1}", new Object[]{
+               originalFilename, destinationFilename});
+        // return the public download link
+        return storage.get(blobInfo.getBlobId()).getMediaLink();
     }
 
 
@@ -127,13 +173,17 @@ public class CloudStorageHelper {
      */
     private void checkFileExtension(String fileName) throws ServletException {
         if (fileName != null && !fileName.isEmpty() && fileName.contains(".")) {
-            String[] allowedExt = {".jpg", ".JPG", ".jpeg", ".png", ".gif"};
+            String[] allowedExt = {".jpg", ".JPG", ".jpeg", ".png", ".gif", ".pdf"};
             for (String ext : allowedExt) {
                 if (fileName.endsWith(ext)) {
                     return;
                 }
             }
-            throw new ServletException("file must be an image");
+            throw new ServletException("file must be an image or .pdf");
         }
+    }
+
+    private String getTimeStamp() {
+        return new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS-").format(new Date());
     }
 }

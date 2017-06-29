@@ -8,8 +8,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -56,7 +60,6 @@ public class CloudStorageHelperTest {
     @Test
     public void deleteBucket() throws Exception {
         helper.createBucket(bucketName);
-        Thread.sleep(2000);
         helper.deleteBucket(bucketName);
 
         String capturedLog = getTestCapturedLog();
@@ -64,12 +67,36 @@ public class CloudStorageHelperTest {
         Assert.assertTrue(capturedLog.contains("deleted"));
     }
 
+    /**
+     * upload file, represented as FileItemStream
+     *
+     * @throws Exception
+     */
     @Test
-    public void uploadFile() throws Exception {
+    public void uploadFileItemStream() throws Exception {
         helper.createBucket(bucketName);
-        Thread.sleep(2000);
         FileItemStream file = FileProvider.getFile();
         String url = helper.uploadFile(file, bucketName);
+        Assert.assertTrue(url != null);
+        Assert.assertFalse(url.equals(""));
+
+        String capturedLog = getTestCapturedLog();
+        Assert.assertTrue(capturedLog.contains("created"));
+        Assert.assertTrue(capturedLog.contains("uploaded"));
+    }
+
+    /**
+     * upload file, represented as Path, which located in Temp directory
+     *
+     * @throws Exception
+     */
+    @Test
+    public void uploadFileFromTemp() throws Exception {
+        helper.createBucket(bucketName);
+
+        String url = helper.uploadFile(getFile(), bucketName);
+        Assert.assertTrue(url != null);
+        Assert.assertFalse(url.equals(""));
 
         String capturedLog = getTestCapturedLog();
         Assert.assertTrue(capturedLog.contains("created"));
@@ -79,6 +106,13 @@ public class CloudStorageHelperTest {
     public String getTestCapturedLog() throws IOException {
         customLogHandler.flush();
         return logCapturingStream.toString();
+    }
+
+    private Path getFile() throws Exception {
+        URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/img.jpg");
+        File file = new File(url.getPath());
+        Path path = Paths.get(file.getPath());
+        return path;
     }
 
 }

@@ -1,22 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" 
-         version="2.5">
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
 
   <servlet>
-    <servlet-name>OCRServlet</servlet-name>
-    <servlet-class>ocrme_backend.OCRServlet</servlet-class>
+    <servlet-name>OcrForTextServlet</servlet-name>
+    <servlet-class>ocrme_backend.servlets.ocr.OcrForTextServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>OCRServlet</servlet-name>
-    <url-pattern>/ocr_file</url-pattern>
+    <servlet-name>OcrForTextServlet</servlet-name>
+    <url-pattern>/ocr_for_text</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>OcrRequestServlet</servlet-name>
+    <servlet-class>ocrme_backend.servlets.ocr.OcrRequestServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OcrRequestServlet</servlet-name>
+    <url-pattern>/ocr_request</url-pattern>
   </servlet-mapping>
 
   <servlet>
     <servlet-name>TranslateServlet</servlet-name>
-    <servlet-class>ocrme_backend.TranslateServlet</servlet-class>
+    <servlet-class>ocrme_backend.servlets.translate.TranslateServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>TranslateServlet</servlet-name>
