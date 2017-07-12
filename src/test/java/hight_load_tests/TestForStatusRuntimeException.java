@@ -1,6 +1,5 @@
 package hight_load_tests;
 
-import ocrme_backend.ocr.OCRProcessorImplTest;
 import ocrme_backend.translate.TranslatorImplTest;
 import org.junit.Before;
 import org.junit.Test;

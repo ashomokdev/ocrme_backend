@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-         version="3.1">
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1" id="data-fabric-web-tool">
 
   <servlet>
     <servlet-name>OcrForTextServlet</servlet-name>
@@ -30,6 +31,12 @@
     <servlet-name>TranslateServlet</servlet-name>
     <url-pattern>/translate</url-pattern>
   </servlet-mapping>
+
+  <!--<listener>-->
+    <!--<listener-class>-->
+      <!--ocrme_backend.servlets.AppContextListener-->
+    <!--</listener-class>-->
+  <!--</listener>-->
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>

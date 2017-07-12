@@ -75,7 +75,7 @@ public class CloudStorageHelperTest {
     @Test
     public void uploadFileItemStream() throws Exception {
         helper.createBucket(bucketName);
-        FileItemStream file = FileProvider.getFile();
+        FileItemStream file = FileProvider.getItemStreamFile();
         String url = helper.uploadFile(file, bucketName);
         Assert.assertTrue(url != null);
         Assert.assertFalse(url.equals(""));
@@ -94,7 +94,7 @@ public class CloudStorageHelperTest {
     public void uploadFileFromTemp() throws Exception {
         helper.createBucket(bucketName);
 
-        String url = helper.uploadFile(getFile(), bucketName);
+        String url = helper.uploadFile(FileProvider.getPathFile(), bucketName);
         Assert.assertTrue(url != null);
         Assert.assertFalse(url.equals(""));
 
@@ -106,13 +106,6 @@ public class CloudStorageHelperTest {
     public String getTestCapturedLog() throws IOException {
         customLogHandler.flush();
         return logCapturingStream.toString();
-    }
-
-    private Path getFile() throws Exception {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/img.jpg");
-        File file = new File(url.getPath());
-        Path path = Paths.get(file.getPath());
-        return path;
     }
 
 }

@@ -30,6 +30,12 @@
     <dependencies>
         <!-- Compile/runtime dependencies -->
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.18</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-api-1.0-sdk</artifactId>
             <version>${appengine.version}</version>
@@ -39,11 +45,6 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.atmosphere</groupId>-->
-            <!--<artifactId>atmosphere-compat-weblogic</artifactId>-->
-            <!--<version>0.8.7</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>jstl</groupId>
             <artifactId>jstl</artifactId>
@@ -59,12 +60,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-vision</artifactId>
-            <version>0.17.2-beta</version>
+            <version>22.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.apis</groupId>
@@ -76,6 +72,12 @@
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
             <version>1.22.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava-jdk5</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

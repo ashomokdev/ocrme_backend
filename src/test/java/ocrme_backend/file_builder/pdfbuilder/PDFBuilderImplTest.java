@@ -1,18 +1,10 @@
 package ocrme_backend.file_builder.pdfbuilder;
 
-import com.google.api.gax.grpc.ApiException;
-import com.google.cloud.vision.spi.v1.ImageAnnotatorClient;
-import com.google.cloud.vision.v1.*;
-import com.google.protobuf.ByteString;
 import ocrme_backend.ocr.OCRProcessor;
-import ocrme_backend.ocr.OCRProcessorImpl;
-import org.junit.Assume;
+
+import ocrme_backend.ocr.OcrProcessorImpl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
@@ -25,8 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -48,27 +38,6 @@ public class PDFBuilderImplTest {
         request = mock(HttpServletRequest.class);
         pdfBuilder = spy(new PDFBuilderImpl(request));
     }
-
-    /**
-     * skip ApiException which occurs because of limits
-     https://cloud.google.com/vision/docs/limits
-     Requests per second	10
-     */
-    @Rule
-    public TestRule skipRule = new TestRule() {
-        public Statement apply(final Statement base, Description desc) {
-
-            return new Statement() {
-                public void evaluate() throws Throwable {
-                    try {
-                        base.evaluate();
-                    } catch (ApiException ex) {
-                        Assume.assumeTrue(true);
-                    }
-                }
-            };
-        }
-    };
 
     @Test
     public void testCreateTempFile() throws Exception {
@@ -141,12 +110,8 @@ public class PDFBuilderImplTest {
         Path path = Paths.get(filePath);
         byte[] data = Files.readAllBytes(path);
 
-        BufferedImage bimg = ImageIO.read(new File(filePath));
-        int sourceWidth = bimg.getWidth();
-        int sourceHeight = bimg.getHeight();
-
-        OCRProcessor processor = new OCRProcessorImpl();
-        return processor.ocrForData(data, sourceHeight, sourceWidth );
+        OCRProcessor processor = new OcrProcessorImpl();
+        return processor.ocrForData(data);
     }
 
     private String createTempFile(String fileName) {

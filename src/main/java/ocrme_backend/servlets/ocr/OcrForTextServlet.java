@@ -1,22 +1,20 @@
 package ocrme_backend.servlets.ocr;
 
+import ocrme_backend.ocr.OCRProcessor;
+import ocrme_backend.ocr.OcrProcessorImpl;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 
-import javax.annotation.Nullable;
-import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.Arrays;
 
 /**
  * Created by iuliia on 5/17/17.
@@ -24,62 +22,55 @@ import java.util.concurrent.Future;
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/items/IMG_8204.JPG" https://imagetotext-149919.appspot.com/ocr_file
  */
 public class OcrForTextServlet extends HttpServlet {
+
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
-
         try {
             byte[] file = extractFile(req);
             String[] languages = req.getParameterValues("language");
 
-            //todo it is better to create a global
-            // instance of ExecutorService and use it in all servlets.
-            // https://stackoverflow.com/questions/11050186/tomcat-6-thread-pool-for-asynchronous-processing/11053152#11053152
-            ExecutorService executor = Executors.newFixedThreadPool(2);
+            OCRProcessor processor = new OcrProcessorImpl();
+            String jsonResult;
 
-            Future<String> result = executor.submit(new OcrCallableTask(file, languages));
-            // shutdown allows the executor to clean up its threads.
-            // Also prevents more Callables/Runnables from being submitted.
-
-            executor.shutdown();
-
-            // The call to .get() will block until the executor has
-            // completed executing the Callable.
-            response.getWriter().write(result.get());
-            response.setStatus(HttpServletResponse.SC_ACCEPTED);
+            if (languages == null || languages.length <= 0) { //run without languages - auto language will be used
+                jsonResult = processor.ocrForText(file);
+            } else {
+                jsonResult = processor.ocrForText(file, Arrays.asList(languages));
+            }
             response.setContentType("text/html;charset=UTF-8");
-
+            response.getWriter().write(jsonResult);
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
         } catch (Exception e) {
             try {
                 e.printStackTrace();
                 response.getWriter().write(e.getMessage());
-            } catch (IOException ioexception) {
-                ioexception.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 
-//    @Override
+    /**
+     * may be useful for better performance. Uncomment in web.xml listener tag.
+     * test performance in stress tests before use this class.
+     */
+    // https://stackoverflow.com/questions/11050186/tomcat-6-thread-pool-for-asynchronous-processing/11053152#11053152
+//        @Override
 //    public void doPost(HttpServletRequest req, HttpServletResponse response) {
 //
 //        try {
 //            byte[] file = extractFile(req);
 //            String[] languages = req.getParameterValues("language");
 //
-//            //todo it is better to create a global
-//            // instance of ExecutorService and use it in all servlets.
-//            // https://stackoverflow.com/questions/11050186/tomcat-6-thread-pool-for-asynchronous-processing/11053152#11053152
-//            ExecutorService executor = Executors.newFixedThreadPool(2);
 //
-//            Future<String> result = executor.submit(new OcrCallableTask(file, languages));
-//            // shutdown allows the executor to clean up its threads.
-//            // Also prevents more Callables/Runnables from being submitted.
+//          OcrCallableTask task = new OcrCallableTask(file, languages);
+//            final ServletContext servletContext = req.getServletContext();
+//            final ExecutorService threadPool = (ExecutorService) servletContext.getAttribute("threadPoolAlias");
+//            final Future<String> result = threadPool.submit(task);
 //
-//            executor.shutdown();
-//
-//            // The call to .get() will block until the executor has
-//            // completed executing the Callable.
 //            response.getWriter().write(result.get());
+//
 //            response.setStatus(HttpServletResponse.SC_ACCEPTED);
 //            response.setContentType("text/html;charset=UTF-8");
 //

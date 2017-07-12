@@ -1,4 +1,4 @@
-package ocrme_backend.ocr;
+package ocrme_backend.datastore.utils;
 
 /**
  * Created by iuliia on 6/12/17.

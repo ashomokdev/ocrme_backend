@@ -31,22 +31,18 @@ public interface OCRProcessor {
      * perform OCR for retrieving text data for generation pdf file or another formatted file.
      * With auto language detection.
      * @param image
-     * @param sourceHeight height of source image. Needed for building file
-     * @param sourceWidth width of source image. Needed for building file
      * @return data about text for generation pdf
      * @throws IOException
      */
-    PDFData ocrForData(byte[] image, int sourceHeight, int sourceWidth) throws IOException;
+    PDFData ocrForData(byte[] image) throws IOException;
 
     /**
      * perform OCR for retrieving text data for generation pdf file or another formatted file.
      * With auto language detection.
      * @param image
-     * @param sourceHeight height of source image. Needed for building file
-     * @param sourceWidth width of source image. Needed for building file
      * @param languages list of languages
      * @return data about text for generation pdf
      * @throws IOException
      */
-    PDFData ocrForData(byte[] image, int sourceHeight, int sourceWidth, @Nullable List<String> languages) throws IOException;
+    PDFData ocrForData(byte[] image, @Nullable List<String> languages) throws IOException;
 }

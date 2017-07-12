@@ -1,6 +1,5 @@
 package ocrme_backend.translate;
 
-import com.google.api.gax.grpc.ApiException;
 import com.google.cloud.translate.TranslateException;
 import org.junit.Assume;
 import org.junit.Before;

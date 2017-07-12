@@ -15,6 +15,7 @@ import java.io.IOException;
  * Created by iuliia on 5/22/17.
  * Run next to test in terminal
  * curl -H "Content-Type: application/json" -X POST -d '{"sourceLang":"de","targetLang":"es", "sourceText":"Mit Macht kommt große Verantwortung."}' https://imagetotext-149919.appspot.com/translate
+ * curl -H "Content-Type: application/json" -X POST -d '{"sourceLang":"de","targetLang":"es", "sourceText":"Mit Macht kommt große Verantwortung."}' http://localhost:8080/translate
  */
 public class TranslateServlet extends HttpServlet {
 
