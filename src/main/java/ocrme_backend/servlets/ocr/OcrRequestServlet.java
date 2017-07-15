@@ -1,9 +1,14 @@
 package ocrme_backend.servlets.ocr;
 
+import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
+import ocrme_backend.file_builder.pdfbuilder.PDFBuilder;
+import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
 import ocrme_backend.file_builder.pdfbuilder.PDFData;
 import ocrme_backend.ocr.OCRProcessor;
+import ocrme_backend.ocr.OcrProcessorImpl;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 
@@ -12,99 +17,64 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 
 /**
- * Created by iuliia on 6/27/17.
+ * Created by iuliia on 5/17/17.
+ * run for test
+ * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/items/obaby/IMG_8771.JPG" https://imagetotext-149919.appspot.com/ocr_request
+ * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/items/obaby/IMG_8771.JPG" http://localhost:8080/ocr_request
  */
 public class OcrRequestServlet extends HttpServlet {
 
-//    @Override
-//    public void doPost(HttpServletRequest req, HttpServletResponse response) {
-//
-//        ServletFileUpload upload = new ServletFileUpload();
-//
-//        try {
-//            FileItemIterator it = upload.getItemIterator(req);
-//
-//            while (it.hasNext()) {
-//                FileItemStream item = it.next();
-//                String fieldName = item.getFieldName();
-//                InputStream fieldValue = item.openStream();
-//
-//                if ("file".equals(fieldName)) {
-//                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-//                    Streams.copy(fieldValue, out, true);
-//                    byte[] bytes = out.toByteArray();
-//                    String[] languages = req.getParameterValues("language");
-//
-//                    OcrResponse ocrResponse = doTask(bytes, languages);
-//
-//                    response.setContentType("application/json");
-//                    response.setCharacterEncoding("UTF-8");
-//                    response.getWriter().print(ocrResponse);
-//                    response.getWriter().flush();
-//                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
-//                }
-//            }
-//        } catch (Exception e) {
-//            try {
-//                e.printStackTrace();
-//                response.getWriter().write(e.getMessage());
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//        }
-//    }
-//
-//    private OcrResponse doTask(byte[] image, String[] languages) throws IOException, GeneralSecurityException {
-//        OCRProcessor processor = new OCRProcessorImpl();
-//        PDFData data;
-//        OcrResponse response = new OcrResponse();
-////
-////        BufferedImage bimg = ImageIO.read(new File(filePath));
-////        int sourceWidth = bimg.getWidth();
-////        int sourceHeight = bimg.getHeight();
-////
-////        if (languages == null || languages.length <= 0) //run without languages - auto language will be used
-////        {
-////            data = processor.ocrForData(bytes);
-////        } else {
-////            data = processor.ocrForData(bytes, Arrays.asList(languages));
-////        }
-//        return response;
-//    }
-//
-//    @Override
-//    protected boolean doRequest(final RequestResponseKey rrk) throws IOException, ServletException {
-//        HttpServletRequest req = rrk.getRequest();
-//        HttpServletResponse res = rrk.getResponse();
-//
-////        TimerManagerFactory.getTimerManagerFactory()
-////                .getDefaultTimerManager().schedule
-////                (new TimerListener() {
-////                    public void timerExpired(Timer timer) {
-////                        try {
-////                            AbstractAsyncServlet.notify(rrk, null);
-////                        } catch (Exception e) {
-////                            e.printStackTrace();
-////                        }
-////                    }
-////                }, 2000);
-//        return true;
-//
-//    }
-//
-//    @Override
-//    protected void doResponse(RequestResponseKey requestResponseKey, Object o) throws IOException, ServletException {
-//
-//    }
-//
-//    @Override
-//    protected void doTimeout(RequestResponseKey requestResponseKey) throws IOException, ServletException {
-//
-//    }
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse response) {
+
+        try {
+            OcrResponse ocrResponse = doTask(req);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().print(ocrResponse);
+            response.getWriter().flush();
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
+
+        } catch (Exception e) {
+            try {
+                e.printStackTrace();
+                response.getWriter().write(e.getMessage());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    private OcrResponse doTask(HttpServletRequest req) throws IOException, GeneralSecurityException, FileUploadException, ServletException {
+        FileItemStream file = extractFile(req);
+        String[] languages = req.getParameterValues("language");
+
+        OcrRequestManager manager = new OcrRequestManager(file, languages, req.getSession());
+        OcrResponse response = manager.processForResult();
+        return response;
+    }
+
+
+
+    private FileItemStream extractFile(HttpServletRequest req) throws IOException, FileUploadException {
+        ServletFileUpload upload = new ServletFileUpload();
+
+        FileItemIterator it = upload.getItemIterator(req);
+
+        FileItemStream item = null;
+        while (it.hasNext()) {
+            item = it.next();
+        }
+        return item;
+    }
 }

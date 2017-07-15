@@ -1,6 +1,7 @@
 package ocrme_backend.datastore.gcloud_datastore.objects;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -10,6 +11,7 @@ public class OcrRequest {
 
     // [START ocrRequest]
     private String inputImageUrl;
+    private String[] languages;
     private String textResult;
     private String pdfResultUrl;
     private Long id;
@@ -20,6 +22,7 @@ public class OcrRequest {
 
     // [START keys]
     public static final String INPUT_IMAGE_URL = "inputImageUrl";
+    public static final String LANGUAGES = "languages";
     public static final String TEXT_RESULT = "textResult";
     public static final String PDF_RESULT_URL = "pdfResultUrl";
     public static final String ID = "id";
@@ -31,6 +34,7 @@ public class OcrRequest {
     // We use a Builder pattern here to simplify and standardize construction of Book objects.
     private OcrRequest(Builder builder) {
         this.inputImageUrl = builder.inputImageUrl;
+        this.languages = languages;
         this.textResult = builder.textResult;
         this.pdfResultUrl = builder.pdfResultUrl;
         this.id = builder.id;
@@ -45,6 +49,10 @@ public class OcrRequest {
 
     public String getInputImageUrl() {
         return inputImageUrl;
+    }
+
+    public String[] getLanguages() {
+        return languages;
     }
 
     public String getTextResult() {
@@ -73,6 +81,7 @@ public class OcrRequest {
 
     public static class Builder {
         private String inputImageUrl;
+        private String[] languages;
         private String textResult;
         private String pdfResultUrl;
         private Long id;
@@ -82,6 +91,11 @@ public class OcrRequest {
 
         public Builder inputImageUrl(String inputImageUrl) {
             this.inputImageUrl = inputImageUrl;
+            return this;
+        }
+
+        public Builder languages(String[] languages) {
+            this.languages = languages;
             return this;
         }
 
@@ -124,11 +138,12 @@ public class OcrRequest {
     public String toString() {
         return
                 "input image url: " + inputImageUrl +
-                        "\ntext result: " + textResult +
-                        "\npdf result url: " + pdfResultUrl +
-                        "\nid: " + id +
-                        "\ncreated by: " + createdBy +
-                        "\ncreated by id: " + createdById +
-                        "\ntime stamp: " + timeStamp;
+                "languages: " +  Arrays.toString(languages) +
+                "\ntext result: " + textResult +
+                "\npdf result url: " + pdfResultUrl +
+                "\nid: " + id +
+                "\ncreated by: " + createdBy +
+                "\ncreated by id: " + createdById +
+                "\ntime stamp: " + timeStamp;
     }
 }

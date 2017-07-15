@@ -13,16 +13,14 @@ import java.util.concurrent.ThreadFactory;
  * Created by iuliia on 7/2/17.
  */
 
-/**
- * may be useful for better performance. Uncomment in web.xml listener tag.
- * test performance in stress tests before use this class.
- */
 public class AppContextListener implements ServletContextListener {
+    private static final int THREAD_NUMB = 5;
+
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
         ThreadFactory factory = ThreadManager.currentRequestThreadFactory();
-        ExecutorService executor = Executors.newSingleThreadExecutor(factory);
+        ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMB, factory);
         final ServletContext servletContext = servletContextEvent.getServletContext();
         servletContext.setAttribute("threadPoolAlias", executor);
     }

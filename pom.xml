@@ -20,7 +20,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <archiveClasses>true</archiveClasses>
-        <ocrme.bucket>BUCKET-NAME-HERE</ocrme.bucket>
+        <ocrme.bucket.pdf>ocr_me_pdf_results_bucket</ocrme.bucket.pdf>
+        <ocrme.bucket.request_images>ocr_me_request_images_bucket</ocrme.bucket.request_images>
     </properties>
 
     <prerequisites>

@@ -6,7 +6,7 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
@@ -20,11 +20,11 @@ import java.util.List;
 
 public class PDFBuilderImpl implements PDFBuilder {
 
-    private final HttpServletRequest request;
+    private final HttpSession session;
     public static final String uploadsDir = "/temp/";
 
-    public PDFBuilderImpl(HttpServletRequest request) {
-        this.request = request;
+    public PDFBuilderImpl(HttpSession session) {
+        this.session = session;
     }
 
     @Nullable
@@ -57,11 +57,10 @@ public class PDFBuilderImpl implements PDFBuilder {
     public void addSimpleContent(String path) {
         Document document = new Document(); //specified size  Document doc = new Document(new Rectangle(570, 924f)); http://developers.itextpdf.com/question/how-add-text-inside-rectangle
         try {
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(path));
+            PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
 
-            Paragraph p
-                    = new Paragraph("Simple string", new Font(Font.FontFamily.HELVETICA, 22));
+            Paragraph p = new Paragraph("Simple string", new Font(Font.FontFamily.HELVETICA, 22));
             p.setAlignment(Element.ALIGN_CENTER);
             document.add(p);
 
@@ -85,7 +84,7 @@ public class PDFBuilderImpl implements PDFBuilder {
             float urx = text.getUrx();
             float ury = text.getUry();
 
-            float fontSize = getMaxFontSize(bf, text.getText(), urx-llx);
+            float fontSize = getMaxFontSize(bf, text.getText(), urx - llx);
             contentByte.setFontAndSize(bf, fontSize);
 
             contentByte.setTextMatrix(llx, lly);
@@ -119,6 +118,7 @@ public class PDFBuilderImpl implements PDFBuilder {
 //
 //    }
 
+    //todo can it be calculated more accurate?
     private float getMaxFontSize(BaseFont bf, String text, float width) {
         int textWidth = bf.getWidth(text);
         return (1000 * width) / textWidth;
@@ -136,23 +136,28 @@ public class PDFBuilderImpl implements PDFBuilder {
      * @return filename
      */
     private String generateFileName() {
-        String sessionId = request.getSession().getId();
+        String sessionId = session.getId();
         return sessionId + ".pdf";
     }
 
+    /**
+     * create file in temp directory
+     *
+     * @param filename
+     * @return file path
+     */
     @Nullable
     public String createTempFile(String filename) {
         try {
-            String realPathtoUploads = request.getSession().getServletContext().getRealPath(uploadsDir);
+            String realPathtoUploads = session.getServletContext().getRealPath(uploadsDir);
             if (!new File(realPathtoUploads).exists()) {
                 new File(realPathtoUploads).mkdir();
             }
-            String filePath = realPathtoUploads + filename;
 
-            File file = new File(filePath);
+            File file = new File(realPathtoUploads, filename);
             file.createNewFile(); // if file already exists will do nothing
-            FileOutputStream oFile = new FileOutputStream(file, false);
-            return filePath;
+            new FileOutputStream(file, false);
+            return file.getPath();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

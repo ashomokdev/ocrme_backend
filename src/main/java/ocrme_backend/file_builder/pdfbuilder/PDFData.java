@@ -47,6 +47,14 @@ public class PDFData extends FileData {
         this.text = invertSymmetrically(this.text, mHeight);
     }
 
+    /**
+     * @param errorMesage
+     */
+    public PDFData(String errorMesage) {
+        this.hasError = true;
+        this.errorMessage = errorMesage;
+    }
+
     public String getSimpleText() {
         StringBuilder simpleText = new StringBuilder();
         for (TextUnit unit : text) {

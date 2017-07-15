@@ -18,6 +18,7 @@ import java.util.Arrays;
 
 /**
  * Created by iuliia on 5/17/17.
+ * for test purposes only
  * run for test
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/items/IMG_8204.JPG" https://imagetotext-149919.appspot.com/ocr_file
  */

@@ -1,11 +1,10 @@
 package ocrme_backend.servlets.ocr;
 
 import ocrme_backend.datastore.utils.FileProvider;
+import ocrme_backend.file_builder.pdfbuilder.PDFData;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -17,9 +16,10 @@ public class OcrCallableTaskTest {
     @Test
     public void testCall() throws Exception {
         ExecutorService service = Executors.newFixedThreadPool(2);
-        Future<String> result = service.submit(new OcrCallableTask(FileProvider.getImageFile().getFile(), null));
+        Future<PDFData> result = service.submit(
+                new OcrCallableTask(FileProvider.getItemStreamFile(), null));
         Assert.assertTrue(result.get() != null);
-        Assert.assertTrue(result.get().length() > 0);
+        Assert.assertTrue(result.get().getText().size() > 0);
         service.shutdown();
     }
 }

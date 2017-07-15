@@ -22,10 +22,6 @@ import com.google.cloud.storage.*;
 import com.google.cloud.storage.Acl.Role;
 import com.google.cloud.storage.Acl.User;
 import org.apache.commons.fileupload.FileItemStream;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -75,7 +71,15 @@ public class CloudStorageHelper {
         return blobInfo.getMediaLink();
     }
 
-    public String uploadFile(Path uploadFrom, final String bucketName) throws IOException, ServletException {
+    /**Upload file from path
+     * @param uploadFrom path
+     * @param bucketName
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public String uploadFile(Path uploadFrom, final String bucketName)
+            throws IOException, ServletException {
 
         String originalFilename = uploadFrom.getFileName().toString();
         checkFileExtension(originalFilename);
@@ -117,14 +121,27 @@ public class CloudStorageHelper {
     }
 
 
+    /**
+     * create bucket if not exists
+     * @param bucketName
+     */
     public void createBucket(String bucketName) {
         // Instantiates a client
         Storage storage = StorageOptions.getDefaultInstance().getService();
 
-        // Creates the new bucket
-        Bucket bucket = storage.create(BucketInfo.of(bucketName));
+        Bucket bucket = storage.get(bucketName, Storage.BucketGetOption.fields());
 
-        logger.log(Level.INFO, "Bucket %s created.%n", bucket.getName());
+        //if exists
+        if (bucket != null) {
+            logger.log(Level.INFO,
+                    "Bucket " + bucketName +" was not created, because it already exists.");
+        }
+        else {
+            // Creates the new bucket
+            storage.create(BucketInfo.of(bucketName));
+            logger.log(Level.INFO, "Bucket " + bucketName +" created");
+        }
+
     }
 
     /**
@@ -149,23 +166,6 @@ public class CloudStorageHelper {
 
             logger.log(Level.INFO, "Bucket %s deleted.%n", bucketName);
         }
-    }
-
-
-    /**
-     * Example of listing buckets, specifying the page size and a name prefix.
-     */
-    // [TARGET list(BucketListOption...)]
-    // [VARIABLE "bucket_"]
-    public Page<Bucket> listBucketsWithSizeAndPrefix(String prefix) {
-        // [START listBucketsWithSizeAndPrefix]
-        Page<Bucket> buckets = storage.list(Storage.BucketListOption.pageSize(100),
-                Storage.BucketListOption.prefix(prefix));
-        for (Bucket bucket : buckets.iterateAll()) {
-            // do something with the bucket
-        }
-        // [END listBucketsWithSizeAndPrefix]
-        return buckets;
     }
 
     /**

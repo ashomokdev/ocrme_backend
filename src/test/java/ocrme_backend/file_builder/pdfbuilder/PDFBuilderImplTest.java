@@ -29,14 +29,14 @@ import static org.mockito.Mockito.*;
 public class PDFBuilderImplTest {
 
     private PDFBuilderImpl pdfBuilder;
-    private HttpServletRequest request;
+    private HttpSession session;
     String defaultFileName = "img.jpg";
     String a4FileName = "a4.jpg";
     String columnsFileName = "columns.png";
     @Before
     public void init() throws IOException, GeneralSecurityException {
-        request = mock(HttpServletRequest.class);
-        pdfBuilder = spy(new PDFBuilderImpl(request));
+        session = mock(HttpSession.class);
+        pdfBuilder = spy(new PDFBuilderImpl(session));
     }
 
     @Test
@@ -83,10 +83,7 @@ public class PDFBuilderImplTest {
 
     private void buildPDF(String fileName) throws Exception {
         //preparation
-        HttpSession mockHttpSession = mock(HttpSession.class);
-        when(request.getSession()).
-                thenReturn(mockHttpSession);
-        when(mockHttpSession.getId()).thenReturn("0");
+        when(session.getId()).thenReturn("0");
 
         String path = createTempFile(fileName);
         doReturn(path).when(pdfBuilder).createTempFile(anyString());
@@ -121,12 +118,7 @@ public class PDFBuilderImplTest {
         when(mockServletContext.getRealPath(PDFBuilderImpl.uploadsDir)).
                 thenReturn(path);
 
-        HttpSession mockHttpSession = mock(HttpSession.class);
-        when(mockHttpSession.getServletContext()).thenReturn(mockServletContext);
-
-        when(request.getSession()).
-                thenReturn(mockHttpSession);
-
+        when(session.getServletContext()).thenReturn(mockServletContext);
         return pdfBuilder.createTempFile(fileName +".pdf");
     }
 

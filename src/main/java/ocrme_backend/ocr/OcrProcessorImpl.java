@@ -77,12 +77,7 @@ public class OcrProcessorImpl implements OCRProcessor {
             result = new PDFData(imageDimensions.height, imageDimensions.width, data);
         } catch (Exception e) {
             e.printStackTrace();
-            data = new ArrayList<>();
-            int defaultHeight = 100;
-            int defaultWidth = 100;
-            result = new PDFData(defaultHeight, defaultWidth, data);
-            result.setHasError(true);
-            result.setErrorMessage(e.getMessage());
+            result = new PDFData(e.getMessage());
         }
         return result;
     }

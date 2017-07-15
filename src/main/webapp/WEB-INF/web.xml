@@ -32,13 +32,27 @@
     <url-pattern>/translate</url-pattern>
   </servlet-mapping>
 
-  <!--<listener>-->
-    <!--<listener-class>-->
-      <!--ocrme_backend.servlets.AppContextListener-->
-    <!--</listener-class>-->
-  <!--</listener>-->
+  <listener>
+    <listener-class>
+      ocrme_backend.servlets.AppContextListener
+    </listener-class>
+  </listener>
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
+
+  <context-param>
+    <param-name>ocrme.bucket.pdf</param-name>
+    <param-value>${ocrme.bucket.pdf}</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>ocrme.bucket.request_images</param-name>
+    <param-value>${ocrme.bucket.request_images}</param-value>
+  </context-param>
+
+
+
+
 </web-app>
