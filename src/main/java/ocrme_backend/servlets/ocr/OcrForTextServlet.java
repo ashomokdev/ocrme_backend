@@ -52,41 +52,6 @@ public class OcrForTextServlet extends HttpServlet {
         }
     }
 
-    /**
-     * may be useful for better performance. Uncomment in web.xml listener tag.
-     * test performance in stress tests before use this class.
-     */
-    // https://stackoverflow.com/questions/11050186/tomcat-6-thread-pool-for-asynchronous-processing/11053152#11053152
-//        @Override
-//    public void doPost(HttpServletRequest req, HttpServletResponse response) {
-//
-//        try {
-//            byte[] file = extractFile(req);
-//            String[] languages = req.getParameterValues("language");
-//
-//
-//          OcrCallableTask task = new OcrCallableTask(file, languages);
-//            final ServletContext servletContext = req.getServletContext();
-//            final ExecutorService threadPool = (ExecutorService) servletContext.getAttribute("threadPoolAlias");
-//            final Future<String> result = threadPool.submit(task);
-//
-//            response.getWriter().write(result.get());
-//
-//            response.setStatus(HttpServletResponse.SC_ACCEPTED);
-//            response.setContentType("text/html;charset=UTF-8");
-//
-//        } catch (Exception e) {
-//            try {
-//                e.printStackTrace();
-//                response.getWriter().write(e.getMessage());
-//            } catch (IOException ioexception) {
-//                ioexception.printStackTrace();
-//            }
-//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//        }
-//    }
-
-
     private byte[] extractFile(HttpServletRequest req) throws IOException, FileUploadException {
         byte[] bytes = null;
         ServletFileUpload upload = new ServletFileUpload();

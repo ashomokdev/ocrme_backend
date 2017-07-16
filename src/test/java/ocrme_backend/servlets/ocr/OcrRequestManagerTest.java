@@ -2,6 +2,7 @@ package ocrme_backend.servlets.ocr;
 
 import ocrme_backend.datastore.utils.FileProvider;
 import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
+import org.apache.commons.fileupload.FileItemIterator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,11 @@ public class OcrRequestManagerTest {
         when(mockServletContext.getAttribute("threadPoolAlias")).thenReturn(service);
 
         String[] languages = new String[]{"en"};
-        manager = new OcrRequestManager(FileProvider.getItemStreamFile(), languages, session);
+        FileItemIterator mockFileItemIterator = mock(FileItemIterator.class);
+        when(mockFileItemIterator.next()).thenReturn(FileProvider.getItemStreamFile());
+        when(mockFileItemIterator.hasNext()).thenReturn(true).thenReturn(false);
+
+        manager = new OcrRequestManager(mockFileItemIterator, languages, session);
     }
 
     @Test

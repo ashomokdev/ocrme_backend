@@ -3,6 +3,7 @@ package ocrme_backend.servlets.ocr;
 import ocrme_backend.datastore.utils.FileProvider;
 import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
 import ocrme_backend.file_builder.pdfbuilder.PDFData;
+import org.apache.commons.fileupload.FileItemIterator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,9 +24,13 @@ public class PdfBuilderCallableTaskTest {
     public void testCall() throws Exception {
         //prepare
         ExecutorService service = Executors.newFixedThreadPool(2);
+        FileItemIterator mockFileItemIterator = mock(FileItemIterator.class);
+        when(mockFileItemIterator.next()).thenReturn(FileProvider.getItemStreamFile());
+        when(mockFileItemIterator.hasNext()).thenReturn(true).thenReturn(false);
+
 
         Future<PDFData> pdfDataFuture = service.submit(
-                new OcrCallableTask(FileProvider.getItemStreamFile(), null));
+                new OcrCallableTask(mockFileItemIterator, null));
         PDFData data = pdfDataFuture.get();
         HttpSession session = mock(HttpSession.class);
         String path = Thread.currentThread().getContextClassLoader().getResource("temp/").getPath();
