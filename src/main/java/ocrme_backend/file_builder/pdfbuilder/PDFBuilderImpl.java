@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import javax.annotation.Nullable;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class PDFBuilderImpl implements PDFBuilder {
 
+    public static final String FONT_PATH = "/WEB-INF/fonts/FreeSans.ttf";
     private final HttpSession session;
     public static final String uploadsDir = "/temp/";
 
@@ -76,7 +78,13 @@ public class PDFBuilderImpl implements PDFBuilder {
         contentByte.beginText();
 
         contentByte.setRGBColorFill(0x00, 0x00, 0x00);
-        BaseFont bf = BaseFont.createFont();
+
+
+        ServletContext context = session.getServletContext();
+        String fontPath = context.getRealPath(FONT_PATH);
+
+        assert fontPath != null;
+        Font bf = FontFactory.getFont(fontPath, BaseFont.IDENTITY_H, true);
 
         for (TextUnit text : textUnits) {
             float llx = text.getLlx();
@@ -85,7 +93,7 @@ public class PDFBuilderImpl implements PDFBuilder {
             float ury = text.getUry();
 
             float fontSize = getMaxFontSize(bf, text.getText(), urx - llx);
-            contentByte.setFontAndSize(bf, fontSize);
+            contentByte.setFontAndSize(bf.getCalculatedBaseFont(true), fontSize);
 
             contentByte.setTextMatrix(llx, lly);
             contentByte.showText(text.getText());
@@ -93,7 +101,6 @@ public class PDFBuilderImpl implements PDFBuilder {
         contentByte.endText();
         contentByte.restoreState();
     }
-
 
 //    private void addContent(PdfWriter writer, List<TextUnit> textUnits) throws Exception {
 //        PdfContentByte contentByte = writer.getDirectContent();
@@ -119,8 +126,8 @@ public class PDFBuilderImpl implements PDFBuilder {
 //    }
 
     //todo can it be calculated more accurate?
-    private float getMaxFontSize(BaseFont bf, String text, float width) {
-        int textWidth = bf.getWidth(text);
+    private float getMaxFontSize(Font bf, String text, float width) {
+        int textWidth = bf.getCalculatedBaseFont(true).getWidth(text);
         return (1000 * width) / textWidth;
     }
 
