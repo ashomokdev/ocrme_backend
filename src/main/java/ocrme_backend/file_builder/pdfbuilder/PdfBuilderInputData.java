@@ -12,7 +12,7 @@ import java.util.List;
  * Text and size we need to build PDF file from ocr result
  * A4 or smaller PDF allowed
  */
-public class PDFData extends FileData {
+public class PdfBuilderInputData {
 
     public static final float maxHeightAllowed = PageSize.A4.getHeight();
     public static final float maxWidthAllowed = PageSize.A4.getWidth();
@@ -33,7 +33,7 @@ public class PDFData extends FileData {
      * @param sourceWidth  source/ocr file width
      * @param text         ocr result
      */
-    public PDFData(int sourceHeight, int sourceWidth, List<TextUnit> text) {
+    public PdfBuilderInputData(int sourceHeight, int sourceWidth, List<TextUnit> text) {
         if (sourceHeight > maxHeightAllowed || sourceWidth > maxWidthAllowed) {
             mHeight = maxHeightAllowed;
             mWidth = maxWidthAllowed;
@@ -50,7 +50,7 @@ public class PDFData extends FileData {
     /**
      * @param errorMesage
      */
-    public PDFData(String errorMesage) {
+    public PdfBuilderInputData(String errorMesage) {
         this.hasError = true;
         this.errorMessage = errorMesage;
     }

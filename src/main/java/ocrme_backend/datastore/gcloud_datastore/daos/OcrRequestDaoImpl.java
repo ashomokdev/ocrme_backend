@@ -46,6 +46,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
         entity.setProperty(OcrRequest.CREATED_BY_ID,  request.getCreatedById());
         entity.setProperty(OcrRequest.TIME_STAMP,  request.getTimeStamp());
+        entity.setProperty(OcrRequest.STATUS, request.getStatus());
 
         Key ocrRequestKey = datastore.put(entity); // Save the Entity
 
@@ -73,6 +74,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
         entity.setProperty(OcrRequest.CREATED_BY_ID,  request.getCreatedById());
         entity.setProperty(OcrRequest.TIME_STAMP,  request.getTimeStamp());
+        entity.setProperty(OcrRequest.STATUS, request.getStatus());
 
         datastore.put(entity);                   // Update the Entity
         logger.log(Level.INFO, "ocrRequest \n{0} \nupdated", request);

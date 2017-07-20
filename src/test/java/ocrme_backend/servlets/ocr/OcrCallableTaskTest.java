@@ -1,7 +1,7 @@
 package ocrme_backend.servlets.ocr;
 
 import ocrme_backend.datastore.utils.FileProvider;
-import ocrme_backend.file_builder.pdfbuilder.PDFData;
+import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class OcrCallableTaskTest {
         when(mockFileItemIterator.hasNext()).thenReturn(true).thenReturn(false);
 
         ExecutorService service = Executors.newFixedThreadPool(2);
-        Future<PDFData> result = service.submit(
+        Future<PdfBuilderInputData> result = service.submit(
                 new OcrCallableTask(mockFileItemIterator, null));
         Assert.assertTrue(result.get() != null);
         Assert.assertTrue(result.get().getText().size() > 0);

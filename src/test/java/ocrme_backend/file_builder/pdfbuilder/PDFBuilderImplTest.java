@@ -101,7 +101,7 @@ public class PDFBuilderImplTest {
 
         ArrayList<String> languages = new ArrayList<>();
         languages.add("ru");
-        PDFData data = getTestData(rusFilename, languages);
+        PdfBuilderInputData data = getTestData(rusFilename, languages);
 
         pdfBuilder.buildPDF(data);
 
@@ -148,7 +148,7 @@ public class PDFBuilderImplTest {
 
         List<TextUnit> texts = new ArrayList<>();
         texts.add(new TextUnit(text, 20, 200, 200, 20));
-        PDFData data = new PDFData(300, 300, texts);
+        PdfBuilderInputData data = new PdfBuilderInputData(300, 300, texts);
 
         pdfBuilder.buildPDF(data);
         baseFileChecks(path);
@@ -170,21 +170,21 @@ public class PDFBuilderImplTest {
         String path = createTempFile(fileName);
         doReturn(path).when(pdfBuilder).createTempFile(anyString());
 
-        PDFData data = getTestData(fileName, null);
+        PdfBuilderInputData data = getTestData(fileName, null);
 
         pdfBuilder.buildPDF(data);
 
         baseFileChecks(path);
     }
 
-    private PDFData getTestData(String fileName, @Nullable List<String> languages) throws Exception {
+    private PdfBuilderInputData getTestData(String fileName, @Nullable List<String> languages) throws Exception {
 
         String filePath = getTestFile(fileName);
         Path path = Paths.get(filePath);
         byte[] data = Files.readAllBytes(path);
 
         OCRProcessor processor = new OcrProcessorImpl();
-        PDFData pdfData = null;
+        PdfBuilderInputData pdfData = null;
         if (languages == null || languages.size() == 0) {
             pdfData = processor.ocrForData(data);
         } else {

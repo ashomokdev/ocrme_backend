@@ -18,6 +18,7 @@ public class OcrRequest {
     private String timeStamp;
     private String createdBy;
     private String createdById;
+    private String status;
     // [END ocrRequest]
 
     // [START keys]
@@ -29,17 +30,19 @@ public class OcrRequest {
     public static final String TIME_STAMP = "timeStamp";
     public static final String CREATED_BY_ID = "createdById";
     public static final String CREATED_BY = "createdBy";
+    public static final String STATUS = "status";
     // [END keys]
 
     // We use a Builder pattern here to simplify and standardize construction of Book objects.
     private OcrRequest(Builder builder) {
         this.inputImageUrl = builder.inputImageUrl;
-        this.languages = languages;
+        this.languages = builder.languages;
         this.textResult = builder.textResult;
         this.pdfResultUrl = builder.pdfResultUrl;
         this.id = builder.id;
         this.createdBy = builder.createdBy;
         this.createdById = builder.createdById;
+        this.status = builder.status;
         String timeStamp = builder.timeStamp;
         if (timeStamp == null) {
             timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.SSS").format(new Date());
@@ -79,6 +82,10 @@ public class OcrRequest {
         return timeStamp;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
     public static class Builder {
         private String inputImageUrl;
         private String[] languages;
@@ -88,6 +95,7 @@ public class OcrRequest {
         private String createdBy;
         private String createdById;
         private String timeStamp;
+        private String status;
 
         public Builder inputImageUrl(String inputImageUrl) {
             this.inputImageUrl = inputImageUrl;
@@ -106,6 +114,11 @@ public class OcrRequest {
 
         public Builder pdfResultUrl(String pdfResultUrl) {
             this.pdfResultUrl = pdfResultUrl;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
             return this;
         }
 
@@ -144,6 +157,7 @@ public class OcrRequest {
                 "\nid: " + id +
                 "\ncreated by: " + createdBy +
                 "\ncreated by id: " + createdById +
+                "\nstatus: " + status +
                 "\ntime stamp: " + timeStamp;
     }
 }

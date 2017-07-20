@@ -1,6 +1,6 @@
 package ocrme_backend.ocr;
 
-import ocrme_backend.file_builder.pdfbuilder.PDFData;
+import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public interface OCRProcessor {
      * @return data about text for generation pdf
      * @throws IOException
      */
-    PDFData ocrForData(byte[] image) throws IOException;
+    PdfBuilderInputData ocrForData(byte[] image) throws IOException;
 
     /**
      * perform OCR for retrieving text data for generation pdf file or another formatted file.
@@ -44,5 +44,5 @@ public interface OCRProcessor {
      * @return data about text for generation pdf
      * @throws IOException
      */
-    PDFData ocrForData(byte[] image, @Nullable List<String> languages) throws IOException;
+    PdfBuilderInputData ocrForData(byte[] image, @Nullable List<String> languages) throws IOException;
 }

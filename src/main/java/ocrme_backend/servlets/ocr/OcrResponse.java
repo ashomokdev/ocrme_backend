@@ -6,10 +6,21 @@ import java.io.Serializable;
  * Created by iuliia on 6/27/17.
  */
 public class OcrResponse implements Serializable {
+
     private String textResult;
     private String pdfResultUrl;
-    private String errorMessage;
-    private boolean containsError;
+
+
+
+    private Status status;
+
+    public enum Status {
+        OK,
+        PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED,
+        TEXT_NOT_FOUND,
+        UNKNOWN_ERROR
+    }
+
 
     public void setTextResult(String textResult) {
         this.textResult = textResult;
@@ -17,28 +28,17 @@ public class OcrResponse implements Serializable {
     public void setPdfResultUrl(String pdfResultUrl) {
         this.pdfResultUrl = pdfResultUrl;
     }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-        containsError = true;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getTextResult() {
         return textResult;
     }
-
     public String getPdfResultUrl() {
         return pdfResultUrl;
     }
-
-    public String getErrorMessage() {
-        return errorMessage;
+    public Status getStatus() {
+        return status;
     }
-
-    public boolean isContainsError() {
-        return containsError;
-    }
-
-
-
 }

@@ -31,7 +31,7 @@ public class PDFBuilderImpl implements PDFBuilder {
 
     @Nullable
     @Override
-    public String buildPDF(PDFData data) {
+    public String buildPDF(PdfBuilderInputData data) {
 
         String filename = generateFileName();
         String path = createTempFile(filename);

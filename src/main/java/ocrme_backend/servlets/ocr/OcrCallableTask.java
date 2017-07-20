@@ -1,6 +1,6 @@
 package ocrme_backend.servlets.ocr;
 
-import ocrme_backend.file_builder.pdfbuilder.PDFData;
+import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.ocr.OCRProcessor;
 import ocrme_backend.ocr.OcrProcessorImpl;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 /**
  * Created by iuliia on 6/29/17.
  */
-public class OcrCallableTask implements Callable<PDFData> {
+public class OcrCallableTask implements Callable<PdfBuilderInputData> {
     private final FileItemIterator fileItemIterator;
     private final String[] languages;
     private static Logger logger;
@@ -32,8 +32,8 @@ public class OcrCallableTask implements Callable<PDFData> {
     }
 
     @Override
-    public PDFData call() throws Exception {
-        PDFData result = doStaff(fileItemIterator, languages);
+    public PdfBuilderInputData call() throws Exception {
+        PdfBuilderInputData result = doStaff(fileItemIterator, languages);
         logger.log(Level.INFO, "text result:" + result.getSimpleText());
         return result;
     }
@@ -57,8 +57,8 @@ public class OcrCallableTask implements Callable<PDFData> {
         return bytes;
     }
 
-    private PDFData doStaff(FileItemIterator fileItemIterator, String[] languages) throws IOException, GeneralSecurityException {
-        PDFData data;
+    private PdfBuilderInputData doStaff(FileItemIterator fileItemIterator, String[] languages) throws IOException, GeneralSecurityException {
+        PdfBuilderInputData data;
         try {
             byte[] bytes = convertToBytes(fileItemIterator);
 
@@ -69,7 +69,7 @@ public class OcrCallableTask implements Callable<PDFData> {
                 data = processor.ocrForData(bytes, Arrays.asList(languages));
             }
         } catch (Exception e) {
-            data = new PDFData(e.getMessage());
+            data = new PdfBuilderInputData(e.getMessage());
             logger.log(Level.WARNING, "ERROR! See log below.");
             e.printStackTrace();
         }
