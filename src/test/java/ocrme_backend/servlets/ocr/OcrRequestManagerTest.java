@@ -1,8 +1,11 @@
 package ocrme_backend.servlets.ocr;
 
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import ocrme_backend.datastore.utils.FileProvider;
 import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
 import org.apache.commons.fileupload.FileItemIterator;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,10 +27,13 @@ public class OcrRequestManagerTest {
 
     private OcrRequestManager manager;
     private String defaultFont = "FreeSans.ttf";
+    private final LocalServiceTestHelper helper =
+            new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+
 
     @Before
     public void init() throws Exception {
-
+        helper.setUp();
         HttpSession session = mock(HttpSession.class);
         String path = Thread.currentThread().getContextClassLoader().getResource("temp/").getPath();
 
@@ -52,6 +58,12 @@ public class OcrRequestManagerTest {
 
         manager = new OcrRequestManager(mockFileItemIterator, languages, session);
     }
+
+    @After
+    public void tearDown() {
+        helper.tearDown();
+    }
+
 
     @Test
     public void processForResult() throws Exception {

@@ -68,7 +68,7 @@ public class OcrRequestDaoImplTest {
 
         OcrRequest obtained = dao.read(id);
         Assert.assertTrue(obtained.getId() == 1);
-        Assert.assertTrue(obtained.getTextResult().equals(textResultExpected));
+        Assert.assertTrue(obtained.getTextResult().getValue().equals(textResultExpected));
         Assert.assertTrue(obtained.getInputImageUrl().equals(inputImageUrlExpected));
     }
 

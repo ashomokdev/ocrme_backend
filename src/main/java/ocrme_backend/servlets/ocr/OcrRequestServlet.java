@@ -1,5 +1,6 @@
 package ocrme_backend.servlets.ocr;
 
+import com.google.gson.Gson;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -29,7 +30,9 @@ public class OcrRequestServlet extends HttpServlet {
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().print(ocrResponse.getTextResult());
+
+            String json = new Gson().toJson(ocrResponse);
+            response.getWriter().print(json);
             response.getWriter().flush();
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
 

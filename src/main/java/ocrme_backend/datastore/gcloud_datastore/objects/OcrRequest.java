@@ -1,5 +1,7 @@
 package ocrme_backend.datastore.gcloud_datastore.objects;
 
+import com.google.appengine.api.datastore.Text;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -12,7 +14,7 @@ public class OcrRequest {
     // [START ocrRequest]
     private String inputImageUrl;
     private String[] languages;
-    private String textResult;
+    private Text textResult;
     private String pdfResultUrl;
     private Long id;
     private String timeStamp;
@@ -58,7 +60,7 @@ public class OcrRequest {
         return languages;
     }
 
-    public String getTextResult() {
+    public Text getTextResult() {
         return textResult;
     }
 
@@ -89,7 +91,7 @@ public class OcrRequest {
     public static class Builder {
         private String inputImageUrl;
         private String[] languages;
-        private String textResult;
+        private Text textResult;
         private String pdfResultUrl;
         private Long id;
         private String createdBy;
@@ -108,7 +110,7 @@ public class OcrRequest {
         }
 
         public Builder textResult(String textResult) {
-            this.textResult = textResult;
+            this.textResult = new Text (textResult);
             return this;
         }
 
@@ -151,7 +153,7 @@ public class OcrRequest {
     public String toString() {
         return
                 "input image url: " + inputImageUrl +
-                "languages: " +  Arrays.toString(languages) +
+                "\nlanguages: " +  Arrays.toString(languages) +
                 "\ntext result: " + textResult +
                 "\npdf result url: " + pdfResultUrl +
                 "\nid: " + id +

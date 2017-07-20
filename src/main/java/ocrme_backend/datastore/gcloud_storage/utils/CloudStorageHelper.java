@@ -71,7 +71,9 @@ public class CloudStorageHelper {
         return blobInfo.getMediaLink();
     }
 
-    /**Upload file from path
+    /**
+     * Upload file from path
+     *
      * @param uploadFrom path
      * @param bucketName
      * @return
@@ -115,7 +117,7 @@ public class CloudStorageHelper {
             storage.create(blobInfo, bytes);
         }
         logger.log(Level.INFO, "File {0} uploaded as {1}", new Object[]{
-               originalFilename, destinationFilename});
+                originalFilename, destinationFilename});
         // return the public download link
         return storage.get(blobInfo.getBlobId()).getMediaLink();
     }
@@ -123,25 +125,28 @@ public class CloudStorageHelper {
 
     /**
      * create bucket if not exists
+     *
      * @param bucketName
      */
     public void createBucket(String bucketName) {
-        // Instantiates a client
-        Storage storage = StorageOptions.getDefaultInstance().getService();
+        try {
+            // Instantiates a client
+            Storage storage = StorageOptions.getDefaultInstance().getService();
 
-        Bucket bucket = storage.get(bucketName, Storage.BucketGetOption.fields());
+            Bucket bucket = storage.get(bucketName, Storage.BucketGetOption.fields());
 
-        //if exists
-        if (bucket != null) {
-            logger.log(Level.INFO,
-                    "Bucket " + bucketName +" was not created, because it already exists.");
+            //if exists
+            if (bucket != null) {
+                logger.log(Level.INFO,
+                        "Bucket " + bucketName + " was not created, because it already exists.");
+            } else {
+                // Creates the new bucket
+                storage.create(BucketInfo.of(bucketName));
+                logger.log(Level.INFO, "Bucket " + bucketName + " created");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        else {
-            // Creates the new bucket
-            storage.create(BucketInfo.of(bucketName));
-            logger.log(Level.INFO, "Bucket " + bucketName +" created");
-        }
-
     }
 
     /**

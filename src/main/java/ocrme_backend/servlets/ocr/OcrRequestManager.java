@@ -48,8 +48,7 @@ public class OcrRequestManager {
             String pdfUrl = pdfBuilderOutputData.getUrl();
             response.setPdfResultUrl(pdfUrl);
             PdfBuilderOutputData.Status status = pdfBuilderOutputData.getStatus();
-            switch (status)
-            {
+            switch (status) {
                 case OK:
                     response.setStatus(OcrResponse.Status.OK);
                     break;
@@ -60,15 +59,14 @@ public class OcrRequestManager {
                     response.setStatus(OcrResponse.Status.TEXT_NOT_FOUND);
                     break;
                 default:
-                    logger.log(Level.INFO,"Unexpected status received.");
+                    logger.log(Level.INFO, "Unexpected status received.");
                     break;
             }
 
         } catch (Exception e) {
             response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             addToDb(response);
         }
 
@@ -76,38 +74,36 @@ public class OcrRequestManager {
     }
 
     private void addToDb(OcrResponse response) {
-        threadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                //upload request file to google cloud storage
-                CloudStorageHelper helper = new CloudStorageHelper();
-                String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_REQUESTS_PARAMETER);
-                assert (bucketName != null);
 
-                helper.createBucket(bucketName);
-                String inputImageUrl = null;
-                try {
-                    while (file.hasNext()) {
-                        FileItemStream item = file.next();
-                        inputImageUrl = helper.uploadFile(item, bucketName);
-                    }
-                } catch (IOException | ServletException |FileUploadException e) {
-                    e.printStackTrace();
-                }
+        //upload request file to google cloud storage
+        CloudStorageHelper helper = new CloudStorageHelper();
+        String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_REQUESTS_PARAMETER);
+        assert (bucketName != null);
 
-                //put request data to Db
-                DbPusher dbPusher = new DbPusher();
-                long requestId = dbPusher.add(
-                        new OcrRequest.Builder()
-                                .inputImageUrl(inputImageUrl)
-                                .languages(languages)
-                                .pdfResultUrl(response.getPdfResultUrl())
-                                .status(response.getStatus().name())
-                                .textResult(response.getTextResult())
-                                .build());
-                logger.log(Level.INFO, "data saved in DB, entity id = " + requestId);
+        helper.createBucket(bucketName);
+        String inputImageUrl = null;
+        try {
+            boolean hasNext = file.hasNext(); //todo due to a bug - false everytime
+            while (file.hasNext()) {
+                FileItemStream item = file.next();
+                inputImageUrl = helper.uploadFile(item, bucketName);
             }
-        });
+        } catch (IOException | ServletException | FileUploadException e) {
+            e.printStackTrace();
+        }
+
+        //put request data to Db
+        DbPusher dbPusher = new DbPusher();
+        long requestId = dbPusher.add(
+                new OcrRequest.Builder()
+                        .inputImageUrl(inputImageUrl) //todo due to a bug null everytime
+                        .languages(languages)
+                        .pdfResultUrl(response.getPdfResultUrl())
+                        .status(response.getStatus().name())
+                        .textResult(response.getTextResult())
+                        .build());
+        logger.log(Level.INFO, "data saved in DB, entity id = " + requestId);
+
     }
 
     private PdfBuilderInputData getOcrResult(ExecutorService threadPool)

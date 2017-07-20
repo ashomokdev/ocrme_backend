@@ -29,7 +29,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         return new OcrRequest.Builder()
                 .id(entity.getKey().getId())
                 .inputImageUrl((String) entity.getProperty(OcrRequest.INPUT_IMAGE_URL))
-                .textResult((String) entity.getProperty(OcrRequest.TEXT_RESULT))
+                .textResult (((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue())
                 .pdfResultUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_URL))
                 .createdBy((String) entity.getProperty(OcrRequest.CREATED_BY))
                 .createdById((String) entity.getProperty(OcrRequest.CREATED_BY_ID))
