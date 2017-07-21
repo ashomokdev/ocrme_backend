@@ -8,8 +8,10 @@ import com.itextpdf.text.pdf.PdfWriter;
 import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -29,9 +31,13 @@ public class PDFBuilderImpl implements PDFBuilder {
         this.session = session;
     }
 
+    /**
+     * @param data
+     * @return path
+     */
     @Nullable
     @Override
-    public String buildPDF(PdfBuilderInputData data) {
+    public String buildPdfFile(PdfBuilderInputData data) {
 
         String filename = generateFileName();
         String path = createTempFile(filename);
@@ -49,6 +55,28 @@ public class PDFBuilderImpl implements PDFBuilder {
         }
 
         return path;
+    }
+
+    /**
+     * @param data
+     * @return ByteArrayOutputStream stream
+     */
+    @Nullable
+    @Override
+    public ByteArrayOutputStream buildPdfStream(PdfBuilderInputData data) {
+        Document document = new Document(new Rectangle(data.getmWidth(), data.getmHeight())); //specified size  Document doc = new Document(new Rectangle(570, 924f)); http://developers.itextpdf.com/question/how-add-text-inside-rectangle
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        try {
+            PdfWriter writer = PdfWriter.getInstance(document, stream);
+            document.open();
+            addMetaData(document);
+            addContent(writer, data.getText());
+            document.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return stream;
     }
 
     /**

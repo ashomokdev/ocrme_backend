@@ -2,15 +2,13 @@ package ocrme_backend.datastore.gcloud_storage.utils;
 
 import ocrme_backend.datastore.utils.FileProvider;
 import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUpload;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,6 +63,24 @@ public class CloudStorageHelperTest {
         String capturedLog = getTestCapturedLog();
         Assert.assertTrue(capturedLog.contains("created"));
         Assert.assertTrue(capturedLog.contains("deleted"));
+    }
+
+    /**
+     * upload file, represented as InputStream
+     *
+     * @throws Exception
+     */
+    @Test
+    public void uploadInputStream() throws Exception {
+        helper.createBucket(bucketName);
+        ByteArrayOutputStream stream = FileProvider.getOutputStream();
+        String url = helper.uploadFile(FileUtils.toInputStream(stream), "filename.pdf", bucketName);
+        Assert.assertTrue(url != null);
+        Assert.assertFalse(url.equals(""));
+
+        String capturedLog = getTestCapturedLog();
+        Assert.assertTrue(capturedLog.contains("created"));
+        Assert.assertTrue(capturedLog.contains("uploaded"));
     }
 
     /**

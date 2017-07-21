@@ -72,6 +72,31 @@ public class CloudStorageHelper {
     }
 
     /**
+     * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
+     * environment variable, appending a timestamp to end of the uploaded filename.
+     */
+    public String uploadFile(InputStream fileStream, String fileName, final String bucketName)
+            throws IOException, ServletException {
+
+        String timeStamp = getTimeStamp();
+
+        fileName = timeStamp + fileName;
+
+        // the inputstream is closed by default, so we don't need to close it here
+        BlobInfo blobInfo =
+                storage.create(
+                        BlobInfo
+                                .newBuilder(bucketName, fileName)
+                                // Modify access list to allow all users with link to read file
+                                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
+                                .build(),
+                        fileStream);
+        logger.log(Level.INFO, "File uploaded as " + fileName);
+        // return the public download link
+        return blobInfo.getMediaLink();
+    }
+
+    /**
      * Upload file from path
      *
      * @param uploadFrom path

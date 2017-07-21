@@ -3,21 +3,21 @@ package ocrme_backend.servlets.ocr;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
+import ocrme_backend.datastore.gcloud_storage.utils.FileUtils;
 import ocrme_backend.file_builder.pdfbuilder.PDFBuilder;
 import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData;
+import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData.Status;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData.Status;
 
 /**
  * Created by iuliia on 7/13/17.
@@ -63,40 +63,41 @@ public class PdfBuilderCallableTask implements Callable<PdfBuilderOutputData> {
         }
 
         PDFBuilder pdfBuilder = new PDFBuilderImpl(session);
-        String pdfTempFilePath = pdfBuilder.buildPDF(data);
 
-        if (isFileEmpty(pdfTempFilePath)) {
+        ByteArrayOutputStream outputStream = pdfBuilder.buildPdfStream(data);
+
+        if (isFileEmpty(outputStream)) {
             throw new LanguageNotSupportedException();
         }
 
-        String url = uploadToStorage(pdfTempFilePath);
+        InputStream inputStream = FileUtils.toInputStream(outputStream);
+        String url = uploadToStorage(inputStream);
         return url;
     }
 
-    private String uploadToStorage(String filePath) {
+    private String uploadToStorage(InputStream inputStream) {
+        String fileName = "file.pdf";
         String url = "";
         try {
             CloudStorageHelper helper = new CloudStorageHelper();
             String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_PDFS_PARAMETER);
             helper.createBucket(bucketName);
-            url = helper.uploadFile(Paths.get(filePath), bucketName);
+            url = helper.uploadFile(inputStream, fileName, bucketName);
         } catch (IOException | ServletException e) {
             e.printStackTrace();
-        } finally {
-            deleteFile(filePath);
         }
         return url;
     }
 
     /**
      * check if pdf file contains any text
-     * @param path
+     * @param outputStream
      * @return
      */
-    private boolean isFileEmpty(String path) {
+    private boolean isFileEmpty(ByteArrayOutputStream outputStream) {
         String allText = "";
         try {
-            PdfReader reader = new PdfReader(path);
+            PdfReader reader = new PdfReader(outputStream.toByteArray());
 
             for (int page = 1; page <= 1; page++) {
                 allText = PdfTextExtractor.getTextFromPage(reader, page);
@@ -105,25 +106,6 @@ public class PdfBuilderCallableTask implements Callable<PdfBuilderOutputData> {
             e.printStackTrace();
         }
         return (allText == null) || allText.length() < 1;
-    }
-
-    /**
-     * delete file if exists
-     *
-     * @param path path
-     */
-    private void deleteFile(String path) {
-        try {
-            File file = new File(path);
-            if (file.delete()) {
-                logger.info(path + " is deleted");
-            } else {
-                logger.info("Delete operation is failed.");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public class TextNotFoundException extends Throwable {

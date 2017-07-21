@@ -10,7 +10,9 @@ import org.springframework.mock.web.MockMultipartHttpServletRequest;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -95,5 +97,17 @@ public class FileProvider {
 
         String end = "\r\n--" + boundary + "--"; // correction suggested @butfly
         return ArrayUtils.addAll(start.getBytes(), ArrayUtils.addAll(data, end.getBytes()));
+    }
+
+    public static ByteArrayOutputStream getOutputStream() throws IOException {
+        URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/img.jpg");
+        File file = new File(url.getPath());
+        Path path = Paths.get(file.getPath());
+        byte[] bytes = Files.readAllBytes(path);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
+        baos.write(bytes, 0, bytes.length);
+
+        return baos;
     }
 }

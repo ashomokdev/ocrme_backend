@@ -19,6 +19,8 @@ import java.security.GeneralSecurityException;
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/items/obaby/IMG_8771.JPG" https://imagetotext-149919.appspot.com/ocr_request
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" http://localhost:8080/ocr_request
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" http://localhost:8080/ocr_request?language=ru
+ * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" https://imagetotext-149919.appspot.com/ocr_request?language=ru
+
  */
 public class OcrRequestServlet extends HttpServlet {
 

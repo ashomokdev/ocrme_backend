@@ -4,16 +4,14 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import ocrme_backend.ocr.OCRProcessor;
 import ocrme_backend.ocr.OcrProcessorImpl;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,6 +62,29 @@ public class PDFBuilderImplTest {
     }
 
     @Test
+    public void testBuildStream() throws Exception {
+        ArrayList<String> languages = new ArrayList<>();
+        languages.add("ru");
+        PdfBuilderInputData data = getTestData(rusFilename, languages);
+
+        ByteArrayOutputStream baos = pdfBuilder.buildPdfStream(data);
+        byte[] byteArray = baos.toByteArray();
+        String s = new String(byteArray);
+        Assert.assertTrue(s.length() > 0);
+
+        //create file
+        File file = new File(createTempFile("fileName"));
+        try(OutputStream outputStream = new FileOutputStream(file.getPath())) {
+            baos.writeTo(outputStream);
+        }
+        assertTrue(file.exists());
+
+        //check file not empty
+        BufferedReader br = new BufferedReader(new FileReader(file.getPath()));
+        assertFalse(br.readLine() == null);
+    }
+
+    @Test
     public void testCreateTempFile() throws Exception {
         File file = new File(createTempFile("fileName"));
         assertTrue(file.exists());
@@ -103,7 +124,7 @@ public class PDFBuilderImplTest {
         languages.add("ru");
         PdfBuilderInputData data = getTestData(rusFilename, languages);
 
-        pdfBuilder.buildPDF(data);
+        pdfBuilder.buildPdfFile(data);
 
         //check file exists
         baseFileChecks(path);
@@ -150,7 +171,7 @@ public class PDFBuilderImplTest {
         texts.add(new TextUnit(text, 20, 200, 200, 20));
         PdfBuilderInputData data = new PdfBuilderInputData(300, 300, texts);
 
-        pdfBuilder.buildPDF(data);
+        pdfBuilder.buildPdfFile(data);
         baseFileChecks(path);
         assertTrue(pdfContainsText(path, text));
     }
@@ -172,7 +193,7 @@ public class PDFBuilderImplTest {
 
         PdfBuilderInputData data = getTestData(fileName, null);
 
-        pdfBuilder.buildPDF(data);
+        pdfBuilder.buildPdfFile(data);
 
         baseFileChecks(path);
     }

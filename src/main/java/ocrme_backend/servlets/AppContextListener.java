@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadFactory;
  */
 
 public class AppContextListener implements ServletContextListener {
-    private static final int THREAD_NUMB = 5;
+    private static final int THREAD_NUMB = 2;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
