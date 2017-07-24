@@ -10,6 +10,7 @@ import java.io.InputStream;
 public class FileUtils {
     public static InputStream toInputStream(ByteArrayOutputStream baos) {
         byte[] array = baos.toByteArray();
+
         InputStream is = new ByteArrayInputStream(array);
         return is;
     }

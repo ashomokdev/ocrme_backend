@@ -11,8 +11,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +22,6 @@ public class OcrRequestManager {
     private FileItemIterator file;
     private String[] languages;
     private HttpSession session;
-    private final ExecutorService threadPool;
     private final Logger logger = Logger.getLogger(OcrRequestManager.class.getName());
     public static final String BUCKET_FOR_REQUESTS_PARAMETER = "ocrme.bucket.request_images";
 
@@ -32,18 +30,17 @@ public class OcrRequestManager {
         this.file = file;
         this.languages = languages;
         this.session = session;
-        threadPool = (ExecutorService) session.getServletContext().getAttribute("threadPoolAlias");
-    }
+            }
 
     public OcrResponse processForResult() throws IOException, ServletException {
 
         OcrResponse response = new OcrResponse();
         try {
-            PdfBuilderInputData ocrResult = getOcrResult(threadPool);
+            PdfBuilderInputData ocrResult = getOcrResult();
             String simpleTextResult = ocrResult.getSimpleText();
             response.setTextResult(simpleTextResult);
 
-            PdfBuilderOutputData pdfBuilderOutputData = makePdf(threadPool, ocrResult);
+            PdfBuilderOutputData pdfBuilderOutputData = makePdf(ocrResult);
 
             String pdfUrl = pdfBuilderOutputData.getUrl();
             response.setPdfResultUrl(pdfUrl);
@@ -69,7 +66,6 @@ public class OcrRequestManager {
         } finally {
             addToDb(response);
         }
-
         return response;
     }
 
@@ -106,23 +102,19 @@ public class OcrRequestManager {
 
     }
 
-    private PdfBuilderInputData getOcrResult(ExecutorService threadPool)
-            throws InterruptedException, java.util.concurrent.ExecutionException {
+    private PdfBuilderInputData getOcrResult()
+            throws InterruptedException, java.util.concurrent.ExecutionException, IOException, GeneralSecurityException {
 
-        OcrCallableTask ocrCallableTask = new OcrCallableTask(file, languages);
-        final Future<PdfBuilderInputData> pdfDataFuture = threadPool.submit(ocrCallableTask);
-        PdfBuilderInputData pdfData = pdfDataFuture.get();
+        OcrSyncTask ocrSyncTask = new OcrSyncTask(file, languages);
+        PdfBuilderInputData pdfData = ocrSyncTask.execute();
         logger.log(Level.INFO, "ocr result obtained");
         return pdfData;
     }
 
-    private PdfBuilderOutputData makePdf(ExecutorService threadPool, PdfBuilderInputData ocrResult)
-            throws InterruptedException, java.util.concurrent.ExecutionException {
-
-        PdfBuilderCallableTask pdfBuilderCallableTask = new PdfBuilderCallableTask(ocrResult, session);
-        final Future<PdfBuilderOutputData> pdfBuilderOutputDataFuture = threadPool.submit(pdfBuilderCallableTask);
-
-        PdfBuilderOutputData pdfBuilderOutputData = pdfBuilderOutputDataFuture.get();
+    private PdfBuilderOutputData makePdf(PdfBuilderInputData ocrResult)
+    {
+        PdfBuilderSyncTask pdfBuilderSyncTask = new PdfBuilderSyncTask(ocrResult, session);
+        PdfBuilderOutputData pdfBuilderOutputData = pdfBuilderSyncTask.execute();
 
         logger.log(Level.INFO, "pdf file generation finished.");
         return pdfBuilderOutputData;

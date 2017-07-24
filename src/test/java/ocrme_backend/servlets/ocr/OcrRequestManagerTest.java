@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl.FONT_PATH_PARAMETER;
 import static ocrme_backend.servlets.ocr.OcrRequestManager.BUCKET_FOR_REQUESTS_PARAMETER;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,11 +26,10 @@ import static org.mockito.Mockito.when;
  */
 public class OcrRequestManagerTest {
 
-    private OcrRequestManager manager;
-    private String defaultFont = "FreeSans.ttf";
     private final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-
+    private OcrRequestManager manager;
+    private String defaultFont = "FreeSans.ttf";
 
     @Before
     public void init() throws Exception {
@@ -41,19 +41,21 @@ public class OcrRequestManagerTest {
         when(mockServletContext.getRealPath(PDFBuilderImpl.uploadsDir)).
                 thenReturn(path);
 
-        when(mockServletContext.getInitParameter(PdfBuilderCallableTask.BUCKET_FOR_PDFS_PARAMETER)).
+        when(mockServletContext.getInitParameter(PdfBuilderSyncTask.BUCKET_FOR_PDFS_PARAMETER)).
                 thenReturn("bucket-for-pdf-test");
         when(mockServletContext.getInitParameter(BUCKET_FOR_REQUESTS_PARAMETER)).
                 thenReturn("bucket-for-requests-test");
         when(session.getServletContext()).thenReturn(mockServletContext);
-        when(mockServletContext.getRealPath(PDFBuilderImpl.FONT_PATH)).thenReturn(getFont(defaultFont));
+
+
+        when(mockServletContext.getInitParameter(FONT_PATH_PARAMETER)).thenReturn(getFontPath(defaultFont));
         when(session.getId()).thenReturn("0");
         ExecutorService service = Executors.newFixedThreadPool(2);
         when(mockServletContext.getAttribute("threadPoolAlias")).thenReturn(service);
 
-        String[] languages = new String[]{"en"};
+        String[] languages = new String[]{"ru"};
         FileItemIterator mockFileItemIterator = mock(FileItemIterator.class);
-        when(mockFileItemIterator.next()).thenReturn(FileProvider.getItemStreamFile());
+        when(mockFileItemIterator.next()).thenReturn(FileProvider.getRusItemStreamImageFile());
         when(mockFileItemIterator.hasNext()).thenReturn(true).thenReturn(false);
 
         manager = new OcrRequestManager(mockFileItemIterator, languages, session);
@@ -73,7 +75,7 @@ public class OcrRequestManagerTest {
         Assert.assertTrue(response.getStatus().equals(OcrResponse.Status.OK));
     }
 
-    private String getFont(String fontFileName) {
+    private String getFontPath(String fontFileName) {
         URL url = Thread.currentThread().getContextClassLoader().getResource("fonts/" + fontFileName);
         assert url != null;
         return url.getPath();

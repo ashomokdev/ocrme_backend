@@ -4,15 +4,16 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nullable;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by iuliia on 6/2/17.
@@ -23,9 +24,10 @@ import java.util.List;
 
 public class PDFBuilderImpl implements PDFBuilder {
 
-    public static final String FONT_PATH = "/WEB-INF/fonts/FreeSans.ttf";
+    public static final String FONT_PATH_PARAMETER = "font.path";
     private final HttpSession session;
     public static final String uploadsDir = "/temp/";
+    private final Logger logger = Logger.getLogger(PDFBuilderImpl.class.getName());
 
     public PDFBuilderImpl(HttpSession session) {
         this.session = session;
@@ -107,12 +109,21 @@ public class PDFBuilderImpl implements PDFBuilder {
 
         contentByte.setRGBColorFill(0x00, 0x00, 0x00);
 
+        String fontPath = session.getServletContext().getInitParameter(FONT_PATH_PARAMETER);
+//        File fontFile = new File(fontPath);
+//
+//        if (fontFile.exists()) {
+//            logger.log(Level.INFO, "Font file exists, path = " + fontPath);
+//        } else {
+//            logger.log(Level.INFO, "Font file not exists in path = " + fontPath);
+//        }
+//        Font bf = FontFactory.getFont(fontPath, BaseFont.IDENTITY_H, true);
 
-        ServletContext context = session.getServletContext();
-        String fontPath = context.getRealPath(FONT_PATH);
 
-        assert fontPath != null;
-        Font bf = FontFactory.getFont(fontPath, BaseFont.IDENTITY_H, true);
+        byte[] bytes = IOUtils.toByteArray(session.getServletContext()
+                .getResourceAsStream(fontPath));
+        Font bf = new Font(BaseFont.createFont("FreeSans.ttf", BaseFont.IDENTITY_H,
+                BaseFont.EMBEDDED, true, bytes, null));
 
         for (TextUnit text : textUnits) {
             float llx = text.getLlx();
@@ -124,7 +135,9 @@ public class PDFBuilderImpl implements PDFBuilder {
             contentByte.setFontAndSize(bf.getCalculatedBaseFont(true), fontSize);
 
             contentByte.setTextMatrix(llx, lly);
-            contentByte.showText(text.getText());
+            contentByte.showText(new String(text.getText().getBytes("utf-8"), "utf-8"));
+
+//            contentByte.showText(text.getText());
         }
         contentByte.endText();
         contentByte.restoreState();
@@ -182,6 +195,7 @@ public class PDFBuilderImpl implements PDFBuilder {
      * @return file path
      */
     @Nullable
+    @Deprecated
     public String createTempFile(String filename) {
         try {
             String realPathtoUploads = session.getServletContext().getRealPath(uploadsDir);

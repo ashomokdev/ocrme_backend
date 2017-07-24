@@ -2,15 +2,14 @@ package ocrme_backend.datastore.gcloud_storage.utils;
 
 import ocrme_backend.datastore.utils.FileProvider;
 import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUpload;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Path;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.logging.Handler;
@@ -71,10 +70,10 @@ public class CloudStorageHelperTest {
      * @throws Exception
      */
     @Test
-    public void uploadInputStream() throws Exception {
+    public void uploadImageAsInputStream() throws Exception {
         helper.createBucket(bucketName);
         ByteArrayOutputStream stream = FileProvider.getOutputStream();
-        String url = helper.uploadFile(FileUtils.toInputStream(stream), "filename.pdf", bucketName);
+        String url = helper.uploadFile(FileUtils.toInputStream(stream), "filename.jpg", bucketName);
         Assert.assertTrue(url != null);
         Assert.assertFalse(url.equals(""));
 
@@ -89,9 +88,9 @@ public class CloudStorageHelperTest {
      * @throws Exception
      */
     @Test
-    public void uploadFileItemStream() throws Exception {
+    public void uploadImageAsFileItemStream() throws Exception {
         helper.createBucket(bucketName);
-        FileItemStream file = FileProvider.getItemStreamFile();
+        FileItemStream file = FileProvider.getItemStreamImageFile();
         String url = helper.uploadFile(file, bucketName);
         Assert.assertTrue(url != null);
         Assert.assertFalse(url.equals(""));
@@ -107,10 +106,49 @@ public class CloudStorageHelperTest {
      * @throws Exception
      */
     @Test
-    public void uploadFileFromTemp() throws Exception {
+    public void uploadImageFileFromTemp() throws Exception {
         helper.createBucket(bucketName);
 
         String url = helper.uploadFile(FileProvider.getPathFile(), bucketName);
+        Assert.assertTrue(url != null);
+        Assert.assertFalse(url.equals(""));
+
+        String capturedLog = getTestCapturedLog();
+        Assert.assertTrue(capturedLog.contains("created"));
+        Assert.assertTrue(capturedLog.contains("uploaded"));
+    }
+
+    //passed
+    @Test
+    public void uploadRusPdfFileFromTemp() throws Exception {
+        helper.createBucket(bucketName);
+        String url =  helper.uploadFile(Paths.get(FileProvider.getRusPdfFile()), bucketName);
+        Assert.assertTrue(url != null);
+        Assert.assertFalse(url.equals(""));
+
+        String capturedLog = getTestCapturedLog();
+        Assert.assertTrue(capturedLog.contains("created"));
+        Assert.assertTrue(capturedLog.contains("uploaded"));
+    }
+
+    //passed
+    @Test
+    public void uploadRusPdfStream() throws Exception {
+        helper.createBucket(bucketName);
+        String url =  helper.uploadFile(FileProvider.getRusPdfFileStream().toByteArray(), "filename",bucketName);
+        Assert.assertTrue(url != null);
+        Assert.assertFalse(url.equals(""));
+
+        String capturedLog = getTestCapturedLog();
+        Assert.assertTrue(capturedLog.contains("created"));
+        Assert.assertTrue(capturedLog.contains("uploaded"));
+    }
+
+    //passed
+    @Test
+    public void uploadRusPdfStream2() throws Exception {
+        helper.createBucket(bucketName);
+        String url =  helper.uploadFile(FileUtils.toInputStream(FileProvider.getRusPdfFileStream()), "filename",bucketName);
         Assert.assertTrue(url != null);
         Assert.assertFalse(url.equals(""));
 

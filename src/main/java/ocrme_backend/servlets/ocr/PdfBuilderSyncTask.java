@@ -23,21 +23,19 @@ import java.util.logging.Logger;
  * Created by iuliia on 7/13/17.
  * builds pdf and save in Google cloud storage
  */
-public class PdfBuilderCallableTask implements Callable<PdfBuilderOutputData> {
+public class PdfBuilderSyncTask {
     private static Logger logger;
     private HttpSession session;
     private PdfBuilderInputData data;
     public static final String BUCKET_FOR_PDFS_PARAMETER = "ocrme.bucket.pdf";
 
-    public PdfBuilderCallableTask(PdfBuilderInputData data, HttpSession session) {
+    public PdfBuilderSyncTask(PdfBuilderInputData data, HttpSession session) {
         this.data = data;
         this.session = session;
-        logger = Logger.getLogger(PdfBuilderCallableTask.class.getName());
+        logger = Logger.getLogger(PdfBuilderSyncTask.class.getName());
     }
 
-
-    @Override
-    public PdfBuilderOutputData call() throws Exception{
+    public PdfBuilderOutputData execute() {
         PdfBuilderOutputData result = new PdfBuilderOutputData();
         String url = null;
         try {
@@ -70,19 +68,32 @@ public class PdfBuilderCallableTask implements Callable<PdfBuilderOutputData> {
             throw new LanguageNotSupportedException();
         }
 
-        InputStream inputStream = FileUtils.toInputStream(outputStream);
-        String url = uploadToStorage(inputStream);
+        String url = uploadToStorage(outputStream.toByteArray());
         return url;
     }
 
-    private String uploadToStorage(InputStream inputStream) {
+//    private String uploadToStorage(InputStream inputStream) {
+//        String fileName = "file.pdf";
+//        String url = "";
+//        try {
+//            CloudStorageHelper helper = new CloudStorageHelper();
+//            String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_PDFS_PARAMETER);
+//            helper.createBucket(bucketName);
+//            url = helper.uploadFile(inputStream, fileName, bucketName);
+//        } catch (IOException | ServletException e) {
+//            e.printStackTrace();
+//        }
+//        return url;
+//    }
+
+    private String uploadToStorage(byte[] file) {
         String fileName = "file.pdf";
         String url = "";
         try {
             CloudStorageHelper helper = new CloudStorageHelper();
             String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_PDFS_PARAMETER);
             helper.createBucket(bucketName);
-            url = helper.uploadFile(inputStream, fileName, bucketName);
+            url = helper.uploadFile(file, fileName, bucketName);
         } catch (IOException | ServletException e) {
             e.printStackTrace();
         }

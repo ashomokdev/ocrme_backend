@@ -21,17 +21,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class TranslatorImplTest {
 
-    private Translator translator;
-
-    @Before
-    public void init() throws IOException, GeneralSecurityException {
-        translator = new TranslatorImpl();
-    }
-
     /**
      * skip TranslateException which occurs because of limits
-     https://cloud.google.com/vision/docs/limits
-     Requests per second	10
+     * https://cloud.google.com/vision/docs/limits
+     * Requests per second	10
      */
     @Rule
     public TestRule skipRule = new TestRule() {
@@ -48,8 +41,15 @@ public class TranslatorImplTest {
             };
         }
     };
+    private Translator translator;
 
-    @Test public void testGermanToSpanishTranslation() throws Exception {
+    @Before
+    public void init() throws IOException, GeneralSecurityException {
+        translator = new TranslatorImpl();
+    }
+
+    @Test
+    public void testGermanToSpanishTranslation() throws Exception {
         // Arrange
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(bout);
@@ -73,7 +73,8 @@ public class TranslatorImplTest {
 
     }
 
-    @Test public void testGermanLangDetection() throws Exception {
+    @Test
+    public void testGermanLangDetection() throws Exception {
         // Arrange
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(bout);
@@ -92,6 +93,6 @@ public class TranslatorImplTest {
         Double confidence = Double.parseDouble(
                 got.split("confidence=")[1].split("}")[0]
         );
-        assertTrue((confidence)>=0.9);
+        assertTrue((confidence) >= 0.9);
     }
 }

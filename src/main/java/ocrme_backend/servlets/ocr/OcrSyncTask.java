@@ -20,19 +20,18 @@ import java.util.logging.Logger;
 /**
  * Created by iuliia on 6/29/17.
  */
-public class OcrCallableTask implements Callable<PdfBuilderInputData> {
+public class OcrSyncTask {
     private final FileItemIterator fileItemIterator;
     private final String[] languages;
     private static Logger logger;
 
-    public OcrCallableTask(FileItemIterator fileItemIterator, String[] languages) {
+    public OcrSyncTask(FileItemIterator fileItemIterator, String[] languages) {
         this.fileItemIterator = fileItemIterator;
         this.languages = languages;
-        logger = Logger.getLogger(OcrCallableTask.class.getName());
+        logger = Logger.getLogger(OcrSyncTask.class.getName());
     }
 
-    @Override
-    public PdfBuilderInputData call() throws Exception {
+    public PdfBuilderInputData execute() throws IOException, GeneralSecurityException {
         PdfBuilderInputData result = doStaff(fileItemIterator, languages);
         logger.log(Level.INFO, "text result:" + result.getSimpleText());
         return result;

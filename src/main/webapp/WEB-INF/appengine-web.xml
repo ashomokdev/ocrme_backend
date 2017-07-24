@@ -4,8 +4,14 @@
     <version>${app.version}</version>
     <threadsafe>true</threadsafe>
     <runtime>java8</runtime>
-    
+
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+        <property name="file.encoding" value="UTF-8" />
+        <property name="DEFAULT_ENCODING" value="UTF-8" />
     </system-properties>
+
+    <resource-files>
+        <include path="WEB-INF/fonts"/>
+    </resource-files>
 </appengine-web-app>

@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,18 +15,17 @@ import static org.mockito.Mockito.when;
 /**
  * Created by iuliia on 7/3/17.
  */
-public class OcrCallableTaskTest {
+public class OcrSyncTaskTest {
     @Test
     public void testCall() throws Exception {
         FileItemIterator mockFileItemIterator = mock(FileItemIterator.class);
-        when(mockFileItemIterator.next()).thenReturn(FileProvider.getItemStreamFile());
+        when(mockFileItemIterator.next()).thenReturn(FileProvider.getItemStreamImageFile());
         when(mockFileItemIterator.hasNext()).thenReturn(true).thenReturn(false);
 
         ExecutorService service = Executors.newFixedThreadPool(2);
-        Future<PdfBuilderInputData> result = service.submit(
-                new OcrCallableTask(mockFileItemIterator, null));
-        Assert.assertTrue(result.get() != null);
-        Assert.assertTrue(result.get().getText().size() > 0);
+        PdfBuilderInputData result = new OcrSyncTask(mockFileItemIterator, null).execute();
+        Assert.assertTrue(result != null);
+        Assert.assertTrue(result.getText().size() > 0);
         service.shutdown();
     }
 }

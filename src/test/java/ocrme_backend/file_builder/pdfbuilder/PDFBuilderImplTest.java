@@ -4,6 +4,8 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import ocrme_backend.ocr.OCRProcessor;
 import ocrme_backend.ocr.OcrProcessorImpl;
+import ocrme_backend.servlets.ocr.PdfBuilderSyncTask;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl.FONT_PATH_PARAMETER;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -53,7 +56,8 @@ public class PDFBuilderImplTest {
 
         ServletContext mockServletContext = mock(ServletContext.class);
         when(session.getServletContext()).thenReturn(mockServletContext);
-        when(session.getServletContext().getRealPath(PDFBuilderImpl.FONT_PATH)).thenReturn(getFont(defaultFont));
+        when(mockServletContext.getInitParameter(FONT_PATH_PARAMETER)).thenReturn(getFontPath(defaultFont));
+
         when(session.getId()).thenReturn("0");
 
         String path = Thread.currentThread().getContextClassLoader().getResource("temp/").getPath();
@@ -74,7 +78,7 @@ public class PDFBuilderImplTest {
 
         //create file
         File file = new File(createTempFile("fileName"));
-        try(OutputStream outputStream = new FileOutputStream(file.getPath())) {
+        try (OutputStream outputStream = new FileOutputStream(file.getPath())) {
             baos.writeTo(outputStream);
         }
         assertTrue(file.exists());
@@ -114,17 +118,37 @@ public class PDFBuilderImplTest {
         buildPDF(a4FileName);
     }
 
-    @Test
-    public void buildRussianPDF() throws Exception {
-        //preparation
-        String path = createTempFile(rusFilename);
-        doReturn(path).when(pdfBuilder).createTempFile(anyString());
+//    @Deprecated
+//    @Test
+//    public void buildRussianPdfFromFile() throws Exception {
+//        //preparation
+//        String path = createTempFile(rusFilename);
+//        doReturn(path).when(pdfBuilder).createTempFile(anyString());
+//
+//        ArrayList<String> languages = new ArrayList<>();
+//        languages.add("ru");
+//        PdfBuilderInputData data = getTestData(rusFilename, languages);
+//
+//        pdfBuilder.buildPdfFile(data);
+//
+//        //check file exists
+//        baseFileChecks(path);
+//        assertTrue(pdfContainsText(path, "Барышня"));
+//    }
 
+    @Test
+    public void buildRussianPdfFromStream() throws Exception {
+        String path = createTempFile(rusFilename);
+
+        //preparation
         ArrayList<String> languages = new ArrayList<>();
         languages.add("ru");
         PdfBuilderInputData data = getTestData(rusFilename, languages);
 
-        pdfBuilder.buildPdfFile(data);
+        pdfBuilder.buildPdfStream(data);
+
+        ByteArrayOutputStream outputStream = pdfBuilder.buildPdfStream(data);
+        FileUtils.writeByteArrayToFile(new File(path), outputStream.toByteArray());
 
         //check file exists
         baseFileChecks(path);
@@ -224,7 +248,7 @@ public class PDFBuilderImplTest {
         return url.getPath();
     }
 
-    private String getFont(String fontFileName) {
+    private String getFontPath(String fontFileName) {
         URL url = Thread.currentThread().getContextClassLoader().getResource("fonts/" + fontFileName);
         assert url != null;
         return url.getPath();

@@ -32,12 +32,6 @@
     <url-pattern>/translate</url-pattern>
   </servlet-mapping>
 
-  <listener>
-    <listener-class>
-      ocrme_backend.servlets.AppContextListener
-    </listener-class>
-  </listener>
-
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
@@ -52,7 +46,10 @@
     <param-value>${ocrme.bucket.request_images}</param-value>
   </context-param>
 
-
+  <context-param>
+    <param-name>font.path</param-name>
+    <param-value>${font.path}</param-value>
+  </context-param>
 
 
 </web-app>

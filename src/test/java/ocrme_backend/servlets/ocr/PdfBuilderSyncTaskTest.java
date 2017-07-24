@@ -4,6 +4,7 @@ import ocrme_backend.datastore.utils.FileProvider;
 import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData;
+import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData.Status;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.junit.After;
@@ -18,17 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
+import static ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl.FONT_PATH_PARAMETER;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData.Status;
 
 /**
  * Created by iuliia on 7/13/17.
  */
-public class PdfBuilderCallableTaskTest {
+public class PdfBuilderSyncTaskTest {
 
     private String defaultFont = "FreeSans.ttf";
     private ExecutorService service;
@@ -40,12 +39,10 @@ public class PdfBuilderCallableTaskTest {
     public void init() throws Exception {
         service = Executors.newFixedThreadPool(2);
         FileItemIterator mockFileItemIterator = mock(FileItemIterator.class);
-        when(mockFileItemIterator.next()).thenReturn(FileProvider.getItemStreamFile());
+        when(mockFileItemIterator.next()).thenReturn(FileProvider.getItemStreamImageFile());
         when(mockFileItemIterator.hasNext()).thenReturn(true).thenReturn(false);
 
-        Future<PdfBuilderInputData> pdfDataFuture = service.submit(
-                new OcrCallableTask(mockFileItemIterator, null));
-        data = pdfDataFuture.get();
+        data = new OcrSyncTask(mockFileItemIterator, null).execute();
         session = mock(HttpSession.class);
         String path = Thread.currentThread().getContextClassLoader().getResource("temp/").getPath();
 
@@ -53,9 +50,10 @@ public class PdfBuilderCallableTaskTest {
         when(mockServletContext.getRealPath(PDFBuilderImpl.uploadsDir)).
                 thenReturn(path);
 
-        when(mockServletContext.getRealPath(PDFBuilderImpl.FONT_PATH)).thenReturn(getFont(defaultFont));
+        when(mockServletContext.getInitParameter(FONT_PATH_PARAMETER)).thenReturn(getFontPath(defaultFont));
 
-        when(mockServletContext.getInitParameter(PdfBuilderCallableTask.BUCKET_FOR_PDFS_PARAMETER)).
+
+        when(mockServletContext.getInitParameter(PdfBuilderSyncTask.BUCKET_FOR_PDFS_PARAMETER)).
                 thenReturn("bucket-for-pdf-test");
         when(session.getServletContext()).thenReturn(mockServletContext);
         when(session.getId()).thenReturn("0");
@@ -68,22 +66,21 @@ public class PdfBuilderCallableTaskTest {
 
 
     @Test
-    public void testCall() throws Exception {
-        Future<PdfBuilderOutputData> result = service.submit(
-                new PdfBuilderCallableTask(data, session));
-        Assert.assertTrue(result.get() != null);
-        Assert.assertTrue(result.get().getUrl().length() > 0);
-        Assert.assertTrue(result.get().getStatus().equals(PdfBuilderOutputData.Status.OK));
+    public void testExecute() throws Exception {
+        PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
+        Assert.assertTrue(result != null);
+        Assert.assertTrue(result.getUrl().length() > 0);
+        Assert.assertTrue(result.getStatus().equals(PdfBuilderOutputData.Status.OK));
     }
 
     @Test
     public void processFileWithNoText() throws Exception {
         data = new PdfBuilderInputData(300, 300, new ArrayList<>());
-        Future<PdfBuilderOutputData> result = service.submit(
-                new PdfBuilderCallableTask(data, session));
+
+        PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
 
         Assert.assertTrue(
-                result.get().getStatus().equals(Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA));
+                result.getStatus().equals(Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA));
     }
 
     @Test
@@ -92,15 +89,14 @@ public class PdfBuilderCallableTaskTest {
         List<TextUnit> texts = new ArrayList<>();
         texts.add(new TextUnit(simpleChinaText, 20, 200, 200, 20));
         data = new PdfBuilderInputData(300, 300, texts);
-        Future<PdfBuilderOutputData> result = service.submit(
-                new PdfBuilderCallableTask(data, session));
+        PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
 
         Assert.assertTrue(
-                result.get().getStatus().equals(Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED));
+                result.getStatus().equals(Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED));
 
     }
 
-    private String getFont(String fontFileName) {
+    private String getFontPath(String fontFileName) {
         URL url = Thread.currentThread().getContextClassLoader().getResource("fonts/" + fontFileName);
         assert url != null;
         return url.getPath();
