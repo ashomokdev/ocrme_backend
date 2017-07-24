@@ -12,6 +12,7 @@
     <properties>
         <app.id>imagetotext-149919</app.id>
         <app.version>1</app.version>
+        <skipTests>true</skipTests>
         <appengine.version>1.9.52</appengine.version>
         <gcloud.plugin.version>2.0.9.133.v201611104</gcloud.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -159,17 +160,6 @@
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.1</version>
@@ -195,7 +185,7 @@
                         <resource>
                             <directory>${basedir}/src/main/webapp/WEB-INF</directory>
                             <excludes>
-                                <exclude>**/fonts</exclude>
+                                <!--<exclude>**/fonts</exclude>-->
                                 <exclude>**/*.ttf</exclude>
                             </excludes>
                             <filtering>true</filtering>

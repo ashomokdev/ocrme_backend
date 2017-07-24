@@ -110,15 +110,6 @@ public class PDFBuilderImpl implements PDFBuilder {
         contentByte.setRGBColorFill(0x00, 0x00, 0x00);
 
         String fontPath = session.getServletContext().getInitParameter(FONT_PATH_PARAMETER);
-//        File fontFile = new File(fontPath);
-//
-//        if (fontFile.exists()) {
-//            logger.log(Level.INFO, "Font file exists, path = " + fontPath);
-//        } else {
-//            logger.log(Level.INFO, "Font file not exists in path = " + fontPath);
-//        }
-//        Font bf = FontFactory.getFont(fontPath, BaseFont.IDENTITY_H, true);
-
 
         byte[] bytes = IOUtils.toByteArray(session.getServletContext()
                 .getResourceAsStream(fontPath));
@@ -135,9 +126,7 @@ public class PDFBuilderImpl implements PDFBuilder {
             contentByte.setFontAndSize(bf.getCalculatedBaseFont(true), fontSize);
 
             contentByte.setTextMatrix(llx, lly);
-            contentByte.showText(new String(text.getText().getBytes("utf-8"), "utf-8"));
-
-//            contentByte.showText(text.getText());
+            contentByte.showText(text.getText());
         }
         contentByte.endText();
         contentByte.restoreState();
