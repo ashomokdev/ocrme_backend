@@ -49,6 +49,7 @@ public class CloudStorageHelper {
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
      * environment variable, appending a timestamp to end of the uploaded filename.
      */
+    @Deprecated
     public String uploadFile(FileItemStream fileStream, final String bucketName)
             throws IOException, ServletException {
         checkFileExtension(fileStream.getName());
@@ -72,6 +73,8 @@ public class CloudStorageHelper {
     }
 
     /**
+     * preferred way to upload the file
+     *
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
      * environment variable, appending a timestamp to end of the uploaded filename.
      */
@@ -122,45 +125,6 @@ public class CloudStorageHelper {
         // return the public download link
         return storage.get(blobInfo.getBlobId()).getMediaLink();
     }
-
-
-//    /**
-//     * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
-//     * environment variable, appending a timestamp to start of the uploaded filename.
-//     */
-//    public String uploadFile(InputStream input, String fileName, final String bucketName)
-//            throws IOException, ServletException {
-//
-//        checkFileExtension(fileName);
-//
-//        String timeStamp = getTimeStamp();
-//        final String destinationFilename = timeStamp + fileName;
-//
-//        BlobInfo blobInfo = BlobInfo
-//                .newBuilder(bucketName, destinationFilename)
-//                // Modify access list to allow all users with link to read file
-//                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
-//                .build();
-//
-//        // When content is not available or large (1MB or more) it is recommended
-//        // to write it in chunks via the blob's channel writer.
-//        try (WriteChannel writer = storage.writer(blobInfo)) {
-//            byte[] buffer = new byte[1024];
-//            int limit;
-//            while ((limit = input.read(buffer)) >= 0) {
-//                try {
-//                    writer.write(ByteBuffer.wrap(buffer, 0, limit));
-//                } catch (Exception ex) {
-//                    ex.printStackTrace();
-//                }
-//            }
-//        }
-//
-//        logger.log(Level.INFO, "File uploaded as "+ destinationFilename);
-//        // return the public download link
-//        return storage.get(blobInfo.getBlobId()).getMediaLink();
-//    }
-
 
     /**
      * Upload file from path

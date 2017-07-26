@@ -34,11 +34,14 @@ public class PDFBuilderImpl implements PDFBuilder {
     }
 
     /**
+     * Bapp engine did not support writing to file system. Use buildPdfStream instead.
+     *
      * @param data
      * @return path
      */
     @Nullable
     @Override
+    @Deprecated
     public String buildPdfFile(PdfBuilderInputData data) {
 
         String filename = generateFileName();
@@ -86,6 +89,7 @@ public class PDFBuilderImpl implements PDFBuilder {
      *
      * @param path of pdf file
      */
+    @Deprecated
     public void addSimpleContent(String path) {
         Document document = new Document(); //specified size  Document doc = new Document(new Rectangle(570, 924f)); http://developers.itextpdf.com/question/how-add-text-inside-rectangle
         try {
@@ -110,7 +114,6 @@ public class PDFBuilderImpl implements PDFBuilder {
         contentByte.setRGBColorFill(0x00, 0x00, 0x00);
 
         String fontPath = session.getServletContext().getInitParameter(FONT_PATH_PARAMETER);
-
         byte[] bytes = IOUtils.toByteArray(session.getServletContext()
                 .getResourceAsStream(fontPath));
         Font bf = new Font(BaseFont.createFont("FreeSans.ttf", BaseFont.IDENTITY_H,

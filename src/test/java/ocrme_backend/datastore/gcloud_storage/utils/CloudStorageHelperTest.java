@@ -1,7 +1,6 @@
 package ocrme_backend.datastore.gcloud_storage.utils;
 
 import ocrme_backend.datastore.utils.FileProvider;
-import org.apache.commons.fileupload.FileItemStream;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,7 +9,6 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -65,14 +63,13 @@ public class CloudStorageHelperTest {
     }
 
     /**
-     * upload file, represented as InputStream
-     *
+     * upload image file, represented as InputStream
      * @throws Exception
      */
     @Test
     public void uploadImageAsInputStream() throws Exception {
         helper.createBucket(bucketName);
-        ByteArrayOutputStream stream = FileProvider.getOutputStream();
+        ByteArrayOutputStream stream = FileProvider.getImageAsStream();
         String url = helper.uploadFile(FileUtils.toInputStream(stream), "filename.jpg", bucketName);
         Assert.assertTrue(url != null);
         Assert.assertFalse(url.equals(""));
@@ -82,16 +79,16 @@ public class CloudStorageHelperTest {
         Assert.assertTrue(capturedLog.contains("uploaded"));
     }
 
+
     /**
-     * upload file, represented as FileItemStream
-     *
+     * upload russian pdf, represented as byte[]
      * @throws Exception
      */
     @Test
-    public void uploadImageAsFileItemStream() throws Exception {
+    public void uploadRusPdfAsByteArray() throws Exception {
         helper.createBucket(bucketName);
-        FileItemStream file = FileProvider.getItemStreamImageFile();
-        String url = helper.uploadFile(file, bucketName);
+        String url =  helper.uploadFile(FileProvider.getPdfAsStream().toByteArray(), "filename.pdf",bucketName);
+        System.out.println("url: "+url);
         Assert.assertTrue(url != null);
         Assert.assertFalse(url.equals(""));
 
@@ -101,15 +98,14 @@ public class CloudStorageHelperTest {
     }
 
     /**
-     * upload file, represented as Path, which located in Temp directory
-     *
+     * upload russian pdf, represented as InputStream
      * @throws Exception
      */
     @Test
-    public void uploadImageFileFromTemp() throws Exception {
+    public void uploadRusPdfAsStream() throws Exception {
         helper.createBucket(bucketName);
-
-        String url = helper.uploadFile(FileProvider.getPathFile(), bucketName);
+        String url =  helper.uploadFile(FileUtils.toInputStream(FileProvider.getPdfAsStream()), "filename.pdf",bucketName);
+        System.out.println("url: "+url);
         Assert.assertTrue(url != null);
         Assert.assertFalse(url.equals(""));
 
@@ -118,46 +114,7 @@ public class CloudStorageHelperTest {
         Assert.assertTrue(capturedLog.contains("uploaded"));
     }
 
-    //passed
-    @Test
-    public void uploadRusPdfFileFromTemp() throws Exception {
-        helper.createBucket(bucketName);
-        String url =  helper.uploadFile(Paths.get(FileProvider.getRusPdfFile()), bucketName);
-        Assert.assertTrue(url != null);
-        Assert.assertFalse(url.equals(""));
-
-        String capturedLog = getTestCapturedLog();
-        Assert.assertTrue(capturedLog.contains("created"));
-        Assert.assertTrue(capturedLog.contains("uploaded"));
-    }
-
-    //passed
-    @Test
-    public void uploadRusPdfStream() throws Exception {
-        helper.createBucket(bucketName);
-        String url =  helper.uploadFile(FileProvider.getRusPdfFileStream().toByteArray(), "filename",bucketName);
-        Assert.assertTrue(url != null);
-        Assert.assertFalse(url.equals(""));
-
-        String capturedLog = getTestCapturedLog();
-        Assert.assertTrue(capturedLog.contains("created"));
-        Assert.assertTrue(capturedLog.contains("uploaded"));
-    }
-
-    //passed
-    @Test
-    public void uploadRusPdfStream2() throws Exception {
-        helper.createBucket(bucketName);
-        String url =  helper.uploadFile(FileUtils.toInputStream(FileProvider.getRusPdfFileStream()), "filename",bucketName);
-        Assert.assertTrue(url != null);
-        Assert.assertFalse(url.equals(""));
-
-        String capturedLog = getTestCapturedLog();
-        Assert.assertTrue(capturedLog.contains("created"));
-        Assert.assertTrue(capturedLog.contains("uploaded"));
-    }
-
-    public String getTestCapturedLog() throws IOException {
+   private String getTestCapturedLog() throws IOException {
         customLogHandler.flush();
         return logCapturingStream.toString();
     }

@@ -12,7 +12,7 @@
     <properties>
         <app.id>imagetotext-149919</app.id>
         <app.version>1</app.version>
-        <skipTests>true</skipTests>
+        <!--<skipTests>true</skipTests>-->
         <appengine.version>1.9.52</appengine.version>
         <gcloud.plugin.version>2.0.9.133.v201611104</gcloud.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -224,5 +224,10 @@
                 <version>${gcloud.plugin.version}</version>
             </plugin>
         </plugins>
+        <!--<testResources>-->
+            <!--<testResource>-->
+                  <!--<directory>${basedir}/target/test-classes/fonts</directory>-->
+            <!--</testResource>-->
+        <!--</testResources>-->
     </build>
 </project>

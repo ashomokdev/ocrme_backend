@@ -28,7 +28,7 @@ public class OcrProcessorImplTest {
 
     @Test
     public void doOCR() throws Exception {
-        byte[] file = FileProvider.getImageFile().getFile();
+        byte[] file = FileProvider.getImageFile().getImageBytes();
         String result = ocrProcessor.ocrForText(file);
         assertNotNull(result);
         assertTrue(result.length() > 0);
@@ -36,7 +36,7 @@ public class OcrProcessorImplTest {
 
     @Test
     public void OCRRussian() throws Exception {
-        byte[] file = FileProvider.getRusImageFile().getFile();
+        byte[] file = FileProvider.getRusImageFile().getImageBytes();
         ArrayList<String> languages = new ArrayList<>();
         languages.add("ru");
         String result = ocrProcessor.ocrForText(file, languages);
@@ -48,7 +48,7 @@ public class OcrProcessorImplTest {
     @Test
     public void ocrForData() throws Exception {
         ImageFile file = FileProvider.getImageFile();
-        PdfBuilderInputData data = ocrProcessor.ocrForData(file.getFile());
+        PdfBuilderInputData data = ocrProcessor.ocrForData(file.getImageBytes());
         assertTrue(data.getText().size() > 0);
     }
 
@@ -57,7 +57,7 @@ public class OcrProcessorImplTest {
         ImageFile file = FileProvider.getRusImageFile();
         List<String> languages = new ArrayList<>();
         languages.add("ru");
-        PdfBuilderInputData data = ocrProcessor.ocrForData(file.getFile(), languages);
+        PdfBuilderInputData data = ocrProcessor.ocrForData(file.getImageBytes(), languages);
         List<TextUnit> text = data.getText();
         assertTrue(text.size() > 0);
 

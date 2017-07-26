@@ -5,12 +5,15 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 
 /**
@@ -20,7 +23,6 @@ import java.security.GeneralSecurityException;
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" http://localhost:8080/ocr_request
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" http://localhost:8080/ocr_request?language=ru
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" https://imagetotext-149919.appspot.com/ocr_request?language=ru
-
  */
 public class OcrRequestServlet extends HttpServlet {
 
@@ -50,18 +52,47 @@ public class OcrRequestServlet extends HttpServlet {
     }
 
     private OcrResponse doTask(HttpServletRequest req) throws IOException, GeneralSecurityException, FileUploadException, ServletException {
-        FileItemIterator file = extractFile(req);
+        InputImage file = extractFile(req);
         String[] languages = req.getParameterValues("language");
 
-        OcrRequestManager manager = new OcrRequestManager(file, languages, req.getSession());
+        OcrRequestManager manager = new OcrRequestManager(file.filename, file.bytes, languages, req.getSession());
         OcrResponse response = manager.processForResult();
         return response;
     }
 
 
-    private  FileItemIterator extractFile(HttpServletRequest req) throws IOException, FileUploadException {
+    private InputImage extractFile(HttpServletRequest req) throws IOException, FileUploadException {
+        InputImage image = new InputImage();
+        byte[] bytes = null;
+        String filename = "default.jpg";
         ServletFileUpload upload = new ServletFileUpload();
+
         FileItemIterator it = upload.getItemIterator(req);
-        return it;
+
+        while (it.hasNext()) {
+            FileItemStream item = it.next();
+            String fieldName = item.getFieldName();
+            InputStream fieldValue = item.openStream();
+
+            if ("file".equals(fieldName)) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                Streams.copy(fieldValue, out, true);
+                bytes = out.toByteArray();
+            }
+            filename = item.getName();
+        }
+        if (bytes == null) {
+            throw new FileUploadException("Can not get file");
+        }
+
+        image.bytes = bytes;
+        image.filename = filename;
+
+        return image;
+    }
+
+    private class InputImage {
+        private byte[] bytes;
+        private String filename;
     }
 }

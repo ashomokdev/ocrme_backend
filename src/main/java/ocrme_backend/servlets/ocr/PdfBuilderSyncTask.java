@@ -72,20 +72,6 @@ public class PdfBuilderSyncTask {
         return url;
     }
 
-//    private String uploadToStorage(InputStream inputStream) {
-//        String fileName = "file.pdf";
-//        String url = "";
-//        try {
-//            CloudStorageHelper helper = new CloudStorageHelper();
-//            String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_PDFS_PARAMETER);
-//            helper.createBucket(bucketName);
-//            url = helper.uploadFile(inputStream, fileName, bucketName);
-//        } catch (IOException | ServletException e) {
-//            e.printStackTrace();
-//        }
-//        return url;
-//    }
-
     private String uploadToStorage(byte[] file) {
         String fileName = "file.pdf";
         String url = "";

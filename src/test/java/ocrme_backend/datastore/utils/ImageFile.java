@@ -14,7 +14,7 @@ public class ImageFile {
         this.height = height;
     }
 
-    public byte[] getFile() {
+    public byte[] getImageBytes() {
         return file;
     }
 
