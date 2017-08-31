@@ -9,9 +9,6 @@ public class OcrResponse implements Serializable {
 
     private String textResult;
     private String pdfResultUrl;
-
-
-
     private Status status;
 
     public enum Status {
@@ -20,7 +17,6 @@ public class OcrResponse implements Serializable {
         TEXT_NOT_FOUND,
         UNKNOWN_ERROR
     }
-
 
     public void setTextResult(String textResult) {
         this.textResult = textResult;

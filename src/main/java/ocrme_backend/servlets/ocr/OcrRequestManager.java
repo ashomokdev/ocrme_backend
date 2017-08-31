@@ -31,7 +31,7 @@ public class OcrRequestManager {
         this.session = session;
     }
 
-    public OcrResponse processForResult() throws IOException, ServletException {
+    public OcrResponse process() throws IOException, ServletException {
 
         OcrResponse response = new OcrResponse();
         try {

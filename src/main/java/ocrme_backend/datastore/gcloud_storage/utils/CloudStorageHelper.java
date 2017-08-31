@@ -95,6 +95,7 @@ public class CloudStorageHelper {
                                 .build(),
                         fileStream);
         logger.log(Level.INFO, "File uploaded as " + fileName);
+
         // return the public download link
         return blobInfo.getMediaLink();
     }

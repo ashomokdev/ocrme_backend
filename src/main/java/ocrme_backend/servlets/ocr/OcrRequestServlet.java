@@ -56,7 +56,7 @@ public class OcrRequestServlet extends HttpServlet {
         String[] languages = req.getParameterValues("language");
 
         OcrRequestManager manager = new OcrRequestManager(file.filename, file.bytes, languages, req.getSession());
-        OcrResponse response = manager.processForResult();
+        OcrResponse response = manager.process();
         return response;
     }
 

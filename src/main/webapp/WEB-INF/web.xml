@@ -32,6 +32,16 @@
     <url-pattern>/translate</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>SupportedLanguagesServlet</servlet-name>
+    <servlet-class>ocrme_backend.servlets.translate.SupportedLanguagesServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SupportedLanguagesServlet</servlet-name>
+    <url-pattern>/supported_languages</url-pattern>
+  </servlet-mapping>
+
+
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>

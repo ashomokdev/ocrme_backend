@@ -3,7 +3,6 @@ package ocrme_backend.servlets.ocr;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import ocrme_backend.datastore.utils.FileProvider;
-import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,12 +10,8 @@ import org.junit.Test;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
-import java.net.URL;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static ocrme_backend.datastore.utils.FileProvider.getFontAsStream;
-import static ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl.FONT_PATH_PARAMETER;
 import static ocrme_backend.servlets.ocr.OcrRequestManager.BUCKET_FOR_REQUESTS_PARAMETER;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -60,7 +55,7 @@ public class OcrRequestManagerTest {
 
     @Test
     public void processForResult() throws Exception {
-        OcrResponse response = manager.processForResult();
+        OcrResponse response = manager.process();
         Assert.assertTrue(response.getTextResult().length() > 0);
         Assert.assertTrue(response.getPdfResultUrl().length() > 0);
         Assert.assertTrue(response.getStatus().equals(OcrResponse.Status.OK));

@@ -1,8 +1,8 @@
 package ocrme_backend.translate;
 
+import com.google.cloud.translate.Language;
 import com.google.cloud.translate.TranslateException;
 import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -10,9 +10,10 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.security.GeneralSecurityException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
@@ -20,32 +21,37 @@ import static org.junit.Assert.assertTrue;
  * Created by iuliia on 5/19/17.
  */
 public class TranslatorImplTest {
-
     /**
      * skip TranslateException which occurs because of limits
      * https://cloud.google.com/vision/docs/limits
      * Requests per second	10
      */
     @Rule
-    public TestRule skipRule = new TestRule() {
-        public Statement apply(final Statement base, Description desc) {
-
-            return new Statement() {
-                public void evaluate() throws Throwable {
-                    try {
-                        base.evaluate();
-                    } catch (TranslateException ex) {
-                        Assume.assumeTrue(true);
-                    }
+    public TestRule skipRule = (base, desc) -> new Statement() {
+        public void evaluate() throws Throwable {
+            try {
+                base.evaluate();
+            } catch (TranslateException ex) {
+                if (ex.getMessage().contains("Daily Limit Exceeded")) {
+                    ex.printStackTrace();
+                    Assume.assumeTrue(true);
+                } else {
+                    throw ex;
                 }
-            };
+            }
         }
     };
-    private Translator translator;
 
-    @Before
-    public void init() throws IOException, GeneralSecurityException {
-        translator = new TranslatorImpl();
+    @Test
+    public void detectRuLanguage() throws Exception {
+        String language = Translator.detectLanguage("Отличные условия");
+        assertTrue((language).contains("ru"));
+    }
+
+    @Test
+    public void detectDeLanguage() throws Exception {
+        String language = Translator.detectLanguage("Mit Macht kommt große Verantwortung.");
+        assertTrue((language).contains("de"));
     }
 
     @Test
@@ -55,7 +61,7 @@ public class TranslatorImplTest {
         PrintStream out = new PrintStream(bout);
 
         // Act
-        TranslatorImpl.translateTextWithOptions("Mit Macht kommt große Verantwortung.", "de", "es", out);
+        Translator.translateTextWithOptions("Mit Macht kommt große Verantwortung.", "de", "es", out);
 
         // Assert
         String got = bout.toString();
@@ -66,7 +72,7 @@ public class TranslatorImplTest {
     public void testGermanToSpanishTranslation2() throws Exception {
 
         // Act
-        String result = translator.translate("de", "es", "Mit Macht kommt große Verantwortung.");
+        String result = Translator.translate("de", "es", "Mit Macht kommt große Verantwortung.");
 
         // Assert
         assertTrue((result).contains("Con el poder viene una gran responsabilidad."));
@@ -74,25 +80,27 @@ public class TranslatorImplTest {
     }
 
     @Test
-    public void testGermanLangDetection() throws Exception {
-        // Arrange
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        PrintStream out = new PrintStream(bout);
+    public void testGetSupportedLanguages() {
+        // by default it'll use English
+        List<Language> langByDefault = Translator.getSupportedLanguages(Optional.empty());
+        assert !langByDefault.isEmpty();
 
-        // Act
-        TranslatorImpl.detectLanguage("Mit Macht kommt große Verantwortung.", out);
+        List<String> defaultSupportCodes = langByDefault.stream()
+                .map(Language::getCode)
+                .collect(Collectors.toList());
 
-        // Assert
-        String got = bout.toString();
-        assertTrue((got).contains("language=de"));
+        List<Language> langByChina = Translator.getSupportedLanguages(Optional.of("zh"));
+        assert !langByChina.isEmpty();
+        List<String> chinaSupportCodes = langByChina.stream()
+                .map(Language::getCode)
+                .collect(Collectors.toList());
 
+        assert defaultSupportCodes.containsAll(chinaSupportCodes);
+        List<String> diffCodeList = defaultSupportCodes.stream()
+                .filter(o -> !chinaSupportCodes.contains(o))
+                .collect(Collectors.toList());
 
-        assertTrue((got).contains("language=de"));
-
-        // Assert
-        Double confidence = Double.parseDouble(
-                got.split("confidence=")[1].split("}")[0]
-        );
-        assertTrue((confidence) >= 0.9);
+        assert diffCodeList.isEmpty();
     }
+
 }
