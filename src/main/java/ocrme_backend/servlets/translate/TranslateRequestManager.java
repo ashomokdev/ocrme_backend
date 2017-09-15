@@ -2,6 +2,7 @@ package ocrme_backend.servlets.translate;
 
 import ocrme_backend.translate.Translator;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -9,18 +10,14 @@ import javax.annotation.Nullable;
  */
 public class TranslateRequestManager {
     public static TranslateResponse translate(
-            String deviceLanguageCode,
             @Nullable String sourceLanguageCode,
-            @Nullable String targetLanguageCode,
+            @Nonnull String targetLanguageCode,
             String sourceText) {
 
         TranslateResponse response = new TranslateResponse();
         try {
             if (sourceLanguageCode == null || sourceLanguageCode.isEmpty()) {
                 sourceLanguageCode = detectSourceLanguage(sourceText);
-            }
-            if (targetLanguageCode == null || targetLanguageCode.isEmpty()) {
-                targetLanguageCode = deviceLanguageCode;
             }
 
             String targetText;

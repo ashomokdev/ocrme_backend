@@ -9,7 +9,7 @@ public class TranslateRequestManagerTest {
     @Test
     public void translate() throws Exception {
         TranslateResponse response = TranslateRequestManager.translate(
-                "ru", null, null, "My mom is kind");
+                null, "ru", "My mom is kind");
 
         assert (! response.getTextResult().isEmpty());
     }
