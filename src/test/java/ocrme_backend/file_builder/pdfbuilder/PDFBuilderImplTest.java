@@ -2,6 +2,7 @@ package ocrme_backend.file_builder.pdfbuilder;
 
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+import ocrme_backend.servlets.ocr.OcrData;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,9 +78,9 @@ public class PDFBuilderImplTest {
         //preparation
         ArrayList<String> languages = new ArrayList<>();
         languages.add("ru");
-        PdfBuilderInputData data = ocrForData(rusFilename, languages);
+        OcrData data = ocrForData(rusFilename, languages);
 
-        ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data);
+        ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data.getPdfBuilderInputData());
 
         String pdfFileName = "filename.pdf";
         File destination  = new File(getPathToTemp(), pdfFileName);
@@ -166,9 +167,9 @@ public class PDFBuilderImplTest {
      */
     private void testBuildPdfFromRealData (String imageFileName, @Nullable ArrayList<String> languages) throws Exception {
         //preparation
-        PdfBuilderInputData data = ocrForData(imageFileName, languages);
+        OcrData data = ocrForData(imageFileName, languages);
 
-        testBuildPdf(data);
+        testBuildPdf(data.getPdfBuilderInputData());
     }
 
     private void testFileExistsAndNotEmpty(String path) throws IOException {

@@ -37,4 +37,13 @@ public class OcrResponse implements Serializable {
     public Status getStatus() {
         return status;
     }
+
+    @Override
+    public String toString() {
+        return "OcrResponse{" +
+                "textResult='" + textResult + '\'' +
+                ", pdfResultUrl='" + pdfResultUrl + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

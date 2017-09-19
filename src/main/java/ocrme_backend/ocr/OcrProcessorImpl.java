@@ -10,6 +10,7 @@ import com.google.api.services.vision.v1.model.*;
 import com.google.common.collect.ImmutableList;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
+import ocrme_backend.servlets.ocr.OcrData;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -59,12 +60,12 @@ public class OcrProcessorImpl implements OCRProcessor {
     }
 
     @Override
-    public PdfBuilderInputData ocrForData(byte[] image) throws IOException {
+    public OcrData ocrForData(byte[] image) throws IOException {
         return ocrForData(image,null);
     }
 
     @Override
-    public PdfBuilderInputData ocrForData(byte[] image, @Nullable List<String> languages) throws IOException {
+    public OcrData ocrForData(byte[] image, @Nullable List<String> languages) throws IOException {
 
         BatchAnnotateImagesResponse batchResponse = ocrForResponce(image, languages);
 
@@ -79,7 +80,8 @@ public class OcrProcessorImpl implements OCRProcessor {
             e.printStackTrace();
             result = new PdfBuilderInputData(e.getMessage());
         }
-        return result;
+
+        return new OcrData(result, extractText(batchResponse));
     }
 
     private ImageDimensions extractImageDimensions(BatchAnnotateImagesResponse batchResponse) {

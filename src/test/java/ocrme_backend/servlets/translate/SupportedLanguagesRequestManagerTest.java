@@ -9,7 +9,7 @@ public class SupportedLanguagesRequestManagerTest {
 
     @Test
     public void getSupportedLanguages() throws Exception {
-        SupportedLanguagesResponse response = SupportedLanguagesRequestManager.getSupportedLanguages("de");
+        SupportedLanguagesResponse response = SupportedLanguagesRequestManager.getSupportedLanguages("gd");
         assert (response.getSupportedLanguages().size() > 0);
         assert (response.getStatus().equals(SupportedLanguagesResponse.Status.OK));
     }

@@ -42,7 +42,7 @@ public class PdfBuilderSyncTaskTest {
         List<String> languages = new ArrayList<>();
         languages.add("ru");
 
-        data = PdfBuilderInputDataProvider.ocrForData(rusFilename, languages);
+        data = PdfBuilderInputDataProvider.ocrForData(rusFilename, languages).getPdfBuilderInputData();
 
         session = mock(HttpSession.class);
 

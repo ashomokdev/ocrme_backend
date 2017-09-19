@@ -25,15 +25,15 @@ public class OcrSyncTask {
         logger = Logger.getLogger(OcrSyncTask.class.getName());
     }
 
-    public PdfBuilderInputData execute() throws IOException, GeneralSecurityException {
+    public OcrData execute() throws IOException, GeneralSecurityException {
 
-        PdfBuilderInputData result = doStaff();
+        OcrData result = doStaff();
         logger.log(Level.INFO, "text result:" + result.getSimpleText());
         return result;
     }
 
-    private PdfBuilderInputData doStaff() throws IOException, GeneralSecurityException {
-        PdfBuilderInputData data;
+    private OcrData doStaff() throws IOException, GeneralSecurityException {
+        OcrData data;
         try {
             if (imageBytes == null) {
                 throw new FileUploadException("Can not get file");
@@ -45,7 +45,7 @@ public class OcrSyncTask {
                 data = processor.ocrForData(imageBytes, Arrays.asList(languages));
             }
         } catch (Exception e) {
-            data = new PdfBuilderInputData(e.getMessage());
+            data = new OcrData(new PdfBuilderInputData(e.getMessage()), "");
             logger.log(Level.WARNING, "ERROR! See log below.");
             e.printStackTrace();
         }

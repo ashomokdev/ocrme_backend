@@ -14,8 +14,8 @@ public class OcrSyncTaskTest {
     @Test
     public void testExecute() throws Exception {
 
-        PdfBuilderInputData result = new OcrSyncTask(FileProvider.getImageFile().getImageBytes(), null).execute();
+        OcrData result = new OcrSyncTask(FileProvider.getImageFile().getImageBytes(), null).execute();
         Assert.assertTrue(result != null);
-        Assert.assertTrue(result.getText().size() > 0);
+        Assert.assertTrue(result.getPdfBuilderInputData().getText().size() > 0);
     }
 }

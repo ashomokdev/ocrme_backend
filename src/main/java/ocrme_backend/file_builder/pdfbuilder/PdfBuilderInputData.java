@@ -58,7 +58,7 @@ public class PdfBuilderInputData {
     public String getSimpleText() {
         StringBuilder simpleText = new StringBuilder();
         for (TextUnit unit : text) {
-            simpleText.append(unit.getText());
+            simpleText.append(unit.getText()).append(" ");
         }
         return simpleText.toString();
     }

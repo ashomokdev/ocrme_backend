@@ -2,8 +2,8 @@ package ocrme_backend.ocr;
 
 import ocrme_backend.datastore.utils.FileProvider;
 import ocrme_backend.datastore.utils.ImageFile;
-import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
+import ocrme_backend.servlets.ocr.OcrData;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,8 +48,8 @@ public class OcrProcessorImplTest {
     @Test
     public void ocrForData() throws Exception {
         ImageFile file = FileProvider.getImageFile();
-        PdfBuilderInputData data = ocrProcessor.ocrForData(file.getImageBytes());
-        assertTrue(data.getText().size() > 0);
+        OcrData data = ocrProcessor.ocrForData(file.getImageBytes());
+        assertTrue(data.getPdfBuilderInputData().getText().size() > 0);
     }
 
     @Test
@@ -57,8 +57,8 @@ public class OcrProcessorImplTest {
         ImageFile file = FileProvider.getRusImageFile();
         List<String> languages = new ArrayList<>();
         languages.add("ru");
-        PdfBuilderInputData data = ocrProcessor.ocrForData(file.getImageBytes(), languages);
-        List<TextUnit> text = data.getText();
+        OcrData data = ocrProcessor.ocrForData(file.getImageBytes(), languages);
+        List<TextUnit> text = data.getPdfBuilderInputData().getText();
         assertTrue(text.size() > 0);
 
 

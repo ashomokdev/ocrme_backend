@@ -35,11 +35,11 @@ public class OcrRequestManager {
 
         OcrResponse response = new OcrResponse();
         try {
-            PdfBuilderInputData ocrResult = getOcrResult();
+            OcrData ocrResult = getOcrResult();
             String simpleTextResult = ocrResult.getSimpleText();
             response.setTextResult(simpleTextResult);
 
-            PdfBuilderOutputData pdfBuilderOutputData = makePdf(ocrResult);
+            PdfBuilderOutputData pdfBuilderOutputData = makePdf(ocrResult.getPdfBuilderInputData());
 
             String pdfUrl = pdfBuilderOutputData.getUrl();
             response.setPdfResultUrl(pdfUrl);
@@ -65,6 +65,7 @@ public class OcrRequestManager {
         } finally {
             addToDb(response);
         }
+        logger.log(Level.INFO, "Response: " + response.toString());
         return response;
     }
 
@@ -99,13 +100,13 @@ public class OcrRequestManager {
         logger.log(Level.INFO, "data saved in DB, entity id = " + requestId);
     }
 
-    private PdfBuilderInputData getOcrResult()
+    private OcrData getOcrResult()
             throws InterruptedException, java.util.concurrent.ExecutionException, IOException, GeneralSecurityException {
 
         OcrSyncTask ocrSyncTask = new OcrSyncTask(imageBytes, languages);
-        PdfBuilderInputData pdfData = ocrSyncTask.execute();
+        OcrData ocrData = ocrSyncTask.execute();
         logger.log(Level.INFO, "ocr result obtained");
-        return pdfData;
+        return ocrData;
     }
 
     private PdfBuilderOutputData makePdf(PdfBuilderInputData ocrResult) {
