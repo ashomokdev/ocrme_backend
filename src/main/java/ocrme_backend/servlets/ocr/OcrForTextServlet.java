@@ -22,6 +22,8 @@ import java.util.Arrays;
  * run for test
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/items/IMG_8204.JPG" https://imagetotext-149919.appspot.com/ocr_file
  */
+
+@Deprecated
 public class OcrForTextServlet extends HttpServlet {
 
     @Override

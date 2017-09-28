@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,12 +122,17 @@ public class OcrRequestManager {
     private OcrData processForOcrResult()
             throws InterruptedException, java.util.concurrent.ExecutionException, IOException, GeneralSecurityException {
 
+        List<String> languagesList = null;
+        if (languages != null) {
+            languagesList = Arrays.asList(languages);
+        }
+
         OCRProcessor processor = new OcrProcessorImpl();
         OcrData ocrData;
         if (gcsImageUri == null) {
-            ocrData = processor.ocrForData(imageBytes, Arrays.asList(languages));
+            ocrData = processor.ocrForData(imageBytes, languagesList);
         } else {
-            ocrData = processor.ocrForData(gcsImageUri, Arrays.asList(languages));
+            ocrData = processor.ocrForData(gcsImageUri, languagesList);
         }
         logger.log(Level.INFO, "ocr result obtained");
         return ocrData;

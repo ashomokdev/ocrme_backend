@@ -1,41 +1,37 @@
 package ocrme_backend.servlets.ocr;
 
 import com.google.gson.Gson;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.GeneralSecurityException;
 
 /**
- * Created by iuliia on 5/17/17.
- * run for test
- * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/items/obaby/IMG_8771.JPG" https://imagetotext-149919.appspot.com/ocr_request
- * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" http://localhost:8080/ocr_request
- * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" http://localhost:8080/ocr_request?language=ru
- * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" https://imagetotext-149919.appspot.com/ocr_request?language=ru
+ * Created by iuliia on 5/22/17.
+ * Run next to test in terminal
+ * curl -H "Content-Type: application/json" -X POST -d '{"gcsImageUri":"gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg", "languages":["ru"]}' https://imagetotext-149919.appspot.com/ocr_request
+ * curl -H "Content-Type: application/json" -X POST -d '{"gcsImageUri":"gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg", "languages":["ru"]}' http://localhost:8080/ocr_request
+ * curl -H "Content-Type: application/json" -X POST -d '{"gcsImageUri":"gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg"}' http://localhost:8080/ocr_request
  */
 
-//fixme takes image url from firebase not bytes.
 //example "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
 
 public class OcrRequestServlet extends HttpServlet {
-
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
 
         try {
-            OcrResponse ocrResponse = doTask(req);
+            BufferedReader reader = req.getReader();
+            OcrRequestBean requestBean = new Gson().fromJson(reader, OcrRequestBean.class);
 
+            OcrRequestManager manager = new OcrRequestManager(
+                    requestBean.getGcsImageUri(),
+                    requestBean.getLanguages(),
+                    req.getSession());
+
+            OcrResponse ocrResponse = manager.process();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
@@ -43,6 +39,7 @@ public class OcrRequestServlet extends HttpServlet {
             response.getWriter().print(json);
             response.getWriter().flush();
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
+
 
         } catch (Exception e) {
             try {
@@ -53,50 +50,5 @@ public class OcrRequestServlet extends HttpServlet {
             }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
-    }
-
-    private OcrResponse doTask(HttpServletRequest req) throws IOException, GeneralSecurityException, FileUploadException, ServletException {
-        InputImage file = extractFile(req);
-        String[] languages = req.getParameterValues("language");
-
-        OcrRequestManager manager = new OcrRequestManager(file.filename, file.bytes, languages, req.getSession());
-        OcrResponse response = manager.process();
-        return response;
-    }
-
-
-    private InputImage extractFile(HttpServletRequest req) throws IOException, FileUploadException {
-        InputImage image = new InputImage();
-        byte[] bytes = null;
-        String filename = "default.jpg";
-        ServletFileUpload upload = new ServletFileUpload();
-
-        FileItemIterator it = upload.getItemIterator(req);
-
-        while (it.hasNext()) {
-            FileItemStream item = it.next();
-            String fieldName = item.getFieldName();
-            InputStream fieldValue = item.openStream();
-
-            if ("file".equals(fieldName)) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                Streams.copy(fieldValue, out, true);
-                bytes = out.toByteArray();
-            }
-            filename = item.getName();
-        }
-        if (bytes == null) {
-            throw new FileUploadException("Can not get file");
-        }
-
-        image.bytes = bytes;
-        image.filename = filename;
-
-        return image;
-    }
-
-    private class InputImage {
-        private byte[] bytes;
-        private String filename;
     }
 }

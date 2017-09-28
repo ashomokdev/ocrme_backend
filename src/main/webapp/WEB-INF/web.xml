@@ -16,6 +16,15 @@
 
   <servlet>
     <servlet-name>OcrRequestServlet</servlet-name>
+    <servlet-class>ocrme_backend.servlets.ocr.OcrRequestServletDeprecated</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OcrRequestServlet</servlet-name>
+    <url-pattern>/ocr_request_deprecated</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>OcrRequestServlet</servlet-name>
     <servlet-class>ocrme_backend.servlets.ocr.OcrRequestServlet</servlet-class>
   </servlet>
   <servlet-mapping>
