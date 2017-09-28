@@ -24,6 +24,10 @@ import java.security.GeneralSecurityException;
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" http://localhost:8080/ocr_request?language=ru
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" https://imagetotext-149919.appspot.com/ocr_request?language=ru
  */
+
+//fixme takes image url from firebase not bytes.
+//example "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
+
 public class OcrRequestServlet extends HttpServlet {
 
     @Override

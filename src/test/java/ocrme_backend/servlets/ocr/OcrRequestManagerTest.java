@@ -24,8 +24,11 @@ public class OcrRequestManagerTest {
 
     private final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-    private OcrRequestManager manager;
+    private OcrRequestManager managerImageBytes;
+    private OcrRequestManager managerImageUri;
     private String defaultFont = "FreeSans.ttf";
+    private static final String imgUri = "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
+
 
     @Before
     public void init() throws Exception {
@@ -45,7 +48,8 @@ public class OcrRequestManagerTest {
         String filename = "ru.jpg";
         byte[] imageBytes = FileProvider.getRusImageFile().getImageBytes();
 
-        manager = new OcrRequestManager(filename, imageBytes, languages, session);
+        managerImageBytes = new OcrRequestManager(filename, imageBytes, languages, session);
+        managerImageUri = new OcrRequestManager(imgUri, languages, session);
     }
 
     @After
@@ -55,9 +59,15 @@ public class OcrRequestManagerTest {
 
     @Test
     public void processForResult() throws Exception {
-        OcrResponse response = manager.process();
-        Assert.assertTrue(response.getTextResult().length() > 0);
-        Assert.assertTrue(response.getPdfResultUrl().length() > 0);
-        Assert.assertTrue(response.getStatus().equals(OcrResponse.Status.OK));
+        OcrResponse response1 = managerImageBytes.process();
+        Assert.assertTrue(response1.getTextResult().length() > 0);
+        Assert.assertTrue(response1.getPdfResultUrl().length() > 0);
+        Assert.assertTrue(response1.getStatus().equals(OcrResponse.Status.OK));
+
+
+        OcrResponse response2 = managerImageUri.process();
+        Assert.assertTrue(response2.getTextResult().length() > 0);
+        Assert.assertTrue(response2.getPdfResultUrl().length() > 0);
+        Assert.assertTrue(response2.getStatus().equals(OcrResponse.Status.OK));
     }
 }

@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableList;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
 import ocrme_backend.servlets.ocr.OcrData;
+import org.apache.commons.fileupload.FileUploadException;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -48,41 +49,95 @@ public class OcrProcessorImpl implements OCRProcessor {
     }
 
     @Override
-    public String ocrForText(byte[] image) throws IOException {
+    public @Nullable String ocrForText(byte[] image) throws IOException {
         return ocrForText(image, null);
     }
 
     @Override
-    public String ocrForText(byte[] image, @Nullable List<String> languages) throws IOException {
-
-        BatchAnnotateImagesResponse batchResponse = ocrForResponce(image, languages);
-        return extractText(batchResponse);
+    public @Nullable String ocrForText(byte[] image, @Nullable List<String> languages) throws IOException {
+        try {
+            if (image == null) {
+                throw new FileUploadException("Can not get file");
+            }
+            BatchAnnotateImagesResponse batchResponse = ocrForResponse(image, languages);
+            return extractText(batchResponse);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "ERROR! See log below.");
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
     public OcrData ocrForData(byte[] image) throws IOException {
-        return ocrForData(image,null);
+        return ocrForData(image, null);
     }
 
     @Override
     public OcrData ocrForData(byte[] image, @Nullable List<String> languages) throws IOException {
-
-        BatchAnnotateImagesResponse batchResponse = ocrForResponce(image, languages);
-
-        List<TextUnit> data;
-        ImageDimensions imageDimensions;
-        PdfBuilderInputData result;
+        OcrData data;
         try {
-            data = extractData(batchResponse);
-            imageDimensions = extractImageDimensions(batchResponse);
-            result = new PdfBuilderInputData(imageDimensions.height, imageDimensions.width, data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            result = new PdfBuilderInputData(e.getMessage());
-        }
+            if (image == null) {
+                throw new FileUploadException("Can not get file");
+            }
+            BatchAnnotateImagesResponse batchResponse = ocrForResponse(image, languages);
 
-        return new OcrData(result, extractText(batchResponse));
+            List<TextUnit> textUnits;
+            ImageDimensions imageDimensions;
+            PdfBuilderInputData result;
+            try {
+                textUnits = extractData(batchResponse);
+                imageDimensions = extractImageDimensions(batchResponse);
+                result = new PdfBuilderInputData(imageDimensions.height, imageDimensions.width, textUnits);
+            } catch (Exception e) {
+                e.printStackTrace();
+                result = new PdfBuilderInputData(e.getMessage());
+            }
+
+            data = new OcrData(result, extractText(batchResponse));
+        } catch (Exception e) {
+            data = new OcrData(new PdfBuilderInputData(e.getMessage()), null);
+            logger.log(Level.WARNING, "ERROR! See log below.");
+            e.printStackTrace();
+        }
+        return data;
     }
+
+    @Override
+    public OcrData ocrForData(String gcsImageUri) throws IOException {
+        return ocrForData(gcsImageUri, null);
+    }
+
+    @Override
+    public OcrData ocrForData(String gcsImageUri, @Nullable List<String> languages) throws IOException {
+        OcrData data;
+        try {
+            if (gcsImageUri == null) {
+                throw new FileUploadException("Can not get file");
+            }
+            BatchAnnotateImagesResponse batchResponse = ocrForResponse(gcsImageUri, languages);
+
+            List<TextUnit> textUnits;
+            ImageDimensions imageDimensions;
+            PdfBuilderInputData result;
+            try {
+                textUnits = extractData(batchResponse);
+                imageDimensions = extractImageDimensions(batchResponse);
+                result = new PdfBuilderInputData(imageDimensions.height, imageDimensions.width, textUnits);
+            } catch (Exception e) {
+                e.printStackTrace();
+                result = new PdfBuilderInputData(e.getMessage());
+            }
+
+            data = new OcrData(result, extractText(batchResponse));
+        } catch (Exception e) {
+            data = new OcrData(new PdfBuilderInputData(e.getMessage()), null);
+            logger.log(Level.WARNING, "ERROR! See log below.");
+            e.printStackTrace();
+        }
+        return data;
+    }
+
 
     private ImageDimensions extractImageDimensions(BatchAnnotateImagesResponse batchResponse) {
         ImageDimensions result = new ImageDimensions();
@@ -99,7 +154,7 @@ public class OcrProcessorImpl implements OCRProcessor {
         return result;
     }
 
-    private BatchAnnotateImagesResponse ocrForResponce(byte[] image, @Nullable List<String> languages) throws IOException {
+    private BatchAnnotateImagesResponse ocrForResponse(byte[] image, @Nullable List<String> languages) throws IOException {
         AnnotateImageRequest request =
                 new AnnotateImageRequest()
                         .setImage(new Image().encodeContent(image))
@@ -108,6 +163,29 @@ public class OcrProcessorImpl implements OCRProcessor {
                                         .setType("DOCUMENT_TEXT_DETECTION")
                                         .setMaxResults(1)));
 
+        return getBatchAnnotateImagesResponse(languages, request);
+    }
+
+    /**
+     *
+     * @param imageUrl url from firebase storage, example https://firebasestorage.googleapis.com/v0/b/test-afc85.appspot.com/o/d2d7dfc0-662e-451a-86ae-1b1da98030b4?alt=media&token=e62047f3-4363-4417-9d85-327842ce3e87
+     * @param languages
+     * @return
+     * @throws IOException
+     */
+    public BatchAnnotateImagesResponse ocrForResponse(String imageUrl, @Nullable List<String> languages) throws IOException {
+        AnnotateImageRequest request =
+                new AnnotateImageRequest()
+                        .setImage(new Image().setSource(new ImageSource().setGcsImageUri(imageUrl)))
+                        .setFeatures(ImmutableList.of(
+                                new Feature()
+                                        .setType("DOCUMENT_TEXT_DETECTION")
+                                        .setMaxResults(1)));
+
+        return getBatchAnnotateImagesResponse(languages, request);
+    }
+
+    private BatchAnnotateImagesResponse getBatchAnnotateImagesResponse(@Nullable List<String> languages, AnnotateImageRequest request) throws IOException {
         if (languages != null && languages.size() > 0) {
             ImageContext imageContext = new ImageContext();
             imageContext.setLanguageHints(languages);
@@ -137,7 +215,7 @@ public class OcrProcessorImpl implements OCRProcessor {
         return message;
     }
 
-    private List<TextUnit> extractData(BatchAnnotateImagesResponse response) throws Exception {
+    public List<TextUnit> extractData(BatchAnnotateImagesResponse response) throws Exception {
         List<TextUnit> data = new ArrayList<>();
         try {
             for (AnnotateImageResponse res : response.getResponses()) {

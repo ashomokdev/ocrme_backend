@@ -1,5 +1,6 @@
 package ocrme_backend.ocr;
 
+import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import ocrme_backend.datastore.utils.FileProvider;
 import ocrme_backend.datastore.utils.ImageFile;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
@@ -50,6 +51,13 @@ public class OcrProcessorImplTest {
         ImageFile file = FileProvider.getImageFile();
         OcrData data = ocrProcessor.ocrForData(file.getImageBytes());
         assertTrue(data.getPdfBuilderInputData().getText().size() > 0);
+    }
+
+    @Test
+    public void ocrFromUri() throws Exception {
+        String imgUri = "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
+        BatchAnnotateImagesResponse data = ocrProcessor.ocrForResponse(imgUri, null);
+        assertTrue(ocrProcessor.extractData(data).size() > 0);
     }
 
     @Test

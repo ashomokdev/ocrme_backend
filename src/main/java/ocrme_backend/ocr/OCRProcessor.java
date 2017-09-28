@@ -45,4 +45,25 @@ public interface OCRProcessor {
      * @throws IOException
      */
     OcrData ocrForData(byte[] image, @Nullable List<String> languages) throws IOException;
+
+    /**
+     * perform OCR for retrieving text data for generation pdf file or another formatted file.
+     * With auto language detection.
+     * @param gcsImageUri - Google cloud storage image uri,
+     *                    example - "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
+     * @return data about text for generation pdf
+     * @throws IOException
+     */
+    OcrData ocrForData(String gcsImageUri) throws IOException;
+
+    /**
+     * perform OCR for retrieving text data for generation pdf file or another formatted file.
+     * With auto language detection.
+     * @param gcsImageUri - Google cloud storage image uri,
+     *                    example - "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
+     * @param languages list of languages
+     * @return data about text for generation pdf
+     * @throws IOException
+     */
+    OcrData ocrForData(String gcsImageUri, @Nullable List<String> languages) throws IOException;
 }

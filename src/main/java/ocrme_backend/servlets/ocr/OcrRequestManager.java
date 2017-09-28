@@ -4,11 +4,14 @@ import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData;
+import ocrme_backend.ocr.OCRProcessor;
+import ocrme_backend.ocr.OcrProcessorImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +24,7 @@ public class OcrRequestManager {
     private String[] languages;
     private HttpSession session;
     private final Logger logger = Logger.getLogger(OcrRequestManager.class.getName());
+    private String gcsImageUri; //download uri of image, stored in google cloud storage
     public static final String BUCKET_FOR_REQUESTS_PARAMETER = "ocrme.bucket.request_images";
 
 
@@ -31,16 +35,26 @@ public class OcrRequestManager {
         this.session = session;
     }
 
+    /**
+     * @param gcsImageUri download uri of image, stored in google cloud storage
+     * @param languages
+     * @param session
+     */
+    public OcrRequestManager(String gcsImageUri, String[] languages, HttpSession session) {
+        this.gcsImageUri = gcsImageUri;
+        this.languages = languages;
+        this.session = session;
+    }
+
     public OcrResponse process() throws IOException, ServletException {
 
         OcrResponse response = new OcrResponse();
         try {
-            OcrData ocrResult = getOcrResult();
+            OcrData ocrResult = processForOcrResult();
             String simpleTextResult = ocrResult.getSimpleText();
             response.setTextResult(simpleTextResult);
 
             PdfBuilderOutputData pdfBuilderOutputData = makePdf(ocrResult.getPdfBuilderInputData());
-
             String pdfUrl = pdfBuilderOutputData.getUrl();
             response.setPdfResultUrl(pdfUrl);
             PdfBuilderOutputData.Status status = pdfBuilderOutputData.getStatus();
@@ -83,10 +97,14 @@ public class OcrRequestManager {
         return url;
     }
 
+    //fixme method saved  inputImageUrl in 2 different formats
     private void addToDb(OcrResponse response) {
-
-        String inputImageUrl = uploadRequestImageToStorage(imageFilename, imageBytes);
-
+        String inputImageUrl;
+        if (gcsImageUri == null) {
+            inputImageUrl = uploadRequestImageToStorage(imageFilename, imageBytes);
+        } else {
+            inputImageUrl = gcsImageUri;
+        }
         //put request data to Db
         DbPusher dbPusher = new DbPusher();
         long requestId = dbPusher.add(
@@ -100,11 +118,16 @@ public class OcrRequestManager {
         logger.log(Level.INFO, "data saved in DB, entity id = " + requestId);
     }
 
-    private OcrData getOcrResult()
+    private OcrData processForOcrResult()
             throws InterruptedException, java.util.concurrent.ExecutionException, IOException, GeneralSecurityException {
 
-        OcrSyncTask ocrSyncTask = new OcrSyncTask(imageBytes, languages);
-        OcrData ocrData = ocrSyncTask.execute();
+        OCRProcessor processor = new OcrProcessorImpl();
+        OcrData ocrData;
+        if (gcsImageUri == null) {
+            ocrData = processor.ocrForData(imageBytes, Arrays.asList(languages));
+        } else {
+            ocrData = processor.ocrForData(gcsImageUri, Arrays.asList(languages));
+        }
         logger.log(Level.INFO, "ocr result obtained");
         return ocrData;
     }
