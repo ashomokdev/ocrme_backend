@@ -25,9 +25,6 @@ public class PdfBuilderInputData {
      */
     private List<TextUnit> text;
 
-    private boolean hasError;
-    private String errorMessage;
-
     /**
      * @param sourceHeight source/ocr file height
      * @param sourceWidth  source/ocr file width
@@ -48,13 +45,8 @@ public class PdfBuilderInputData {
     }
 
     /**
-     * @param errorMesage
+     * @return Simple text without new-line symbols.
      */
-    public PdfBuilderInputData(String errorMesage) {
-        this.hasError = true;
-        this.errorMessage = errorMesage;
-    }
-
     public String getSimpleText() {
         StringBuilder simpleText = new StringBuilder();
         for (TextUnit unit : text) {
@@ -73,22 +65,6 @@ public class PdfBuilderInputData {
 
     public float getmWidth() {
         return mWidth;
-    }
-
-    public boolean isHasError() {
-        return hasError;
-    }
-
-    public void setHasError(boolean hasError) {
-        this.hasError = hasError;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
     }
 
     /**

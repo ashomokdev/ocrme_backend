@@ -49,12 +49,14 @@ public class OcrProcessorImpl implements OCRProcessor {
     }
 
     @Override
-    public @Nullable String ocrForText(byte[] image) throws IOException {
+    public @Nullable
+    String ocrForText(byte[] image) throws IOException {
         return ocrForText(image, null);
     }
 
     @Override
-    public @Nullable String ocrForText(byte[] image, @Nullable List<String> languages) throws IOException {
+    public @Nullable
+    String ocrForText(byte[] image, @Nullable List<String> languages) throws IOException {
         try {
             if (image == null) {
                 throw new FileUploadException("Can not get file");
@@ -82,34 +84,32 @@ public class OcrProcessorImpl implements OCRProcessor {
             }
             BatchAnnotateImagesResponse batchResponse = ocrForResponse(image, languages);
 
-            List<TextUnit> textUnits;
-            ImageDimensions imageDimensions;
-            PdfBuilderInputData result;
-            try {
-                textUnits = extractData(batchResponse);
-                imageDimensions = extractImageDimensions(batchResponse);
-                result = new PdfBuilderInputData(imageDimensions.height, imageDimensions.width, textUnits);
-            } catch (Exception e) {
-                e.printStackTrace();
-                result = new PdfBuilderInputData(e.getMessage());
+            String simpleText = extractText(batchResponse);
+            if (simpleText == null || simpleText.length() == 0) {
+                data = new OcrData(null, null, OcrData.Status.TEXT_NOT_FOUND);
+            } else {
+                List<TextUnit> textUnits = extractData(batchResponse);
+                ImageDimensions imageDimensions = extractImageDimensions(batchResponse);
+                PdfBuilderInputData result = new PdfBuilderInputData(imageDimensions.height, imageDimensions.width, textUnits);
+                data = new OcrData(result, simpleText, OcrData.Status.OK);
             }
-
-            data = new OcrData(result, extractText(batchResponse));
-        } catch (Exception e) {
-            data = new OcrData(new PdfBuilderInputData(e.getMessage()), null);
-            logger.log(Level.WARNING, "ERROR! See log below.");
+        } catch (FileUploadException | IOException e) {
             e.printStackTrace();
+            data = new OcrData(null, null, OcrData.Status.UNKNOWN_ERROR);
+        } catch (AnnotateImageResponseException e) {
+            e.printStackTrace();
+            data = new OcrData(null, null, OcrData.Status.INVALID_LANGUAGE_HINTS);
         }
         return data;
     }
 
     @Override
-    public OcrData ocrForData(String gcsImageUri) throws IOException {
+    public OcrData ocrForData(String gcsImageUri) {
         return ocrForData(gcsImageUri, null);
     }
 
     @Override
-    public OcrData ocrForData(String gcsImageUri, @Nullable List<String> languages) throws IOException {
+    public OcrData ocrForData(String gcsImageUri, @Nullable List<String> languages) {
         OcrData data;
         try {
             if (gcsImageUri == null) {
@@ -117,27 +117,24 @@ public class OcrProcessorImpl implements OCRProcessor {
             }
             BatchAnnotateImagesResponse batchResponse = ocrForResponse(gcsImageUri, languages);
 
-            List<TextUnit> textUnits;
-            ImageDimensions imageDimensions;
-            PdfBuilderInputData result;
-            try {
-                textUnits = extractData(batchResponse);
-                imageDimensions = extractImageDimensions(batchResponse);
-                result = new PdfBuilderInputData(imageDimensions.height, imageDimensions.width, textUnits);
-            } catch (Exception e) {
-                e.printStackTrace();
-                result = new PdfBuilderInputData(e.getMessage());
+            String simpleText = extractText(batchResponse);
+            if (simpleText == null || simpleText.length() == 0) {
+                data = new OcrData(null, null, OcrData.Status.TEXT_NOT_FOUND);
+            } else {
+                List<TextUnit> textUnits = extractData(batchResponse);
+                ImageDimensions imageDimensions = extractImageDimensions(batchResponse);
+                PdfBuilderInputData result = new PdfBuilderInputData(imageDimensions.height, imageDimensions.width, textUnits);
+                data = new OcrData(result, simpleText, OcrData.Status.OK);
             }
-
-            data = new OcrData(result, extractText(batchResponse));
-        } catch (Exception e) {
-            data = new OcrData(new PdfBuilderInputData(e.getMessage()), null);
-            logger.log(Level.WARNING, "ERROR! See log below.");
+        } catch (FileUploadException | IOException e) {
             e.printStackTrace();
+            data = new OcrData(null, null, OcrData.Status.UNKNOWN_ERROR);
+        } catch (AnnotateImageResponseException e) {
+            e.printStackTrace();
+            data = new OcrData(null, null, OcrData.Status.INVALID_LANGUAGE_HINTS);
         }
         return data;
     }
-
 
     private ImageDimensions extractImageDimensions(BatchAnnotateImagesResponse batchResponse) {
         ImageDimensions result = new ImageDimensions();
@@ -167,8 +164,7 @@ public class OcrProcessorImpl implements OCRProcessor {
     }
 
     /**
-     *
-     * @param imageUrl url from firebase storage, example https://firebasestorage.googleapis.com/v0/b/test-afc85.appspot.com/o/d2d7dfc0-662e-451a-86ae-1b1da98030b4?alt=media&token=e62047f3-4363-4417-9d85-327842ce3e87
+     * @param imageUrl  url from firebase storage, example https://firebasestorage.googleapis.com/v0/b/test-afc85.appspot.com/o/d2d7dfc0-662e-451a-86ae-1b1da98030b4?alt=media&token=e62047f3-4363-4417-9d85-327842ce3e87
      * @param languages
      * @return
      * @throws IOException
@@ -205,45 +201,47 @@ public class OcrProcessorImpl implements OCRProcessor {
     }
 
 
-    private String extractText(BatchAnnotateImagesResponse response) {
+    private String extractText(BatchAnnotateImagesResponse response) throws AnnotateImageResponseException {
         String message = "";
-
-        List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations();
-        if (texts != null && texts.size() > 0) {
-            message += texts.get(0).getDescription();
+        AnnotateImageResponse res = response.getResponses().get(0);
+        if (null != res.getError()) {
+            String errorMessage = res.getError().getMessage();
+            logger.log(Level.WARNING, "AnnotateImageResponse ERROR: " + errorMessage);
+            throw new AnnotateImageResponseException("AnnotateImageResponse ERROR: " + errorMessage);
+        }else {
+            List<EntityAnnotation> texts = res.getTextAnnotations();
+            if (texts != null && texts.size() > 0) {
+                message += texts.get(0).getDescription();
+            }
         }
         return message;
     }
 
-    public List<TextUnit> extractData(BatchAnnotateImagesResponse response) throws Exception {
+    List<TextUnit> extractData(BatchAnnotateImagesResponse response) throws AnnotateImageResponseException {
         List<TextUnit> data = new ArrayList<>();
-        try {
-            for (AnnotateImageResponse res : response.getResponses()) {
-                if (null != res.getError()) {
-                    String errorMessage = res.getError().getMessage();
-                    logger.log(Level.WARNING, "AnnotateImageResponse ERROR: " + errorMessage);
-                    throw new Exception("AnnotateImageResponse ERROR: " + errorMessage);
-                } else {
-                    List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations();
-                    if (texts != null && texts.size() > 0) {
-                        for (int i = 1; i < texts.size(); i++) {//exclude first text - it contains all text of the page
 
-                            String blockText = texts.get(i).getDescription();
-                            BoundingPoly poly = texts.get(i).getBoundingPoly();
+        for (AnnotateImageResponse res : response.getResponses()) {
+            if (null != res.getError()) {
+                String errorMessage = res.getError().getMessage();
+                logger.log(Level.WARNING, "AnnotateImageResponse ERROR: " + errorMessage);
+                throw new AnnotateImageResponseException("AnnotateImageResponse ERROR: " + errorMessage);
+            } else {
+                List<EntityAnnotation> texts = response.getResponses().get(0).getTextAnnotations();
+                if (texts != null && texts.size() > 0) {
+                    for (int i = 1; i < texts.size(); i++) {//exclude first text - it contains all text of the page
 
-                            float llx = (poly.getVertices().get(0).getX() + poly.getVertices().get(3).getX()) / 2;
-                            float lly = (poly.getVertices().get(0).getY() + poly.getVertices().get(1).getY()) / 2;
-                            float urx = (poly.getVertices().get(2).getX() + poly.getVertices().get(1).getX()) / 2;
-                            float ury = (poly.getVertices().get(2).getY() + poly.getVertices().get(3).getY()) / 2;
+                        String blockText = texts.get(i).getDescription();
+                        BoundingPoly poly = texts.get(i).getBoundingPoly();
 
-                            data.add(new TextUnit(blockText, llx, lly, urx, ury));
-                        }
+                        float llx = (poly.getVertices().get(0).getX() + poly.getVertices().get(3).getX()) / 2;
+                        float lly = (poly.getVertices().get(0).getY() + poly.getVertices().get(1).getY()) / 2;
+                        float urx = (poly.getVertices().get(2).getX() + poly.getVertices().get(1).getX()) / 2;
+                        float ury = (poly.getVertices().get(2).getY() + poly.getVertices().get(3).getY()) / 2;
+
+                        data.add(new TextUnit(blockText, llx, lly, urx, ury));
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
         }
         return data;
     }
@@ -251,5 +249,11 @@ public class OcrProcessorImpl implements OCRProcessor {
     private static final class ImageDimensions {
         private int width;
         private int height;
+    }
+
+    public class AnnotateImageResponseException extends Exception {
+        AnnotateImageResponseException(String s) {
+            super(s);
+        }
     }
 }

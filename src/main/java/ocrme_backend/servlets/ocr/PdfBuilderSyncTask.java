@@ -37,7 +37,7 @@ public class PdfBuilderSyncTask {
 
     public PdfBuilderOutputData execute() {
         PdfBuilderOutputData result = new PdfBuilderOutputData();
-        String url = null;
+        String url;
         try {
             url = buildPdf();
             result.setUrl(url);
@@ -49,6 +49,10 @@ public class PdfBuilderSyncTask {
         } catch (LanguageNotSupportedException e) {
             result.setStatus(Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED);
             logger.log(Level.INFO, "pdf not generated, language not supported");
+        } catch (Exception e) {
+            result.setStatus(Status.UNKNOWN_ERROR);
+            logger.log(Level.WARNING, "pdf not generated, unknown error");
+            e.printStackTrace();
         }
         return result;
     }
@@ -56,7 +60,7 @@ public class PdfBuilderSyncTask {
     private String buildPdf()
             throws TextNotFoundException, LanguageNotSupportedException {
 
-        if (data.getText().size() == 0) {
+        if (data.getText() == null || data.getText().size() == 0) {
             throw new TextNotFoundException();
         }
 

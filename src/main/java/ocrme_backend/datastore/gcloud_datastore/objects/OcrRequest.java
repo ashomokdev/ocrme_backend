@@ -5,6 +5,7 @@ import com.google.appengine.api.datastore.Text;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Created by iuliia on 6/19/17.
@@ -109,8 +110,8 @@ public class OcrRequest {
             return this;
         }
 
-        public Builder textResult(String textResult) {
-            this.textResult = new Text (textResult);
+        public Builder textResult(Optional<String> textResult) {
+            this.textResult = new Text (textResult.orElse(""));
             return this;
         }
 

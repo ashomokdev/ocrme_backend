@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
@@ -79,7 +80,7 @@ public class OcrRequestDaoImplTest {
         String textResultUpdated = "dummy text result updated";
         OcrRequest updated = new OcrRequest.Builder()
                 .id(id)
-                .textResult(textResultUpdated)
+                .textResult(Optional.ofNullable(textResultUpdated))
                 .build();
 
         dao.update(updated);
@@ -123,7 +124,7 @@ public class OcrRequestDaoImplTest {
 
         OcrRequest request = new OcrRequest.Builder()
                 .inputImageUrl(inputImageUrl)
-                .textResult(textResult)
+                .textResult(Optional.ofNullable(textResult))
                 .build();
 
         OcrRequestDao dao = new OcrRequestDaoImpl();

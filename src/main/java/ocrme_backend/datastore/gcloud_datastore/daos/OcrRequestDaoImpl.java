@@ -5,10 +5,7 @@ import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_datastore.objects.Result;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,7 +26,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         return new OcrRequest.Builder()
                 .id(entity.getKey().getId())
                 .inputImageUrl((String) entity.getProperty(OcrRequest.INPUT_IMAGE_URL))
-                .textResult (((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue())
+                .textResult (Optional.ofNullable(((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue()))
                 .pdfResultUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_URL))
                 .createdBy((String) entity.getProperty(OcrRequest.CREATED_BY))
                 .createdById((String) entity.getProperty(OcrRequest.CREATED_BY_ID))

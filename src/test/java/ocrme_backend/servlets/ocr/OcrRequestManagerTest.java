@@ -27,8 +27,12 @@ public class OcrRequestManagerTest {
     private OcrRequestManager managerImageBytes;
     private OcrRequestManager managerImageUri;
     private OcrRequestManager managerNoLanguages;
+    private OcrRequestManager managerLanguagesSet;
+    private OcrRequestManager managerLanguagesSetEmptyImage;
     private String defaultFont = "FreeSans.ttf";
     private static final String imgUri = "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
+    private static final String emptyImgUri = "gs://bucket-for-requests-test/search-3-512.jpg";
+    
 
 
     @Before
@@ -48,10 +52,14 @@ public class OcrRequestManagerTest {
         String[] languages = new String[]{"ru"};
         String filename = "ru.jpg";
         byte[] imageBytes = FileProvider.getRusImageFile().getImageBytes();
+        String[] languagesSet = new String[]{"az", "bn", "bg"};
 
         managerImageBytes = new OcrRequestManager(filename, imageBytes, languages, session);
         managerImageUri = new OcrRequestManager(imgUri, languages, session);
         managerNoLanguages = new OcrRequestManager(imgUri, null, session);
+        managerLanguagesSet = new OcrRequestManager(imgUri, languagesSet, session);
+        managerLanguagesSetEmptyImage = new OcrRequestManager(emptyImgUri, languagesSet, session);
+     
     }
 
     @After
@@ -76,5 +84,15 @@ public class OcrRequestManagerTest {
         Assert.assertTrue(response3.getTextResult().length() > 0);
         Assert.assertTrue(response3.getPdfResultUrl().length() > 0);
         Assert.assertTrue(response3.getStatus().equals(OcrResponse.Status.OK));
+
+        OcrResponse response4 = managerLanguagesSet.process();
+        Assert.assertTrue(response4.getTextResult() == null);
+        Assert.assertTrue(response4.getPdfResultUrl()==null);
+        Assert.assertTrue(response4.getStatus().equals(OcrResponse.Status.INVALID_LANGUAGE_HINTS));
+
+        OcrResponse response5 = managerLanguagesSetEmptyImage.process();
+        Assert.assertTrue(response5.getTextResult() == null);
+        Assert.assertTrue(response5.getPdfResultUrl()==null);
+        Assert.assertTrue(response5.getStatus().equals(OcrResponse.Status.TEXT_NOT_FOUND));
     }
 }

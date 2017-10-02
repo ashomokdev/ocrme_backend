@@ -15,6 +15,7 @@ public class OcrResponse implements Serializable {
         OK,
         PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED,
         TEXT_NOT_FOUND,
+        INVALID_LANGUAGE_HINTS,
         UNKNOWN_ERROR
     }
 

@@ -11,7 +11,8 @@ public class PdfBuilderOutputData {
     public enum Status {
         OK,
         PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED,
-        PDF_CAN_NOT_BE_CREATED_EMPTY_DATA
+        PDF_CAN_NOT_BE_CREATED_EMPTY_DATA,
+        UNKNOWN_ERROR
     }
 
 
