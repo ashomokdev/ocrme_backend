@@ -26,6 +26,7 @@ public class OcrRequestManagerTest {
             new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
     private OcrRequestManager managerImageBytes;
     private OcrRequestManager managerImageUri;
+    private OcrRequestManager managerNoLanguages;
     private String defaultFont = "FreeSans.ttf";
     private static final String imgUri = "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
 
@@ -50,6 +51,7 @@ public class OcrRequestManagerTest {
 
         managerImageBytes = new OcrRequestManager(filename, imageBytes, languages, session);
         managerImageUri = new OcrRequestManager(imgUri, languages, session);
+        managerNoLanguages = new OcrRequestManager(imgUri, null, session);
     }
 
     @After
@@ -69,5 +71,10 @@ public class OcrRequestManagerTest {
         Assert.assertTrue(response2.getTextResult().length() > 0);
         Assert.assertTrue(response2.getPdfResultUrl().length() > 0);
         Assert.assertTrue(response2.getStatus().equals(OcrResponse.Status.OK));
+
+        OcrResponse response3 = managerNoLanguages.process();
+        Assert.assertTrue(response3.getTextResult().length() > 0);
+        Assert.assertTrue(response3.getPdfResultUrl().length() > 0);
+        Assert.assertTrue(response3.getStatus().equals(OcrResponse.Status.OK));
     }
 }

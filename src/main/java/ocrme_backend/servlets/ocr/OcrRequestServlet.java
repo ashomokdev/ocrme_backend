@@ -13,6 +13,7 @@ import java.io.IOException;
  * Run next to test in terminal
  * curl -H "Content-Type: application/json" -X POST -d '{"gcsImageUri":"gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg", "languages":["ru"]}' https://imagetotext-149919.appspot.com/ocr_request
  * curl -H "Content-Type: application/json" -X POST -d '{"gcsImageUri":"gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg", "languages":["ru"]}' http://localhost:8080/ocr_request
+ * curl -H "Content-Type: application/json" -X POST -d '{"gcsImageUri":"gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg"}' https://imagetotext-149919.appspot.com/ocr_request
  * curl -H "Content-Type: application/json" -X POST -d '{"gcsImageUri":"gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg"}' http://localhost:8080/ocr_request
  */
 
