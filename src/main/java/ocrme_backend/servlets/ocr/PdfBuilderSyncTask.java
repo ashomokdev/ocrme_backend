@@ -1,21 +1,18 @@
 package ocrme_backend.servlets.ocr;
 
+import com.google.cloud.storage.Blob;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
-import ocrme_backend.datastore.gcloud_storage.utils.FileUtils;
 import ocrme_backend.file_builder.pdfbuilder.PDFBuilder;
 import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData.Status;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +25,7 @@ public class PdfBuilderSyncTask {
     private HttpSession session;
     private PdfBuilderInputData data;
     public static final String BUCKET_FOR_PDFS_PARAMETER = "ocrme.bucket.pdf";
+    public static final String DIRECTORY_FOR_PDFS_PARAMETER = "ocrme.dir.pdf";
 
     public PdfBuilderSyncTask(PdfBuilderInputData data, HttpSession session) {
         this.data = data;
@@ -37,12 +35,12 @@ public class PdfBuilderSyncTask {
 
     public PdfBuilderOutputData execute() {
         PdfBuilderOutputData result = new PdfBuilderOutputData();
-        String url;
         try {
-            url = buildPdf();
-            result.setUrl(url);
+            FileUploadedResult fileUploadedResult = buildPdf();
+            result.setGsUrl(fileUploadedResult.gsLink);
+            result.setMediaUrl(fileUploadedResult.mediaLink);
             result.setStatus(Status.OK);
-            logger.log(Level.INFO, "pdf generated, url for download: " + url);
+            logger.log(Level.INFO, "pdf generated, url for download: " + fileUploadedResult.mediaLink);
         } catch (TextNotFoundException e) {
            result.setStatus(Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA);
             logger.log(Level.INFO, "pdf not generated, empty data");
@@ -57,38 +55,43 @@ public class PdfBuilderSyncTask {
         return result;
     }
 
-    private String buildPdf()
-            throws TextNotFoundException, LanguageNotSupportedException {
+    private FileUploadedResult buildPdf() throws Exception {
 
         if (data.getText() == null || data.getText().size() == 0) {
             throw new TextNotFoundException();
         }
 
         PDFBuilder pdfBuilder = new PDFBuilderImpl(session);
-
         ByteArrayOutputStream outputStream = pdfBuilder.buildPdfStream(data);
 
         if (isFileEmpty(outputStream)) {
             throw new LanguageNotSupportedException();
         }
 
-        String url = uploadToStorage(outputStream.toByteArray());
-        return url;
+        return uploadToGoogleStorage(outputStream.toByteArray());
     }
 
-    private String uploadToStorage(byte[] file) {
+
+    private FileUploadedResult uploadToGoogleStorage(byte[] file) throws Exception {
         String fileName = "file.pdf";
-        String url = "";
+        FileUploadedResult result;
         try {
             CloudStorageHelper helper = new CloudStorageHelper();
             String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_PDFS_PARAMETER);
+            String directoryName = session.getServletContext().getInitParameter(DIRECTORY_FOR_PDFS_PARAMETER);
             helper.createBucket(bucketName);
-            url = helper.uploadFile(file, fileName, bucketName);
-        } catch (IOException | ServletException e) {
+            Blob blob = helper.uploadFileForBlob(file, fileName, directoryName, bucketName);
+            result = new FileUploadedResult(
+                   "gs://"+ blob.getBucket() + blob.getName(),
+                    blob.getMediaLink()
+            );
+        } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
-        return url;
+        return result;
     }
+
 
     /**
      * check if pdf file contains any text
@@ -109,9 +112,19 @@ public class PdfBuilderSyncTask {
         return (allText == null) || allText.length() < 1;
     }
 
-    public class TextNotFoundException extends Throwable {
+    public class TextNotFoundException extends Exception {
     }
 
-    public class LanguageNotSupportedException extends Throwable {
+    public class LanguageNotSupportedException extends Exception {
+    }
+
+    private class FileUploadedResult{
+        String gsLink;
+        String mediaLink;
+
+        FileUploadedResult(String gsLink, String mediaLink) {
+            this.gsLink = gsLink;
+            this.mediaLink = mediaLink;
+        }
     }
 }

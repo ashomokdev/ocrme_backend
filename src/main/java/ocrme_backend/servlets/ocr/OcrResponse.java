@@ -8,7 +8,8 @@ import java.io.Serializable;
 public class OcrResponse implements Serializable {
 
     private String textResult;
-    private String pdfResultUrl;
+    private String pdfResultGsUrl;
+    private String pdfResultMediaUrl;
     private Status status;
 
     public enum Status {
@@ -22,8 +23,8 @@ public class OcrResponse implements Serializable {
     public void setTextResult(String textResult) {
         this.textResult = textResult;
     }
-    public void setPdfResultUrl(String pdfResultUrl) {
-        this.pdfResultUrl = pdfResultUrl;
+    public void setPdfResultGsUrl(String pdfResultGsUrl) {
+        this.pdfResultGsUrl = pdfResultGsUrl;
     }
     public void setStatus(Status status) {
         this.status = status;
@@ -32,19 +33,28 @@ public class OcrResponse implements Serializable {
     public String getTextResult() {
         return textResult;
     }
-    public String getPdfResultUrl() {
-        return pdfResultUrl;
+    public String getPdfResultGsUrl() {
+        return pdfResultGsUrl;
     }
     public Status getStatus() {
         return status;
     }
+    public String getPdfResultMediaUrl() {
+        return pdfResultMediaUrl;
+    }
+    public void setPdfResultMediaUrl(String pdfResultMediaUrl) {
+        this.pdfResultMediaUrl = pdfResultMediaUrl;
+    }
+
 
     @Override
     public String toString() {
         return "OcrResponse{" +
                 "textResult='" + textResult + '\'' +
-                ", pdfResultUrl='" + pdfResultUrl + '\'' +
+                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
+                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
                 ", status=" + status +
                 '}';
     }
+
 }

@@ -151,7 +151,8 @@ public class OcrProcessorImpl implements OCRProcessor {
         return result;
     }
 
-    private BatchAnnotateImagesResponse ocrForResponse(byte[] image, @Nullable List<String> languages) throws IOException {
+    private BatchAnnotateImagesResponse ocrForResponse(byte[] image, @Nullable List<String> languages)
+            throws IOException {
         AnnotateImageRequest request =
                 new AnnotateImageRequest()
                         .setImage(new Image().encodeContent(image))
@@ -169,7 +170,8 @@ public class OcrProcessorImpl implements OCRProcessor {
      * @return
      * @throws IOException
      */
-    public BatchAnnotateImagesResponse ocrForResponse(String imageUrl, @Nullable List<String> languages) throws IOException {
+    public BatchAnnotateImagesResponse ocrForResponse(String imageUrl, @Nullable List<String> languages)
+            throws IOException {
         AnnotateImageRequest request =
                 new AnnotateImageRequest()
                         .setImage(new Image().setSource(new ImageSource().setGcsImageUri(imageUrl)))
@@ -181,7 +183,8 @@ public class OcrProcessorImpl implements OCRProcessor {
         return getBatchAnnotateImagesResponse(languages, request);
     }
 
-    private BatchAnnotateImagesResponse getBatchAnnotateImagesResponse(@Nullable List<String> languages, AnnotateImageRequest request) throws IOException {
+    private BatchAnnotateImagesResponse getBatchAnnotateImagesResponse(
+            @Nullable List<String> languages, AnnotateImageRequest request) throws IOException {
         if (languages != null && languages.size() > 0) {
             ImageContext imageContext = new ImageContext();
             imageContext.setLanguageHints(languages);

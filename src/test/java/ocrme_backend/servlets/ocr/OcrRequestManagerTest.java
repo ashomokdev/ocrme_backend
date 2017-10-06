@@ -12,7 +12,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
 import static ocrme_backend.datastore.utils.FileProvider.getFontAsStream;
-import static ocrme_backend.servlets.ocr.OcrRequestManager.BUCKET_FOR_REQUESTS_PARAMETER;
+import static ocrme_backend.servlets.ocr.OcrRequestManager.BUCKET_FOR_REQUEST_IMAGES_PARAMETER;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -46,7 +46,7 @@ public class OcrRequestManagerTest {
 
         when(mockServletContext.getInitParameter(PdfBuilderSyncTask.BUCKET_FOR_PDFS_PARAMETER)).
                 thenReturn("bucket-for-pdf-test");
-        when(mockServletContext.getInitParameter(BUCKET_FOR_REQUESTS_PARAMETER)).
+        when(mockServletContext.getInitParameter(BUCKET_FOR_REQUEST_IMAGES_PARAMETER)).
                 thenReturn("bucket-for-requests-test");
 
         String[] languages = new String[]{"ru"};
@@ -71,28 +71,28 @@ public class OcrRequestManagerTest {
     public void processForResult() throws Exception {
         OcrResponse response1 = managerImageBytes.process();
         Assert.assertTrue(response1.getTextResult().length() > 0);
-        Assert.assertTrue(response1.getPdfResultUrl().length() > 0);
+        Assert.assertTrue(response1.getPdfResultGsUrl().length() > 0);
         Assert.assertTrue(response1.getStatus().equals(OcrResponse.Status.OK));
 
 
         OcrResponse response2 = managerImageUri.process();
         Assert.assertTrue(response2.getTextResult().length() > 0);
-        Assert.assertTrue(response2.getPdfResultUrl().length() > 0);
+        Assert.assertTrue(response2.getPdfResultGsUrl().length() > 0);
         Assert.assertTrue(response2.getStatus().equals(OcrResponse.Status.OK));
 
         OcrResponse response3 = managerNoLanguages.process();
         Assert.assertTrue(response3.getTextResult().length() > 0);
-        Assert.assertTrue(response3.getPdfResultUrl().length() > 0);
+        Assert.assertTrue(response3.getPdfResultGsUrl().length() > 0);
         Assert.assertTrue(response3.getStatus().equals(OcrResponse.Status.OK));
 
         OcrResponse response4 = managerLanguagesSet.process();
         Assert.assertTrue(response4.getTextResult() == null);
-        Assert.assertTrue(response4.getPdfResultUrl()==null);
+        Assert.assertTrue(response4.getPdfResultGsUrl()==null);
         Assert.assertTrue(response4.getStatus().equals(OcrResponse.Status.INVALID_LANGUAGE_HINTS));
 
         OcrResponse response5 = managerLanguagesSetEmptyImage.process();
         Assert.assertTrue(response5.getTextResult() == null);
-        Assert.assertTrue(response5.getPdfResultUrl()==null);
+        Assert.assertTrue(response5.getPdfResultGsUrl()==null);
         Assert.assertTrue(response5.getStatus().equals(OcrResponse.Status.TEXT_NOT_FOUND));
     }
 }

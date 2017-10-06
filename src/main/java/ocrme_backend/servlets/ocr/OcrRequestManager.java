@@ -1,6 +1,5 @@
 package ocrme_backend.servlets.ocr;
 
-import com.google.api.services.vision.v1.model.AnnotateImageResponse;
 import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
@@ -28,8 +27,8 @@ public class OcrRequestManager {
     private HttpSession session;
     private final Logger logger = Logger.getLogger(OcrRequestManager.class.getName());
     private String gcsImageUri; //download uri of image, stored in google cloud storage
-    public static final String BUCKET_FOR_REQUESTS_PARAMETER = "ocrme.bucket.request_images";
-
+    public static final String BUCKET_FOR_REQUEST_IMAGES_PARAMETER = "ocrme.bucket.request_images";
+    public static final String DIR_FOR_REQUEST_IMAGES_PARAMETER = "ocrme.dir.request_images";
 
     public OcrRequestManager(String imageFilename, byte[] imageBytes, String[] languages, HttpSession session) {
         this.imageFilename = imageFilename;
@@ -90,8 +89,10 @@ public class OcrRequestManager {
         response.setTextResult(simpleTextResult);
 
         PdfBuilderOutputData pdfBuilderOutputData = makePdf(ocrResult.getPdfBuilderInputData());
-        String pdfUrl = pdfBuilderOutputData.getUrl();
-        response.setPdfResultUrl(pdfUrl);
+        String pdfGsUrl = pdfBuilderOutputData.getGsUrl();
+        String pdfMediaUrl = pdfBuilderOutputData.getMediaUrl();
+        response.setPdfResultGsUrl(pdfGsUrl);
+        response.setPdfResultMediaUrl(pdfMediaUrl);
         PdfBuilderOutputData.Status status = pdfBuilderOutputData.getStatus();
         switch (status) {
             case OK:
@@ -118,9 +119,10 @@ public class OcrRequestManager {
         String url = "";
         try {
             CloudStorageHelper helper = new CloudStorageHelper();
-            String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_REQUESTS_PARAMETER);
+            String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_REQUEST_IMAGES_PARAMETER);
+            String directoryName = session.getServletContext().getInitParameter(DIR_FOR_REQUEST_IMAGES_PARAMETER);
             helper.createBucket(bucketName);
-            url = helper.uploadFile(file, filename, bucketName);
+            url = helper.uploadFile(file, filename, directoryName, bucketName);
         } catch (IOException | ServletException e) {
             e.printStackTrace();
         }
@@ -141,7 +143,7 @@ public class OcrRequestManager {
                 new OcrRequest.Builder()
                         .inputImageUrl(inputImageUrl)
                         .languages(languages)
-                        .pdfResultUrl(response.getPdfResultUrl())
+                        .pdfResultUrl(response.getPdfResultGsUrl())
                         .status(response.getStatus().name())
                         .textResult(Optional.ofNullable(response.getTextResult()))
                         .build());

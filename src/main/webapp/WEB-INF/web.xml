@@ -8,6 +8,7 @@
   <servlet>
     <servlet-name>OcrForTextServlet</servlet-name>
     <servlet-class>ocrme_backend.servlets.ocr.OcrForTextServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>OcrForTextServlet</servlet-name>
@@ -17,6 +18,7 @@
   <servlet>
     <servlet-name>OcrRequestServlet</servlet-name>
     <servlet-class>ocrme_backend.servlets.ocr.OcrRequestServletDeprecated</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>OcrRequestServlet</servlet-name>
@@ -26,6 +28,7 @@
   <servlet>
     <servlet-name>OcrRequestServlet</servlet-name>
     <servlet-class>ocrme_backend.servlets.ocr.OcrRequestServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>OcrRequestServlet</servlet-name>
@@ -35,6 +38,7 @@
   <servlet>
     <servlet-name>TranslateServlet</servlet-name>
     <servlet-class>ocrme_backend.servlets.translate.TranslateServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>TranslateServlet</servlet-name>
@@ -44,6 +48,7 @@
   <servlet>
     <servlet-name>SupportedLanguagesServlet</servlet-name>
     <servlet-class>ocrme_backend.servlets.translate.SupportedLanguagesServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>SupportedLanguagesServlet</servlet-name>

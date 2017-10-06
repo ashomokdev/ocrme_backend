@@ -6,7 +6,25 @@ package ocrme_backend.file_builder.pdfbuilder;
 public class PdfBuilderOutputData {
 
     private Status status;
-    private String url;
+
+    /**
+     * google storage url, example "gs://imagetotext-149919.appspot.com/ru.pdf";
+     */
+    private String gsUrl;
+
+    /**
+     * media url (for downloading)
+     * example https://www.googleapis.com/download/storage/v1/b/ocr_me_pdf_results_bucket/o/2017-10-04-18-06-40-130-2017-10-04-18-06-40-130-file.pdf?generation=1507140400342025&alt=media
+     */
+    private String mediaUrl;
+
+    public void setGsUrl(String gsUrl) {
+        this.gsUrl = gsUrl;
+    }
+
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
+    }
 
     public enum Status {
         OK,
@@ -15,20 +33,19 @@ public class PdfBuilderOutputData {
         UNKNOWN_ERROR
     }
 
-
     public Status getStatus() {
         return status;
     }
 
-    public String getUrl() {
-        return url;
+    public String getGsUrl() {
+        return gsUrl;
+    }
+
+    public String getMediaUrl() {
+        return mediaUrl;
     }
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 }

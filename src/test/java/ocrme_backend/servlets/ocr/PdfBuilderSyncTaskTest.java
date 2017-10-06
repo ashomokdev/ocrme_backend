@@ -59,7 +59,7 @@ public class PdfBuilderSyncTaskTest {
     public void testExecute() throws Exception {
         PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
         Assert.assertTrue(result != null);
-        Assert.assertTrue(result.getUrl().length() > 0);
+        Assert.assertTrue(result.getGsUrl().length() > 0);
         Assert.assertTrue(result.getStatus().equals(PdfBuilderOutputData.Status.OK));
     }
 
