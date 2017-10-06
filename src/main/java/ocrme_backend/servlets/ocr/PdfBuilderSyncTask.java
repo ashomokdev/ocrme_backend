@@ -82,7 +82,7 @@ public class PdfBuilderSyncTask {
             helper.createBucket(bucketName);
             Blob blob = helper.uploadFileForBlob(file, fileName, directoryName, bucketName);
             result = new FileUploadedResult(
-                   "gs://"+ blob.getBucket() + blob.getName(),
+                   "gs://"+ blob.getBucket() + "/"+ blob.getName(),
                     blob.getMediaLink()
             );
         } catch (Exception e) {

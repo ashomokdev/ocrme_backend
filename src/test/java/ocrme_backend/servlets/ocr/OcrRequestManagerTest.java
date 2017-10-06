@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 /**
  * Created by iuliia on 7/14/17.
  */
+
+//todo clean bucket when finished
 public class OcrRequestManagerTest {
 
     private final LocalServiceTestHelper helper =
@@ -59,7 +61,6 @@ public class OcrRequestManagerTest {
         managerNoLanguages = new OcrRequestManager(imgUri, null, session);
         managerLanguagesSet = new OcrRequestManager(imgUri, languagesSet, session);
         managerLanguagesSetEmptyImage = new OcrRequestManager(emptyImgUri, languagesSet, session);
-     
     }
 
     @After

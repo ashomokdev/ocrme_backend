@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +74,7 @@ public class CloudStorageHelper {
 
     /**
      * preferred way to upload the file
-     *
+     * <p>
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
      * environment variable, appending a timestamp to end of the uploaded filename.
      */
@@ -117,42 +116,27 @@ public class CloudStorageHelper {
     public String uploadFile(byte[] bytes, String fileName, String directoryName, final String bucketName)
             throws IOException, ServletException {
 
-        String timeStamp = getTimeStamp();
-
-        final String destinationFilename = Paths.get(directoryName, timeStamp + fileName).toString();
-
-        BlobInfo blobInfo = BlobInfo
-                .newBuilder(bucketName, destinationFilename)
-                // Modify access list to allow all users with link to read file
-                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
-                .build();
-
-        // create the blob in one request.
-       Blob blob = storage.create(blobInfo, bytes);
-
-        logger.log(Level.INFO, "File uploaded as "+ destinationFilename);
-        // return the public download link
-
-        return storage.get(blobInfo.getBlobId()).getMediaLink();
+        return uploadFileForBlob(bytes, fileName, directoryName, bucketName).getMediaLink();
     }
 
     /**
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
      * environment variable, appending a timestamp to end of the uploaded filename.
-     * @param bytes file bytes
-     * @param fileName file name - must be unique
+     *
+     * @param bytes         file bytes
+     * @param fileName      file name - must be unique
      * @param directoryName string or "" if none
      * @param bucketName
      * @return Blob
      * @throws IOException
      * @throws ServletException
      */
-    public Blob uploadFileForBlob (byte[] bytes, String fileName, String directoryName, final String bucketName)
+    public Blob uploadFileForBlob(byte[] bytes, String fileName, String directoryName, final String bucketName)
             throws IOException, ServletException {
 
         String timeStamp = getTimeStamp();
 
-        final String destinationFilename = Paths.get(directoryName, timeStamp + fileName).toString();
+        final String destinationFilename = directoryName + "/" + timeStamp + fileName;
 
         BlobInfo blobInfo = BlobInfo
                 .newBuilder(bucketName, destinationFilename)
@@ -163,7 +147,7 @@ public class CloudStorageHelper {
         // create the blob in one request.
         Blob blob = storage.create(blobInfo, bytes);
 
-        logger.log(Level.INFO, "File uploaded as "+ destinationFilename);
+        logger.log(Level.INFO, "File uploaded as " + destinationFilename);
 
         return blob;
     }
