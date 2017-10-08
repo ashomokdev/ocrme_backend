@@ -211,7 +211,7 @@ public class OcrProcessorImpl implements OCRProcessor {
             String errorMessage = res.getError().getMessage();
             logger.log(Level.WARNING, "AnnotateImageResponse ERROR: " + errorMessage);
             throw new AnnotateImageResponseException("AnnotateImageResponse ERROR: " + errorMessage);
-        }else {
+        } else {
             List<EntityAnnotation> texts = res.getTextAnnotations();
             if (texts != null && texts.size() > 0) {
                 message += texts.get(0).getDescription();
@@ -236,12 +236,16 @@ public class OcrProcessorImpl implements OCRProcessor {
                         String blockText = texts.get(i).getDescription();
                         BoundingPoly poly = texts.get(i).getBoundingPoly();
 
-                        float llx = (poly.getVertices().get(0).getX() + poly.getVertices().get(3).getX()) / 2;
-                        float lly = (poly.getVertices().get(0).getY() + poly.getVertices().get(1).getY()) / 2;
-                        float urx = (poly.getVertices().get(2).getX() + poly.getVertices().get(1).getX()) / 2;
-                        float ury = (poly.getVertices().get(2).getY() + poly.getVertices().get(3).getY()) / 2;
+                        try {
+                            float llx = (poly.getVertices().get(0).getX() + poly.getVertices().get(3).getX()) / 2;
+                            float lly = (poly.getVertices().get(0).getY() + poly.getVertices().get(1).getY()) / 2;
+                            float urx = (poly.getVertices().get(2).getX() + poly.getVertices().get(1).getX()) / 2;
+                            float ury = (poly.getVertices().get(2).getY() + poly.getVertices().get(3).getY()) / 2;
 
-                        data.add(new TextUnit(blockText, llx, lly, urx, ury));
+                            data.add(new TextUnit(blockText, llx, lly, urx, ury));
+                        } catch (NullPointerException e) {
+                            //ignore - some polys has not X or Y coordinate if text located closed to bounds.
+                        }
                     }
                 }
             }

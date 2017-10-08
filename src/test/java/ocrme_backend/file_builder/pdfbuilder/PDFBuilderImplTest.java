@@ -14,14 +14,13 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ocrme_backend.datastore.utils.FileProvider.deleteFile;
-import static ocrme_backend.datastore.utils.FileProvider.getFontAsStream;
-import static ocrme_backend.datastore.utils.FileProvider.getPathToTemp;
-import static ocrme_backend.datastore.utils.PdfBuilderInputDataProvider.ocrForData;
+import static ocrme_backend.utils.FileProvider.*;
+import static ocrme_backend.utils.PdfBuilderInputDataProvider.ocrForData;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by iuliia on 6/4/17.
@@ -34,6 +33,10 @@ public class PDFBuilderImplTest {
     private String a4FileName = "a4.jpg";
     private String columnsFileName = "columns.png";
     private String rusFilename = "rus.jpg";
+    private String cut_meFilename = "cut_me.jpg";
+    private String cut_me_left_rightFilename = "cut_me_left_right.jpg";
+    private String cut_me_rightFilename = "cut_me_right.jpg";
+
 
     private String defaultFont = "FreeSans.ttf";
 
@@ -71,6 +74,39 @@ public class PDFBuilderImplTest {
         testBuildPdfFromRealData(a4FileName, null);
     }
 
+    @Test
+    public void cutAndBuildPDF() throws Exception {
+        //get all files with cut_me part
+        //preparation
+        OcrData cut_me_data = ocrForData(cut_meFilename, null);
+        OcrData cut_me_left_right = ocrForData(cut_me_left_rightFilename, null);
+        OcrData cut_me_right = ocrForData(cut_me_rightFilename, null);
+
+        ArrayList<OcrData> ocrDataList = new ArrayList<>();
+        ocrDataList.add(cut_me_data);
+        ocrDataList.add(cut_me_left_right);
+        ocrDataList.add(cut_me_right);
+
+        ArrayList<String> pathList = new ArrayList<>();
+
+        for (OcrData data : ocrDataList) {
+            ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data.getPdfBuilderInputData());
+
+            String pdfFileName = "filename.pdf";
+            File destination = new File(getPathToTemp(), pdfFileName);
+            try (OutputStream outputStream = new FileOutputStream(destination)) {
+                stream.writeTo(outputStream);
+            }
+
+            String path = destination.getPath();
+            testFileExistsAndNotEmpty(path);
+            pathList.add(path);
+        }
+        for (String path : pathList) {
+            deleteFile(path);
+        }
+    }
+
 
     @Test
     public void buildRussianPdfFromStream() throws Exception {
@@ -83,7 +119,7 @@ public class PDFBuilderImplTest {
         ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data.getPdfBuilderInputData());
 
         String pdfFileName = "filename.pdf";
-        File destination  = new File(getPathToTemp(), pdfFileName);
+        File destination = new File(getPathToTemp(), pdfFileName);
         try (OutputStream outputStream = new FileOutputStream(destination)) {
             stream.writeTo(outputStream);
         }
@@ -129,6 +165,7 @@ public class PDFBuilderImplTest {
 
     /**
      * test building pdf with simple text setted as param
+     *
      * @param text
      * @throws IOException
      */
@@ -143,6 +180,7 @@ public class PDFBuilderImplTest {
 
     /**
      * test build pdf from PdfBuilderInputData
+     *
      * @param data
      * @throws IOException
      */
@@ -150,7 +188,7 @@ public class PDFBuilderImplTest {
         ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data);
 
         String pdfFileName = "filename.pdf";
-        File destination = new File(getPathToTemp(),pdfFileName);
+        File destination = new File(getPathToTemp(), pdfFileName);
         try (OutputStream outputStream = new FileOutputStream(destination)) {
             stream.writeTo(outputStream);
         }
@@ -162,10 +200,11 @@ public class PDFBuilderImplTest {
 
     /**
      * test build pdf from real data obtained after ocr real image
+     *
      * @param imageFileName
      * @throws Exception
      */
-    private void testBuildPdfFromRealData (String imageFileName, @Nullable ArrayList<String> languages) throws Exception {
+    private void testBuildPdfFromRealData(String imageFileName, @Nullable ArrayList<String> languages) throws Exception {
         //preparation
         OcrData data = ocrForData(imageFileName, languages);
 

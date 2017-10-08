@@ -1,6 +1,5 @@
-package ocrme_backend.datastore.utils;
+package ocrme_backend.utils;
 
-import autovalue.shaded.org.apache.commons.lang.ArrayUtils;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 

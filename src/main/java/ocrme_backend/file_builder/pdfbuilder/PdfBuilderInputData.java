@@ -25,20 +25,126 @@ public class PdfBuilderInputData {
      */
     private List<TextUnit> text;
 
+    //todo cut pdf in needed
+
     /**
      * @param sourceHeight source/ocr file height
      * @param sourceWidth  source/ocr file width
      * @param text         ocr result
      */
     public PdfBuilderInputData(int sourceHeight, int sourceWidth, List<TextUnit> text) {
-        if (sourceHeight > maxHeightAllowed || sourceWidth > maxWidthAllowed) {
+        //get all text llx, lly, urx, ury----------------------------------
+        float lowestLlx = sourceWidth;
+        float lowestLly = sourceHeight;
+        float highestUrx = 0;
+        float highestUry = 0;
+
+        for (TextUnit textUnit : text) {
+            float llx = textUnit.getLlx();
+            float lly = textUnit.getLly();
+            float urx = textUnit.getUrx();
+            float ury = textUnit.getUry();
+
+            if (llx < lowestLlx) {
+                lowestLlx = llx;
+            }
+            if (lly < lowestLly) {
+                lowestLly = lly;
+            }
+            if (urx > highestUrx) {
+                highestUrx = urx;
+            }
+            if (ury > highestUry) {
+                highestUry = ury;
+            }
+        }
+        //--------------------------------------------------------------------
+
+        //get boundaries size - 10% of image side
+        float textWidth = highestUrx - lowestLlx;
+        float textHeight = highestUry - lowestLly;
+
+        float maxSide = textHeight;
+        if (maxSide < textWidth) {
+            maxSide = textWidth;
+        }
+
+        float boundariesSize = maxSide / 20; //5% of image size will use as boundaries
+        //--------------------------------------------------------------------------
+
+        //cut from left side if needed-----------------------------------------
+        float dLlx = lowestLlx - boundariesSize;
+        boolean cutLlx = false;
+        if (dLlx > 0) {
+            //cut - decrease llx for each elem
+            cutLlx = true;
+        }
+
+        //cut from bottom if needed--------------------------------------------
+        float dLly = lowestLly - boundariesSize;
+        boolean cutLly = false;
+        if (dLly > 0) {
+            //cut
+            cutLly = true;
+        }
+
+        //cut from right side if needed-----------------------------------------
+        float dUrx = highestUrx + boundariesSize;
+        boolean cutUrx = false;
+        if (dUrx < sourceWidth) {
+            //cut - decrease llx for each elem
+            cutUrx = true;
+        }
+
+        //cut from top if needed--------------------------------------------
+        float dUry = highestUry + boundariesSize;
+        boolean cutUry = false;
+        if (dUry < sourceHeight) {
+            cutUry = true;
+        }
+
+        int newSourceHeight = sourceHeight;
+        int newSourceWidth = sourceWidth;
+
+        for (int i = 0; i < text.size(); i++) {
+            TextUnit textUnit = text.get(i);
+            if (cutLlx) {
+                float llx = textUnit.getLlx() - dLlx;
+                textUnit.setLlx(llx);
+                float urx = textUnit.getUrx() - dLlx;
+                textUnit.setUrx(urx);
+            }
+            if (cutLly) {
+                float lly = textUnit.getLly() - dLly;
+                textUnit.setLly(lly);
+                float ury = textUnit.getUry() - dLly;
+                textUnit.setUry(ury);
+            }
+            text.set(i, textUnit);
+        }
+        if (cutLlx) {
+            newSourceWidth -= dLlx;
+        }
+        if (cutLly) {
+            newSourceHeight -= dLly;
+        }
+        if (cutUrx) {
+            newSourceWidth -= sourceWidth - highestUrx - boundariesSize;
+        }
+        if (cutUry) {
+            newSourceHeight -= sourceHeight - highestUry - boundariesSize;
+        }
+        //cut image END--------------------------------------------------------
+
+        if ((mHeight > maxHeightAllowed || mWidth > maxWidthAllowed)) {
+
             mHeight = maxHeightAllowed;
             mWidth = maxWidthAllowed;
-            this.text = decreaseTextDimensions(sourceHeight, sourceWidth, text);
-
+            this.text = decreaseTextDimensions(
+                    mHeight, mWidth, maxHeightAllowed, maxWidthAllowed, text);
         } else {
-            mHeight = sourceHeight;
-            mWidth = sourceWidth;
+            mHeight = (newSourceHeight > 0) ? newSourceHeight : sourceHeight;
+            mWidth = (newSourceWidth > 0) ? newSourceWidth : sourceWidth;
             this.text = text;
         }
         this.text = invertSymmetrically(this.text, mHeight);
@@ -69,35 +175,36 @@ public class PdfBuilderInputData {
 
     /**
      * since text units have boundingPoly-s bigger, than current PDF size, we need recalculate boundingPoly-s.
-     *
-     * @param sourceHeight original text height
+     *  @param sourceHeight original text height
      * @param sourceWidth  original text width
+     * @param mHeight
+     * @param mWidth
      * @param text         original text units
      */
-    private List<TextUnit> decreaseTextDimensions(int sourceHeight, int sourceWidth, List<TextUnit> text) {
-        //By how much does sourceHeight exceed maxHeightAllowed?
-        float heightCoefficient = sourceHeight * 100 / maxHeightAllowed;
-
-        //By how much does sourceWidth exceed maxWidthAllowed?
-        float widthCoefficient = sourceWidth * 100 / maxWidthAllowed;
-
-        //measure by height. Height of source will set to maxHeightAllowed.
+    private List<TextUnit> decreaseTextDimensions(
+            float sourceHeight, float sourceWidth, float mHeight, float mWidth, List<TextUnit> text) {
+        //By how much does sourceHeight exceed mHeight?
+        float heightCoefficient = sourceHeight * 100 / mHeight;
+        //By how much does sourceWidth exceed mWidth?
+        float widthCoefficient = sourceWidth * 100 / mWidth;
+        //measure by height. Height of source will set to mHeight.
         if (heightCoefficient > widthCoefficient) {
             for (TextUnit unit : text) {
-                unit.setLlx(unit.getLlx() * maxHeightAllowed / sourceHeight);
-                unit.setLly(unit.getLly() * maxHeightAllowed / sourceHeight);
-                unit.setUrx(unit.getUrx() * maxHeightAllowed / sourceHeight);
-                unit.setUry(unit.getUry() * maxHeightAllowed / sourceHeight);
+                unit.setLlx(unit.getLlx() * mHeight / sourceHeight);
+                unit.setLly(unit.getLly() * mHeight / sourceHeight);
+                unit.setUrx(unit.getUrx() * mHeight / sourceHeight);
+                unit.setUry(unit.getUry() * mHeight / sourceHeight);
             }
         } else {
             for (TextUnit unit : text) {
-                unit.setLlx(unit.getLlx() * maxWidthAllowed / sourceWidth);
-                unit.setLly(unit.getLly() * maxWidthAllowed / sourceWidth);
-                unit.setUrx(unit.getUrx() * maxWidthAllowed / sourceWidth);
-                unit.setUry(unit.getUry() * maxWidthAllowed / sourceWidth);
+                unit.setLlx(unit.getLlx() * mWidth / sourceWidth);
+                unit.setLly(unit.getLly() * mWidth / sourceWidth);
+                unit.setUrx(unit.getUrx() * mWidth / sourceWidth);
+                unit.setUry(unit.getUry() * mWidth / sourceWidth);
             }
         }
         return text;
+
     }
 
     /**

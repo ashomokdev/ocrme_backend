@@ -1,25 +1,20 @@
 package ocrme_backend.servlets.ocr;
 
-import ocrme_backend.datastore.utils.FileProvider;
-import ocrme_backend.datastore.utils.PdfBuilderInputDataProvider;
-import ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl;
+import ocrme_backend.utils.PdfBuilderInputDataProvider;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData.Status;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ocrme_backend.datastore.utils.FileProvider.getFontAsStream;
-import static ocrme_backend.file_builder.pdfbuilder.PDFBuilderImpl.FONT_PATH_PARAMETER;
+import static ocrme_backend.utils.FileProvider.getFontAsStream;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

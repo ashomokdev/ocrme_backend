@@ -1,6 +1,5 @@
-package ocrme_backend.datastore.utils;
+package ocrme_backend.utils;
 
-import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.ocr.OCRProcessor;
 import ocrme_backend.ocr.OcrProcessorImpl;
 import ocrme_backend.servlets.ocr.OcrData;

@@ -2,7 +2,7 @@ package ocrme_backend.servlets.ocr;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import ocrme_backend.datastore.utils.FileProvider;
+import ocrme_backend.utils.FileProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,7 +11,7 @@ import org.junit.Test;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
-import static ocrme_backend.datastore.utils.FileProvider.getFontAsStream;
+import static ocrme_backend.utils.FileProvider.getFontAsStream;
 import static ocrme_backend.servlets.ocr.OcrRequestManager.BUCKET_FOR_REQUEST_IMAGES_PARAMETER;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;

@@ -1,8 +1,8 @@
 package ocrme_backend.ocr;
 
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
-import ocrme_backend.datastore.utils.FileProvider;
-import ocrme_backend.datastore.utils.ImageFile;
+import ocrme_backend.utils.FileProvider;
+import ocrme_backend.utils.ImageFile;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
 import ocrme_backend.servlets.ocr.OcrData;
 import org.junit.Before;

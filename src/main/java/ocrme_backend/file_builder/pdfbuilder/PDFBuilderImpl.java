@@ -135,6 +135,13 @@ public class PDFBuilderImpl implements PDFBuilder {
         contentByte.restoreState();
     }
 
+
+//    /**
+//     * may be usefull in adding "This is FREE mode" at the start of pdf file
+//     * @param writer
+//     * @param textUnits
+//     * @throws Exception
+//     */
 //    private void addContent(PdfWriter writer, List<TextUnit> textUnits) throws Exception {
 //        PdfContentByte contentByte = writer.getDirectContent();
 //        contentByte.saveState();

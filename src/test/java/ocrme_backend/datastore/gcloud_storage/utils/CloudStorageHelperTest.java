@@ -1,6 +1,6 @@
 package ocrme_backend.datastore.gcloud_storage.utils;
 
-import ocrme_backend.datastore.utils.FileProvider;
+import ocrme_backend.utils.FileProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
