@@ -34,10 +34,10 @@ public class PdfBuilderInputData {
      */
     public PdfBuilderInputData(int sourceHeight, int sourceWidth, List<TextUnit> text) {
         //get all text llx, lly, urx, ury----------------------------------
-        float lowestLlx = sourceWidth;
-        float lowestLly = sourceHeight;
-        float highestUrx = 0;
-        float highestUry = 0;
+        float minLlx = sourceWidth;
+        float minLly = sourceHeight;
+        float maxUrx = 0;
+        float maxUry = 0;
 
         for (TextUnit textUnit : text) {
             float llx = textUnit.getLlx();
@@ -45,24 +45,25 @@ public class PdfBuilderInputData {
             float urx = textUnit.getUrx();
             float ury = textUnit.getUry();
 
-            if (llx < lowestLlx) {
-                lowestLlx = llx;
+            if (llx < minLlx) {
+                minLlx = llx;
             }
-            if (lly < lowestLly) {
-                lowestLly = lly;
+            if (lly < minLly) {
+                minLly = lly;
             }
-            if (urx > highestUrx) {
-                highestUrx = urx;
+            if (urx > maxUrx) {
+                maxUrx = urx;
             }
-            if (ury > highestUry) {
-                highestUry = ury;
+            if (ury > maxUry) {
+                maxUry = ury;
             }
         }
         //--------------------------------------------------------------------
 
+        //todo edit
         //get boundaries size - 10% of image side
-        float textWidth = highestUrx - lowestLlx;
-        float textHeight = highestUry - lowestLly;
+        float textWidth = maxUrx - minLlx;
+        float textHeight = maxUry - minLly;
 
         float maxSide = textHeight;
         if (maxSide < textWidth) {
@@ -73,7 +74,7 @@ public class PdfBuilderInputData {
         //--------------------------------------------------------------------------
 
         //cut from left side if needed-----------------------------------------
-        float dLlx = lowestLlx - boundariesSize;
+        float dLlx = minLlx - boundariesSize;
         boolean cutLlx = false;
         if (dLlx > 0) {
             //cut - decrease llx for each elem
@@ -81,7 +82,7 @@ public class PdfBuilderInputData {
         }
 
         //cut from bottom if needed--------------------------------------------
-        float dLly = lowestLly - boundariesSize;
+        float dLly = minLly - boundariesSize;
         boolean cutLly = false;
         if (dLly > 0) {
             //cut
@@ -89,17 +90,17 @@ public class PdfBuilderInputData {
         }
 
         //cut from right side if needed-----------------------------------------
-        float dUrx = highestUrx + boundariesSize;
+        float dUrx = sourceWidth - maxUrx - boundariesSize;
         boolean cutUrx = false;
-        if (dUrx < sourceWidth) {
+        if (dUrx > 0) {
             //cut - decrease llx for each elem
             cutUrx = true;
         }
 
         //cut from top if needed--------------------------------------------
-        float dUry = highestUry + boundariesSize;
+        float dUry =  sourceHeight -maxUry - boundariesSize;
         boolean cutUry = false;
-        if (dUry < sourceHeight) {
+        if (dUry > 0) {
             cutUry = true;
         }
 
@@ -114,7 +115,7 @@ public class PdfBuilderInputData {
                 float urx = textUnit.getUrx() - dLlx;
                 textUnit.setUrx(urx);
             }
-            if (cutLly) {
+            if (cutUry) {
                 float lly = textUnit.getLly() - dLly;
                 textUnit.setLly(lly);
                 float ury = textUnit.getUry() - dLly;
@@ -129,10 +130,10 @@ public class PdfBuilderInputData {
             newSourceHeight -= dLly;
         }
         if (cutUrx) {
-            newSourceWidth -= sourceWidth - highestUrx - boundariesSize;
+            newSourceWidth -= dUrx;
         }
         if (cutUry) {
-            newSourceHeight -= sourceHeight - highestUry - boundariesSize;
+            newSourceHeight -= dUry;
         }
         //cut image END--------------------------------------------------------
 
@@ -147,7 +148,7 @@ public class PdfBuilderInputData {
             mWidth = (newSourceWidth > 0) ? newSourceWidth : sourceWidth;
             this.text = text;
         }
-        this.text = invertSymmetrically(this.text, mHeight);
+//        this.text = invertSymmetrically(this.text, mHeight);
     }
 
     /**
@@ -218,8 +219,9 @@ public class PdfBuilderInputData {
      */
     private List<TextUnit> invertSymmetrically(List<TextUnit> text, float mHeight) {
         for (TextUnit unit : text) {
-            unit.setLly(mHeight - unit.getLly());
-            unit.setUry(mHeight - unit.getUry());
+            float wordHeight = unit.getUry() - unit.getLly();
+            unit.setLly(mHeight - unit.getLly() - wordHeight);
+            unit.setUry(mHeight - unit.getUry() + wordHeight);
         }
         return text;
     }

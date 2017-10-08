@@ -11,7 +11,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static ocrme_backend.utils.FileProvider.*;
@@ -36,7 +38,8 @@ public class PDFBuilderImplTest {
     private String cut_meFilename = "cut_me.jpg";
     private String cut_me_left_rightFilename = "cut_me_left_right.jpg";
     private String cut_me_rightFilename = "cut_me_right.jpg";
-
+    private String cut_me_topFilename = "cut_me_top.jpg";
+    private String cut_me_top2Filename = "cut_me_top2.jpg";
 
     private String defaultFont = "FreeSans.ttf";
 
@@ -78,21 +81,26 @@ public class PDFBuilderImplTest {
     public void cutAndBuildPDF() throws Exception {
         //get all files with cut_me part
         //preparation
-        OcrData cut_me_data = ocrForData(cut_meFilename, null);
-        OcrData cut_me_left_right = ocrForData(cut_me_left_rightFilename, null);
-        OcrData cut_me_right = ocrForData(cut_me_rightFilename, null);
+//        OcrData cut_me_data = ocrForData(cut_meFilename, null);
+//        OcrData cut_me_left_right = ocrForData(cut_me_left_rightFilename, null);
+//        OcrData cut_me_right = ocrForData(cut_me_rightFilename, null);
+        OcrData cut_me_top = ocrForData(cut_me_topFilename, null);
+//        OcrData cut_me_top2 = ocrForData(cut_me_top2Filename, null);
 
         ArrayList<OcrData> ocrDataList = new ArrayList<>();
-        ocrDataList.add(cut_me_data);
-        ocrDataList.add(cut_me_left_right);
-        ocrDataList.add(cut_me_right);
+//        ocrDataList.add(cut_me_data);
+//        ocrDataList.add(cut_me_left_right);
+//        ocrDataList.add(cut_me_right);
+        ocrDataList.add(cut_me_top);
+//        ocrDataList.add(cut_me_top2);
 
         ArrayList<String> pathList = new ArrayList<>();
 
         for (OcrData data : ocrDataList) {
             ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data.getPdfBuilderInputData());
 
-            String pdfFileName = "filename.pdf";
+            String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS-").format(new Date());
+            String pdfFileName = timeStamp + "filename.pdf";
             File destination = new File(getPathToTemp(), pdfFileName);
             try (OutputStream outputStream = new FileOutputStream(destination)) {
                 stream.writeTo(outputStream);
