@@ -33,11 +33,104 @@ public class PdfBuilderInputData {
      * @param text         ocr result
      */
     public PdfBuilderInputData(int sourceHeight, int sourceWidth, List<TextUnit> text) {
+
+        this.mHeight = sourceHeight;
+        this.mWidth = sourceWidth;
+        this.text = text;
+
+        cutImage(mHeight, mWidth, this.text);
+        decreaseTextDimensions(mHeight, mWidth, this.text);
+        increaseTextDimensions();
+        invertSymmetrically(this.text, mHeight);
+    }
+
+    private void increaseTextDimensions() {
+        float maxDx = 0;
+        float maxDy = 0;
+
+        for (TextUnit unit : text) {
+            float llx = unit.getLlx();
+            float lly = unit.getLly();
+            float urx = unit.getUrx();
+            float ury = unit.getUry();
+
+            float dx = 0;
+            if (llx < 0) {
+                dx = -llx;
+            }
+
+            if (dx > maxDx) {
+                maxDx = dx;
+            }
+
+            if (urx < 0) {
+                dx = -urx;
+            }
+
+            if (dx > maxDx) {
+                maxDx = dx;
+            }
+
+            float dy = 0;
+            if (lly < 0) {
+                dy = -lly;
+            }
+
+            if (dy > maxDy) {
+                maxDy = dy;
+            }
+
+            if (ury < 0) {
+                dy = -ury;
+            }
+
+            if (dy > maxDy) {
+                maxDy = dy;
+            }
+        }
+
+
+        for (TextUnit unit : text) {
+            float llx = unit.getLlx();
+            float lly = unit.getLly();
+            float urx = unit.getUrx();
+            float ury = unit.getUry();
+
+            unit.setUrx(urx + maxDx);
+            unit.setUry(ury + maxDy);
+            unit.setLlx(llx + maxDx);
+            unit.setLly(lly + maxDy);
+        }
+
+        mHeight +=maxDy;
+        mWidth +=maxDx;
+
+//
+//        //get boundaries size - 10% of image side
+//        float textWidth = maxUrx - minLlx;
+//        float textHeight = maxLly - minUry;
+//
+//        float maxSide = textHeight;
+//        if (maxSide < textWidth) {
+//            maxSide = textWidth;
+//        }
+//
+//        float boundariesSize = maxSide / 20; //5% of image size will use as boundaries
+    }
+
+    /**
+     * cut white borders of text if needed (if too wide)
+     *
+     * @param sourceHeight
+     * @param sourceWidth
+     * @param text
+     */
+    private void cutImage(float sourceHeight, float sourceWidth, List<TextUnit> text) {
         //get all text llx, lly, urx, ury----------------------------------
         float minLlx = sourceWidth;
-        float minLly = sourceHeight;
+        float maxLly = 0;
         float maxUrx = 0;
-        float maxUry = 0;
+        float minUry = sourceHeight;
 
         for (TextUnit textUnit : text) {
             float llx = textUnit.getLlx();
@@ -48,29 +141,28 @@ public class PdfBuilderInputData {
             if (llx < minLlx) {
                 minLlx = llx;
             }
-            if (lly < minLly) {
-                minLly = lly;
+            if (lly > maxLly) {
+                maxLly = lly;
             }
             if (urx > maxUrx) {
                 maxUrx = urx;
             }
-            if (ury > maxUry) {
-                maxUry = ury;
+            if (ury < minUry) {
+                minUry = ury;
             }
         }
         //--------------------------------------------------------------------
 
-        //todo edit
-        //get boundaries size - 10% of image side
+        //get boundaries size
         float textWidth = maxUrx - minLlx;
-        float textHeight = maxUry - minLly;
+        float textHeight = maxLly - minUry;
 
         float maxSide = textHeight;
         if (maxSide < textWidth) {
             maxSide = textWidth;
         }
 
-        float boundariesSize = maxSide / 20; //5% of image size will use as boundaries
+        float boundariesSize = maxSide / 10; //10% of image size will use as boundaries
         //--------------------------------------------------------------------------
 
         //cut from left side if needed-----------------------------------------
@@ -82,7 +174,7 @@ public class PdfBuilderInputData {
         }
 
         //cut from bottom if needed--------------------------------------------
-        float dLly = minLly - boundariesSize;
+        float dLly = sourceHeight - maxLly - boundariesSize;
         boolean cutLly = false;
         if (dLly > 0) {
             //cut
@@ -98,14 +190,14 @@ public class PdfBuilderInputData {
         }
 
         //cut from top if needed--------------------------------------------
-        float dUry =  sourceHeight -maxUry - boundariesSize;
+        float dUry = minUry - boundariesSize;
         boolean cutUry = false;
         if (dUry > 0) {
             cutUry = true;
         }
 
-        int newSourceHeight = sourceHeight;
-        int newSourceWidth = sourceWidth;
+        float newSourceHeight = sourceHeight;
+        float newSourceWidth = sourceWidth;
 
         for (int i = 0; i < text.size(); i++) {
             TextUnit textUnit = text.get(i);
@@ -116,10 +208,10 @@ public class PdfBuilderInputData {
                 textUnit.setUrx(urx);
             }
             if (cutUry) {
-                float lly = textUnit.getLly() - dLly;
-                textUnit.setLly(lly);
-                float ury = textUnit.getUry() - dLly;
+                float ury = textUnit.getUry() - dUry;
                 textUnit.setUry(ury);
+                float lly = textUnit.getLly() - dUry;
+                textUnit.setLly(lly);
             }
             text.set(i, textUnit);
         }
@@ -135,21 +227,12 @@ public class PdfBuilderInputData {
         if (cutUry) {
             newSourceHeight -= dUry;
         }
-        //cut image END--------------------------------------------------------
 
-        if ((mHeight > maxHeightAllowed || mWidth > maxWidthAllowed)) {
-
-            mHeight = maxHeightAllowed;
-            mWidth = maxWidthAllowed;
-            this.text = decreaseTextDimensions(
-                    mHeight, mWidth, maxHeightAllowed, maxWidthAllowed, text);
-        } else {
-            mHeight = (newSourceHeight > 0) ? newSourceHeight : sourceHeight;
-            mWidth = (newSourceWidth > 0) ? newSourceWidth : sourceWidth;
-            this.text = text;
-        }
-//        this.text = invertSymmetrically(this.text, mHeight);
+        mHeight = (newSourceHeight > 0) ? newSourceHeight : sourceHeight;
+        mWidth = (newSourceWidth > 0) ? newSourceWidth : sourceWidth;
+        this.text = text;
     }
+
 
     /**
      * @return Simple text without new-line symbols.
@@ -175,37 +258,41 @@ public class PdfBuilderInputData {
     }
 
     /**
-     * since text units have boundingPoly-s bigger, than current PDF size, we need recalculate boundingPoly-s.
-     *  @param sourceHeight original text height
+     * decrease text if it bigger than default pdf size
+     *
+     * @param sourceHeight original text height
      * @param sourceWidth  original text width
-     * @param mHeight
-     * @param mWidth
      * @param text         original text units
      */
-    private List<TextUnit> decreaseTextDimensions(
-            float sourceHeight, float sourceWidth, float mHeight, float mWidth, List<TextUnit> text) {
-        //By how much does sourceHeight exceed mHeight?
-        float heightCoefficient = sourceHeight * 100 / mHeight;
-        //By how much does sourceWidth exceed mWidth?
-        float widthCoefficient = sourceWidth * 100 / mWidth;
-        //measure by height. Height of source will set to mHeight.
-        if (heightCoefficient > widthCoefficient) {
-            for (TextUnit unit : text) {
-                unit.setLlx(unit.getLlx() * mHeight / sourceHeight);
-                unit.setLly(unit.getLly() * mHeight / sourceHeight);
-                unit.setUrx(unit.getUrx() * mHeight / sourceHeight);
-                unit.setUry(unit.getUry() * mHeight / sourceHeight);
-            }
-        } else {
-            for (TextUnit unit : text) {
-                unit.setLlx(unit.getLlx() * mWidth / sourceWidth);
-                unit.setLly(unit.getLly() * mWidth / sourceWidth);
-                unit.setUrx(unit.getUrx() * mWidth / sourceWidth);
-                unit.setUry(unit.getUry() * mWidth / sourceWidth);
-            }
-        }
-        return text;
+    private void decreaseTextDimensions(float sourceHeight, float sourceWidth, List<TextUnit> text) {
+        if ((mHeight > maxHeightAllowed || mWidth > maxWidthAllowed)) {
 
+            mHeight = maxHeightAllowed;
+            mWidth = maxWidthAllowed;
+
+            //By how much does sourceHeight exceed mHeight?
+            float heightCoefficient = sourceHeight * 100 / mHeight;
+            //By how much does sourceWidth exceed mWidth?
+            float widthCoefficient = sourceWidth * 100 / mWidth;
+            //measure by height. Height of source will set to mHeight.
+            if (heightCoefficient > widthCoefficient) {
+                for (TextUnit unit : text) {
+                    unit.setLlx(unit.getLlx() * mHeight / sourceHeight);
+                    unit.setLly(unit.getLly() * mHeight / sourceHeight);
+                    unit.setUrx(unit.getUrx() * mHeight / sourceHeight);
+                    unit.setUry(unit.getUry() * mHeight / sourceHeight);
+                }
+            } else {
+                for (TextUnit unit : text) {
+                    unit.setLlx(unit.getLlx() * mWidth / sourceWidth);
+                    unit.setLly(unit.getLly() * mWidth / sourceWidth);
+                    unit.setUrx(unit.getUrx() * mWidth / sourceWidth);
+                    unit.setUry(unit.getUry() * mWidth / sourceWidth);
+                }
+            }
+
+            this.text = text;
+        }
     }
 
     /**
@@ -217,12 +304,12 @@ public class PdfBuilderInputData {
      * @param mHeight
      * @return text units inverted symmetrically by 0X coordinates.
      */
-    private List<TextUnit> invertSymmetrically(List<TextUnit> text, float mHeight) {
+    private void invertSymmetrically(List<TextUnit> text, float mHeight) {
         for (TextUnit unit : text) {
             float wordHeight = unit.getUry() - unit.getLly();
             unit.setLly(mHeight - unit.getLly() - wordHeight);
             unit.setUry(mHeight - unit.getUry() + wordHeight);
         }
-        return text;
+        this.text = text;
     }
 }

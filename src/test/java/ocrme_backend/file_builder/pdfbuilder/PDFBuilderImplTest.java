@@ -27,6 +27,8 @@ import static org.mockito.Mockito.when;
 /**
  * Created by iuliia on 6/4/17.
  */
+
+//todo refactoring needed
 public class PDFBuilderImplTest {
 
     private PDFBuilderImpl pdfBuilder;
@@ -39,7 +41,7 @@ public class PDFBuilderImplTest {
     private String cut_me_left_rightFilename = "cut_me_left_right.jpg";
     private String cut_me_rightFilename = "cut_me_right.jpg";
     private String cut_me_topFilename = "cut_me_top.jpg";
-    private String cut_me_top2Filename = "cut_me_top2.jpg";
+    private String cut_me2Filename = "cut_me2.jpg";
 
     private String defaultFont = "FreeSans.ttf";
 
@@ -48,7 +50,8 @@ public class PDFBuilderImplTest {
     private String simpleEngText = "Simple English text";
     private String simplePlnText = "Ocenia się że język polski jest językiem ojczystym około 44 milionów ludzi na świecie";
     private String simpleHindiText = "साधारण पाठ हिन्दी";
-    private String simpleChinaText = "简单的文字中国";
+    private String simpleChinaText = "简单的文字中国"; //todo fix me - not supported yet
+    ArrayList<String> imageLocalPathArray = new ArrayList<>();
 
     @Before
     public void init() throws IOException, GeneralSecurityException {
@@ -60,6 +63,13 @@ public class PDFBuilderImplTest {
 
         when(mockServletContext.getResourceAsStream(anyString())).thenReturn(getFontAsStream(defaultFont));
     }
+//
+//    @After
+//    public void deleteFiles() {
+//        for (String path : imageLocalPathArray) {
+//            deleteFile(path);
+//        }
+//    }
 
 
     @Test
@@ -80,39 +90,11 @@ public class PDFBuilderImplTest {
     @Test
     public void cutAndBuildPDF() throws Exception {
         //get all files with cut_me part
-        //preparation
-//        OcrData cut_me_data = ocrForData(cut_meFilename, null);
-//        OcrData cut_me_left_right = ocrForData(cut_me_left_rightFilename, null);
-//        OcrData cut_me_right = ocrForData(cut_me_rightFilename, null);
-        OcrData cut_me_top = ocrForData(cut_me_topFilename, null);
-//        OcrData cut_me_top2 = ocrForData(cut_me_top2Filename, null);
-
-        ArrayList<OcrData> ocrDataList = new ArrayList<>();
-//        ocrDataList.add(cut_me_data);
-//        ocrDataList.add(cut_me_left_right);
-//        ocrDataList.add(cut_me_right);
-        ocrDataList.add(cut_me_top);
-//        ocrDataList.add(cut_me_top2);
-
-        ArrayList<String> pathList = new ArrayList<>();
-
-        for (OcrData data : ocrDataList) {
-            ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data.getPdfBuilderInputData());
-
-            String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS-").format(new Date());
-            String pdfFileName = timeStamp + "filename.pdf";
-            File destination = new File(getPathToTemp(), pdfFileName);
-            try (OutputStream outputStream = new FileOutputStream(destination)) {
-                stream.writeTo(outputStream);
-            }
-
-            String path = destination.getPath();
-            testFileExistsAndNotEmpty(path);
-            pathList.add(path);
-        }
-        for (String path : pathList) {
-            deleteFile(path);
-        }
+        testBuildPdfFromRealData(cut_meFilename, null);
+        testBuildPdfFromRealData(cut_me_left_rightFilename, null);
+        testBuildPdfFromRealData(cut_me_rightFilename, null);
+        testBuildPdfFromRealData(cut_me_topFilename, null);
+        testBuildPdfFromRealData(cut_me2Filename, null);
     }
 
 
@@ -134,10 +116,8 @@ public class PDFBuilderImplTest {
 
         String destinationPath = destination.getPath();
         testFileExistsAndNotEmpty(destinationPath);
-
         assertTrue(pdfContainsText(destinationPath, "Барышня"));
-
-        deleteFile(destinationPath);
+        imageLocalPathArray.add(destinationPath);
     }
 
     @Test
@@ -183,27 +163,30 @@ public class PDFBuilderImplTest {
         texts.add(new TextUnit(text, 20, 200, 200, 20));
         PdfBuilderInputData data = new PdfBuilderInputData(300, 300, texts);
 
-        testBuildPdf(data);
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS-").format(new Date());
+        testBuildPdf(timeStamp + ".pdf", data);
     }
 
     /**
      * test build pdf from PdfBuilderInputData
      *
+     *
+     * @param imageFileName
      * @param data
      * @throws IOException
      */
-    private void testBuildPdf(PdfBuilderInputData data) throws IOException {
+    private void testBuildPdf(String imageFileName, PdfBuilderInputData data) throws IOException {
         ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data);
 
-        String pdfFileName = "filename.pdf";
+        String pdfFileName = imageFileName + ".pdf";
         File destination = new File(getPathToTemp(), pdfFileName);
         try (OutputStream outputStream = new FileOutputStream(destination)) {
             stream.writeTo(outputStream);
         }
+        String path = destination.getPath();
 
-        testFileExistsAndNotEmpty(destination.getPath());
-
-        deleteFile(destination.getPath());
+        testFileExistsAndNotEmpty(path);
+        imageLocalPathArray.add(path);
     }
 
     /**
@@ -216,7 +199,7 @@ public class PDFBuilderImplTest {
         //preparation
         OcrData data = ocrForData(imageFileName, languages);
 
-        testBuildPdf(data.getPdfBuilderInputData());
+        testBuildPdf(imageFileName, data.getPdfBuilderInputData());
     }
 
     private void testFileExistsAndNotEmpty(String path) throws IOException {
