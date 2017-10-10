@@ -3,6 +3,7 @@ package ocrme_backend.file_builder.pdfbuilder;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import ocrme_backend.servlets.ocr.OcrData;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,13 +63,13 @@ public class PDFBuilderImplTest {
 
         when(mockServletContext.getResourceAsStream(anyString())).thenReturn(getFontAsStream(defaultFont));
     }
-//
-//    @After
-//    public void deleteFiles() {
-//        for (String path : imageLocalPathArray) {
-//            deleteFile(path);
-//        }
-//    }
+
+    @After
+    public void deleteFiles() {
+        for (String path : imageLocalPathArray) {
+            deleteFile(path);
+        }
+    }
 
 
     @Test
@@ -145,6 +146,7 @@ public class PDFBuilderImplTest {
 //         testBuildSimplePdf(simpleChinaText);
 //    }
 
+    //
     @Test
     public void buildSimplePolishPDF() throws IOException {
         testBuildSimplePdf(simplePlnText);
