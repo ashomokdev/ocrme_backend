@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
  * Created by iuliia on 6/4/17.
  */
 
-//todo refactoring needed
 public class PDFBuilderImplTest {
 
     private PDFBuilderImpl pdfBuilder;

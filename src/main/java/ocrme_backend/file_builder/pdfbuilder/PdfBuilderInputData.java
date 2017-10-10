@@ -41,7 +41,7 @@ public class PdfBuilderInputData {
         cutImage(mHeight, mWidth, this.text);
         decreaseTextDimensions(mHeight, mWidth, this.text);
         increaseTextDimensions();
-        invertSymmetrically(this.text, mHeight);
+        invertSymmetrically();
     }
 
     private void increaseTextDimensions() {
@@ -299,17 +299,14 @@ public class PdfBuilderInputData {
      * since Google Vision Api returns boundingPoly-s when Coordinates starts from top left corner,
      * but Itext uses coordinate system with bottom left start position -
      * we need invert the result for continue to work with itext.
-     *
-     * @param text
-     * @param mHeight
+
      * @return text units inverted symmetrically by 0X coordinates.
      */
-    private void invertSymmetrically(List<TextUnit> text, float mHeight) {
+    private void invertSymmetrically() {
         for (TextUnit unit : text) {
             float wordHeight = unit.getUry() - unit.getLly();
             unit.setLly(mHeight - unit.getLly() - wordHeight);
             unit.setUry(mHeight - unit.getUry() + wordHeight);
         }
-        this.text = text;
     }
 }
