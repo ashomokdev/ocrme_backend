@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 /**
  * Created by iuliia on 7/11/17.
+ * docs https://cloud.google.com/vision/docs/languages
  */
 public class OcrProcessorImpl implements OCRProcessor {
 
@@ -57,6 +58,7 @@ public class OcrProcessorImpl implements OCRProcessor {
     @Override
     public @Nullable
     String ocrForText(byte[] image, @Nullable List<String> languages) throws IOException {
+
         try {
             if (image == null) {
                 throw new FileUploadException("Can not get file");
@@ -158,7 +160,7 @@ public class OcrProcessorImpl implements OCRProcessor {
                         .setImage(new Image().encodeContent(image))
                         .setFeatures(ImmutableList.of(
                                 new Feature()
-                                        .setType("DOCUMENT_TEXT_DETECTION")
+                                        .setType("TEXT_DETECTION")
                                         .setMaxResults(1)));
 
         return getBatchAnnotateImagesResponse(languages, request);
@@ -177,7 +179,7 @@ public class OcrProcessorImpl implements OCRProcessor {
                         .setImage(new Image().setSource(new ImageSource().setGcsImageUri(imageUrl)))
                         .setFeatures(ImmutableList.of(
                                 new Feature()
-                                        .setType("DOCUMENT_TEXT_DETECTION")
+                                        .setType("TEXT_DETECTION")
                                         .setMaxResults(1)));
 
         return getBatchAnnotateImagesResponse(languages, request);

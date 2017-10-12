@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -126,10 +125,11 @@ public class PDFBuilderImpl implements PDFBuilder {
             float ury = text.getUry();
 
             float fontSize = getMaxFontSize(bf, text.getText(), urx - llx);
-            contentByte.setFontAndSize(bf.getCalculatedBaseFont(true), fontSize);
-
-            contentByte.setTextMatrix(llx, lly);
-            contentByte.showText(text.getText());
+            if (fontSize > 0) {
+                contentByte.setFontAndSize(bf.getCalculatedBaseFont(true), fontSize);
+                contentByte.setTextMatrix(llx, lly);
+                contentByte.showText(text.getText());
+            }
         }
         contentByte.endText();
         contentByte.restoreState();
