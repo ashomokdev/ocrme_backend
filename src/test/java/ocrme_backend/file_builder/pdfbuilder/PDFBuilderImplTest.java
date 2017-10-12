@@ -41,7 +41,9 @@ public class PDFBuilderImplTest {
     private String cut_me_left_rightFilename = "cut_me_left_right.jpg";
     private String cut_me_rightFilename = "cut_me_right.jpg";
     private String cut_me_topFilename = "cut_me_top.jpg";
+    private String cut_me2_wrong_orientationFilename = "cut_me2_wrong_orientation.jpg";
     private String cut_me2Filename = "cut_me2.jpg";
+    private String image_no_pdfFilename = "image_no_pdf.jpg";
 
     private String defaultFont = "FreeSans.ttf";
 
@@ -64,17 +66,29 @@ public class PDFBuilderImplTest {
         when(mockServletContext.getResourceAsStream(anyString())).thenReturn(getFontAsStream(defaultFont));
     }
 
-    @After
-    public void deleteFiles() {
-        for (String path : imageLocalPathArray) {
-            deleteFile(path);
-        }
-    }
+//    @After
+//    public void deleteFiles() {
+//        for (String path : imageLocalPathArray) {
+//            deleteFile(path);
+//        }
+//    }
 
 
     @Test
     public void buildPDFDefault() throws Exception {
         testBuildPdfFromRealData(defaultFileName, null);
+    }
+
+    //todo failed - empty result because of wrong image orientation
+    @Test
+    public void buildPDFwrongOrientation() throws Exception {
+        testBuildPdfFromRealData(cut_me2_wrong_orientationFilename, null);
+    }
+
+    //todo failed - empty result because of wrong image orientation
+    @Test
+    public void buildPDFsourseRotated() throws Exception {
+        testBuildPdfFromRealData(image_no_pdfFilename, null);
     }
 
     @Test

@@ -25,8 +25,8 @@ public class PdfBuilderInputData {
      */
     private List<TextUnit> text;
 
-    //todo cut pdf in needed
 
+    //todo result pdf dont influence of sourceHeight and sourceWidth - this fix will also fix a bug with emty pdf in source image rotated
     /**
      * @param sourceHeight source/ocr file height
      * @param sourceWidth  source/ocr file width
