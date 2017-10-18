@@ -3,7 +3,6 @@ package ocrme_backend.file_builder.pdfbuilder;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import ocrme_backend.servlets.ocr.OcrData;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,7 +42,13 @@ public class PDFBuilderImplTest {
     private String cut_me_topFilename = "cut_me_top.jpg";
     private String cut_me2_wrong_orientationFilename = "cut_me2_wrong_orientation.jpg";
     private String cut_me2Filename = "cut_me2.jpg";
-    private String image_no_pdfFilename = "image_no_pdf.jpg";
+    private String image_rotated_90 = "image_rotated_90.jpg";
+
+    private String rotated_180 = "rotated_180.jpg";
+    private String rotated_180_2 = "rotated_180_2.jpg";
+    private String rotated_270 = "rotated_270.jpg";
+    private String rotated_270_2 = "rotated_270_2.jpg";
+
 
     private String defaultFont = "FreeSans.ttf";
 
@@ -79,16 +84,22 @@ public class PDFBuilderImplTest {
         testBuildPdfFromRealData(defaultFileName, null);
     }
 
-    //todo failed - empty result because of wrong image orientation
     @Test
-    public void buildPDFwrongOrientation() throws Exception {
-        testBuildPdfFromRealData(cut_me2_wrong_orientationFilename, null);
+    public void buildPDFsourseRotated90() throws Exception {
+        testBuildPdfFromRealData(image_rotated_90, null);
     }
 
-    //todo failed - empty result because of wrong image orientation
     @Test
-    public void buildPDFsourseRotated() throws Exception {
-        testBuildPdfFromRealData(image_no_pdfFilename, null);
+    public void buildPDFsourseRotated180() throws Exception {
+        testBuildPdfFromRealData(rotated_180, null);
+        testBuildPdfFromRealData(rotated_180_2, null);
+    }
+
+
+    @Test
+    public void buildPDFsourseRotated270() throws Exception {
+        testBuildPdfFromRealData(rotated_270, null);
+        testBuildPdfFromRealData(rotated_270_2, null);
     }
 
     @Test
@@ -176,7 +187,7 @@ public class PDFBuilderImplTest {
         //preparation
         List<TextUnit> texts = new ArrayList<>();
         texts.add(new TextUnit(text, 20, 200, 200, 20));
-        PdfBuilderInputData data = new PdfBuilderInputData(300, 300, texts);
+        PdfBuilderInputData data = new PdfBuilderInputData(texts);
 
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS-").format(new Date());
         testBuildPdf(timeStamp + ".pdf", data);

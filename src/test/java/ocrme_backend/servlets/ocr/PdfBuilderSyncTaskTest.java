@@ -60,7 +60,7 @@ public class PdfBuilderSyncTaskTest {
 
     @Test
     public void processFileWithNoText() throws Exception {
-        data = new PdfBuilderInputData(300, 300, new ArrayList<>());
+        data = new PdfBuilderInputData( new ArrayList<>());
 
         PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
 
@@ -73,7 +73,7 @@ public class PdfBuilderSyncTaskTest {
 
         List<TextUnit> texts = new ArrayList<>();
         texts.add(new TextUnit(simpleChinaText, 20, 200, 200, 20));
-        data = new PdfBuilderInputData(300, 300, texts);
+        data = new PdfBuilderInputData( texts);
         PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
 
         Assert.assertTrue(
