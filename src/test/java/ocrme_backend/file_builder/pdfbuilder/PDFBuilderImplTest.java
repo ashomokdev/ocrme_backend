@@ -40,15 +40,16 @@ public class PDFBuilderImplTest {
     private String cut_me_left_rightFilename = "cut_me_left_right.jpg";
     private String cut_me_rightFilename = "cut_me_right.jpg";
     private String cut_me_topFilename = "cut_me_top.jpg";
-    private String cut_me2_wrong_orientationFilename = "cut_me2_wrong_orientation.jpg";
+    private String cut_me_rotated_90 = "cut_me_rotated_90.jpg";
     private String cut_me2Filename = "cut_me2.jpg";
-    private String image_rotated_90 = "image_rotated_90.jpg";
 
+    private String image_rotated_90 = "image_rotated_90.jpg";
+    private String image_rotated_90_2 = "image_rotated_90_2.png";
     private String rotated_180 = "rotated_180.jpg";
+    private String rotated_ok = "rotated_ok.jpg";
     private String rotated_180_2 = "rotated_180_2.jpg";
     private String rotated_270 = "rotated_270.jpg";
     private String rotated_270_2 = "rotated_270_2.jpg";
-
 
     private String defaultFont = "FreeSans.ttf";
 
@@ -87,12 +88,15 @@ public class PDFBuilderImplTest {
     @Test
     public void buildPDFsourseRotated90() throws Exception {
         testBuildPdfFromRealData(image_rotated_90, null);
+        testBuildPdfFromRealData(image_rotated_90_2, null);
+        testBuildPdfFromRealData(cut_me_rotated_90, null);
     }
 
     @Test
     public void buildPDFsourseRotated180() throws Exception {
-        testBuildPdfFromRealData(rotated_180, null);
         testBuildPdfFromRealData(rotated_180_2, null);
+        testBuildPdfFromRealData(rotated_180, null);
+        testBuildPdfFromRealData(rotated_ok, null);
     }
 
 
@@ -201,7 +205,7 @@ public class PDFBuilderImplTest {
      * @param data
      * @throws IOException
      */
-    private void testBuildPdf(String imageFileName, PdfBuilderInputData data) throws IOException {
+    private String testBuildPdf(String imageFileName, PdfBuilderInputData data) throws IOException {
         ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data);
 
         String pdfFileName = imageFileName + ".pdf";
@@ -213,6 +217,7 @@ public class PDFBuilderImplTest {
 
         testFileExistsAndNotEmpty(path);
         imageLocalPathArray.add(path);
+        return  path;
     }
 
     /**
@@ -221,11 +226,11 @@ public class PDFBuilderImplTest {
      * @param imageFileName
      * @throws Exception
      */
-    private void testBuildPdfFromRealData(String imageFileName, @Nullable ArrayList<String> languages) throws Exception {
+    private String testBuildPdfFromRealData(String imageFileName, @Nullable ArrayList<String> languages) throws Exception {
         //preparation
         OcrData data = ocrForData(imageFileName, languages);
 
-        testBuildPdf(imageFileName, data.getPdfBuilderInputData());
+        return testBuildPdf(imageFileName, data.getPdfBuilderInputData());
     }
 
     private void testFileExistsAndNotEmpty(String path) throws IOException {

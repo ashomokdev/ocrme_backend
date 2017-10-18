@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -279,13 +280,13 @@ public class OcrProcessorImpl implements OCRProcessor {
                 if (texts.size() > 0) {
 
                     //get orientation
-                    EntityAnnotation allText = texts.get(0); //all text of the page
+                    EntityAnnotation first_word = texts.get(1);
                     int orientation;
                     try {
-                        orientation = getExifOrientation(allText);
+                        orientation = getExifOrientation(first_word);
                     } catch (NullPointerException e) {
                         try {
-                            orientation = getExifOrientation(texts.get(1));
+                            orientation = getExifOrientation(texts.get(2));
                         } catch (NullPointerException e1) {
                             orientation = EXIF_ORIENTATION_NORMAL;
                         }
@@ -294,7 +295,7 @@ public class OcrProcessorImpl implements OCRProcessor {
 
                     // Calculate the center
                     float centerX = 0, centerY = 0;
-                    for (Vertex vertex : allText.getBoundingPoly().getVertices()) {
+                    for (Vertex vertex : first_word.getBoundingPoly().getVertices()) {
                         if (vertex.getX() != null) {
                             centerX += vertex.getX();
                         }
@@ -318,16 +319,33 @@ public class OcrProcessorImpl implements OCRProcessor {
                             float ury = 0;
                             if (orientation == EXIF_ORIENTATION_NORMAL) {
                                 poly = invertSymmetricallyByY(centerY, poly);
-                                llx = (poly.getVertices().get(0).getX() + poly.getVertices().get(3).getX()) / 2;
-                                lly = (poly.getVertices().get(0).getY() + poly.getVertices().get(1).getY()) / 2;
-                                urx = (poly.getVertices().get(2).getX() + poly.getVertices().get(1).getX()) / 2;
-                                ury = (poly.getVertices().get(2).getY() + poly.getVertices().get(3).getY()) / 2;
+                                llx = getLlx(poly);
+                                lly = getLly(poly);
+                                urx = getUrx(poly);
+                                ury = getUry(poly);
                             } else if (orientation == EXIF_ORIENTATION_90_DEGREE) {
+                                //invert by x
                                 poly = rotate(centerX, centerY, poly, Math.toRadians(-90));
-                                llx = (poly.getVertices().get(1).getX() + poly.getVertices().get(2).getX()) / 2;
-                                lly = (poly.getVertices().get(2).getY() + poly.getVertices().get(3).getY()) / 2;
-                                urx = (poly.getVertices().get(0).getX() + poly.getVertices().get(3).getX()) / 2;
-                                ury = (poly.getVertices().get(0).getY() + poly.getVertices().get(1).getY()) / 2;
+                                poly = invertSymmetricallyByX(centerX, poly);
+                                llx = getLlx(poly);
+                                lly = getLly(poly);
+                                urx = getUrx(poly);
+                                ury = getUry(poly);
+                            } else if (orientation == EXIF_ORIENTATION_180_DEGREE) {
+                                poly = rotate(centerX, centerY, poly, Math.toRadians(-180));
+                                poly = invertSymmetricallyByX(centerX, poly);
+                                llx = getLlx(poly);
+                                lly = getLly(poly);
+                                urx = getUrx(poly);
+                                ury = getUry(poly);
+                            }else if (orientation == EXIF_ORIENTATION_270_DEGREE){
+                                //invert by x
+                                poly = rotate(centerX, centerY, poly, Math.toRadians(-270));
+                                poly = invertSymmetricallyByX(centerX, poly);
+                                llx = getLlx(poly);
+                                lly = getLly(poly);
+                                urx = getUrx(poly);
+                                ury = getUry(poly);
                             }
 
 
@@ -340,6 +358,92 @@ public class OcrProcessorImpl implements OCRProcessor {
             }
         }
         return data;
+    }
+
+
+
+    private float getLlx(BoundingPoly poly) {
+        try {
+            List<Vertex> vertices = poly.getVertices();
+
+            ArrayList<Float> xs = new ArrayList<>();
+            for (Vertex v : vertices) {
+                float x = 0;
+                if (v.getX() != null) {
+                    x = v.getX();
+                }
+                xs.add(x);
+            }
+
+            Collections.sort(xs);
+            float llx = (xs.get(0) + xs.get(1)) / 2;
+            return llx;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private float getLly(BoundingPoly poly) {
+        try {
+            List<Vertex> vertices = poly.getVertices();
+
+            ArrayList<Float> ys = new ArrayList<>();
+            for (Vertex v : vertices) {
+                float y = 0;
+                if (v.getY() != null) {
+                    y = v.getY();
+                }
+                ys.add(y);
+            }
+
+            Collections.sort(ys);
+            float lly = (ys.get(0) + ys.get(1)) / 2;
+            return lly;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private float getUrx(BoundingPoly poly) {
+        try {
+            List<Vertex> vertices = poly.getVertices();
+
+            ArrayList<Float> xs = new ArrayList<>();
+            for (Vertex v : vertices) {
+                float x = 0;
+                if (v.getX() != null) {
+                    x = v.getX();
+                }
+                xs.add(x);
+            }
+
+            Collections.sort(xs);
+            float urx = (xs.get(xs.size()-1) + xs.get(xs.size()-2)) / 2;
+            return urx;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private float getUry(BoundingPoly poly) {
+        try {
+            List<Vertex> vertices = poly.getVertices();
+
+            ArrayList<Float> ys = new ArrayList<>();
+            for (Vertex v : vertices) {
+                float y = 0;
+                if (v.getY() != null) {
+                    y = v.getY();
+                }
+                ys.add(y);
+            }
+
+            Collections.sort(ys);
+            float ury = (ys.get(ys.size()-1) +ys.get(ys.size()-2)) / 2;
+            return ury;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     /**
@@ -381,6 +485,22 @@ public class OcrProcessorImpl implements OCRProcessor {
         for (Vertex v : vertices) {
             if (v.getY() != null) {
                 v.setY((int) (centerY + (centerY - v.getY())));
+            }
+        }
+        return poly;
+    }
+
+    /**
+     *
+     * @param centerX
+     * @param poly
+     * @return  text units inverted symmetrically by 0Y coordinates.
+     */
+    private BoundingPoly invertSymmetricallyByX(float centerX, BoundingPoly poly) {
+        List<Vertex> vertices = poly.getVertices();
+        for (Vertex v : vertices) {
+            if (v.getX() != null) {
+                v.setX((int) (centerX + (centerX - v.getX())));
             }
         }
         return poly;
