@@ -318,7 +318,7 @@ public class OcrProcessorImpl implements OCRProcessor {
                             float urx = 0;
                             float ury = 0;
                             if (orientation == EXIF_ORIENTATION_NORMAL) {
-                                poly = invertSymmetricallyByY(centerY, poly);
+                                poly = invertSymmetricallyBy0X(centerY, poly);
                                 llx = getLlx(poly);
                                 lly = getLly(poly);
                                 urx = getUrx(poly);
@@ -326,14 +326,14 @@ public class OcrProcessorImpl implements OCRProcessor {
                             } else if (orientation == EXIF_ORIENTATION_90_DEGREE) {
                                 //invert by x
                                 poly = rotate(centerX, centerY, poly, Math.toRadians(-90));
-                                poly = invertSymmetricallyByX(centerX, poly);
+                                poly = invertSymmetricallyBy0Y(centerX, poly);
                                 llx = getLlx(poly);
                                 lly = getLly(poly);
                                 urx = getUrx(poly);
                                 ury = getUry(poly);
                             } else if (orientation == EXIF_ORIENTATION_180_DEGREE) {
                                 poly = rotate(centerX, centerY, poly, Math.toRadians(-180));
-                                poly = invertSymmetricallyByX(centerX, poly);
+                                poly = invertSymmetricallyBy0Y(centerX, poly);
                                 llx = getLlx(poly);
                                 lly = getLly(poly);
                                 urx = getUrx(poly);
@@ -341,7 +341,7 @@ public class OcrProcessorImpl implements OCRProcessor {
                             }else if (orientation == EXIF_ORIENTATION_270_DEGREE){
                                 //invert by x
                                 poly = rotate(centerX, centerY, poly, Math.toRadians(-270));
-                                poly = invertSymmetricallyByX(centerX, poly);
+                                poly = invertSymmetricallyBy0Y(centerX, poly);
                                 llx = getLlx(poly);
                                 lly = getLly(poly);
                                 urx = getUrx(poly);
@@ -479,7 +479,7 @@ public class OcrProcessorImpl implements OCRProcessor {
      *
      * @return text units inverted symmetrically by 0X coordinates.
      */
-    private BoundingPoly invertSymmetricallyByY(float centerY, BoundingPoly poly) {
+    private BoundingPoly invertSymmetricallyBy0X(float centerY, BoundingPoly poly) {
 
         List<Vertex> vertices = poly.getVertices();
         for (Vertex v : vertices) {
@@ -496,7 +496,7 @@ public class OcrProcessorImpl implements OCRProcessor {
      * @param poly
      * @return  text units inverted symmetrically by 0Y coordinates.
      */
-    private BoundingPoly invertSymmetricallyByX(float centerX, BoundingPoly poly) {
+    private BoundingPoly invertSymmetricallyBy0Y(float centerX, BoundingPoly poly) {
         List<Vertex> vertices = poly.getVertices();
         for (Vertex v : vertices) {
             if (v.getX() != null) {

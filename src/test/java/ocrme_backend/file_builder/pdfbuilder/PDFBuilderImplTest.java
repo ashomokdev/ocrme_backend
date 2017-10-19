@@ -35,6 +35,9 @@ public class PDFBuilderImplTest {
     private String defaultFileName = "img.jpg";
     private String a4FileName = "a4.jpg";
     private String columnsFileName = "columns.png";
+    private String columns_90 = "columns_90.png";
+    private String columns_180= "columns_180.png";
+    private String columns_270 = "columns_270.png";
     private String rusFilename = "rus.jpg";
     private String cut_meFilename = "cut_me.jpg";
     private String cut_me_left_rightFilename = "cut_me_left_right.jpg";
@@ -44,7 +47,6 @@ public class PDFBuilderImplTest {
     private String cut_me2Filename = "cut_me2.jpg";
 
     private String image_rotated_90 = "image_rotated_90.jpg";
-    private String image_rotated_90_2 = "image_rotated_90_2.png";
     private String rotated_180 = "rotated_180.jpg";
     private String rotated_ok = "rotated_ok.jpg";
     private String rotated_180_2 = "rotated_180_2.jpg";
@@ -88,7 +90,7 @@ public class PDFBuilderImplTest {
     @Test
     public void buildPDFsourseRotated90() throws Exception {
         testBuildPdfFromRealData(image_rotated_90, null);
-        testBuildPdfFromRealData(image_rotated_90_2, null);
+        testBuildPdfFromRealData(columns_90, null);
         testBuildPdfFromRealData(cut_me_rotated_90, null);
     }
 
@@ -97,6 +99,8 @@ public class PDFBuilderImplTest {
         testBuildPdfFromRealData(rotated_180_2, null);
         testBuildPdfFromRealData(rotated_180, null);
         testBuildPdfFromRealData(rotated_ok, null);
+        testBuildPdfFromRealData(columns_180, null);
+
     }
 
 
@@ -104,6 +108,7 @@ public class PDFBuilderImplTest {
     public void buildPDFsourseRotated270() throws Exception {
         testBuildPdfFromRealData(rotated_270, null);
         testBuildPdfFromRealData(rotated_270_2, null);
+        testBuildPdfFromRealData(columns_270, null);
     }
 
     @Test
