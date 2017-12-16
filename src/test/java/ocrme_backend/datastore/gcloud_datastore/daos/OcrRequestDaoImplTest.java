@@ -69,7 +69,7 @@ public class OcrRequestDaoImplTest {
         OcrRequest obtained = dao.read(id);
         Assert.assertTrue(obtained.getId() == 1);
         Assert.assertTrue(obtained.getTextResult().getValue().equals(textResultExpected));
-        Assert.assertTrue(obtained.getInputImageUrl().equals(inputImageUrlExpected));
+        Assert.assertTrue(obtained.getSourceImageUrl().equals(inputImageUrlExpected));
     }
 
     @Test
@@ -123,7 +123,7 @@ public class OcrRequestDaoImplTest {
         String textResult = "dummy text result";
 
         OcrRequest request = new OcrRequest.Builder()
-                .inputImageUrl(inputImageUrl)
+                .sourceImageUrl(inputImageUrl)
                 .textResult(Optional.ofNullable(textResult))
                 .build();
 

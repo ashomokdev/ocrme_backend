@@ -13,7 +13,7 @@ import java.util.Optional;
 public class OcrRequest {
 
     // [START ocrRequest]
-    private String inputImageUrl;
+    private String sourceImageUrl;
     private String[] languages;
     private Text textResult;
     private String pdfResultUrl;
@@ -25,7 +25,7 @@ public class OcrRequest {
     // [END ocrRequest]
 
     // [START keys]
-    public static final String INPUT_IMAGE_URL = "inputImageUrl";
+    public static final String SOURCE_IMAGE_URL = "sourceImageUrl";
     public static final String LANGUAGES = "languages";
     public static final String TEXT_RESULT = "textResult";
     public static final String PDF_RESULT_URL = "pdfResultUrl";
@@ -38,7 +38,7 @@ public class OcrRequest {
 
     // We use a Builder pattern here to simplify and standardize construction of Book objects.
     private OcrRequest(Builder builder) {
-        this.inputImageUrl = builder.inputImageUrl;
+        this.sourceImageUrl = builder.inputImageUrl;
         this.languages = builder.languages;
         this.textResult = builder.textResult;
         this.pdfResultUrl = builder.pdfResultUrl;
@@ -53,8 +53,8 @@ public class OcrRequest {
         this.timeStamp = timeStamp;
     }
 
-    public String getInputImageUrl() {
-        return inputImageUrl;
+    public String getSourceImageUrl() {
+        return sourceImageUrl;
     }
 
     public String[] getLanguages() {
@@ -100,7 +100,7 @@ public class OcrRequest {
         private String timeStamp;
         private String status;
 
-        public Builder inputImageUrl(String inputImageUrl) {
+        public Builder sourceImageUrl(String inputImageUrl) {
             this.inputImageUrl = inputImageUrl;
             return this;
         }
@@ -153,7 +153,7 @@ public class OcrRequest {
     @Override
     public String toString() {
         return
-                "input image url: " + inputImageUrl +
+                "input image url: " + sourceImageUrl +
                 "\nlanguages: " +  Arrays.toString(languages) +
                 "\ntext result: " + textResult +
                 "\npdf result url: " + pdfResultUrl +

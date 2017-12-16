@@ -8,6 +8,8 @@ public class OcrRequestBean {
 
     private String gcsImageUri;
 
+    private String idTokenString;
+
     public String[] getLanguages() {
         return languages;
     }
@@ -16,4 +18,7 @@ public class OcrRequestBean {
         return gcsImageUri;
     }
 
+    public String getIdTokenString() {
+        return idTokenString;
+    }
 }

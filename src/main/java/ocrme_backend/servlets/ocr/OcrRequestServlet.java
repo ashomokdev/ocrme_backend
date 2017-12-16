@@ -28,6 +28,7 @@ public class OcrRequestServlet extends HttpServlet {
             OcrRequestBean requestBean = new Gson().fromJson(reader, OcrRequestBean.class);
 
             OcrRequestManager manager = new OcrRequestManager(
+                    requestBean.getIdTokenString(),
                     requestBean.getGcsImageUri(),
                     requestBean.getLanguages(),
                     req.getSession());

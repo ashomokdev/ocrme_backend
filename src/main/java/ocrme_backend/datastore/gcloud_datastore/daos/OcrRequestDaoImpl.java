@@ -4,7 +4,6 @@ import com.google.appengine.api.datastore.*;
 import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_datastore.objects.Result;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +24,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
     public OcrRequest entityToOCRRequest(Entity entity) {
         return new OcrRequest.Builder()
                 .id(entity.getKey().getId())
-                .inputImageUrl((String) entity.getProperty(OcrRequest.INPUT_IMAGE_URL))
+                .sourceImageUrl((String) entity.getProperty(OcrRequest.SOURCE_IMAGE_URL))
                 .textResult (Optional.ofNullable(((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue()))
                 .pdfResultUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_URL))
                 .createdBy((String) entity.getProperty(OcrRequest.CREATED_BY))
@@ -37,7 +36,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
     @Override
     public Long create(OcrRequest request) {
         Entity entity = new Entity(OCR_REQUEST_KIND);  // Key will be assigned once written
-        entity.setProperty(OcrRequest.INPUT_IMAGE_URL, request.getInputImageUrl());
+        entity.setProperty(OcrRequest.SOURCE_IMAGE_URL, request.getSourceImageUrl());
         entity.setProperty(OcrRequest.TEXT_RESULT, request.getTextResult());
         entity.setProperty(OcrRequest.PDF_RESULT_URL, request.getPdfResultUrl());
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
@@ -65,7 +64,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
     public void update(OcrRequest request) {
         Key key = KeyFactory.createKey(OCR_REQUEST_KIND, request.getId());  // From a OcrRequest, create a Key
         Entity entity = new Entity(key);         // Convert OcrRequest to an Entity
-        entity.setProperty(OcrRequest.INPUT_IMAGE_URL, request.getInputImageUrl());
+        entity.setProperty(OcrRequest.SOURCE_IMAGE_URL, request.getSourceImageUrl());
         entity.setProperty(OcrRequest.TEXT_RESULT, request.getTextResult());
         entity.setProperty(OcrRequest.PDF_RESULT_URL, request.getPdfResultUrl());
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());

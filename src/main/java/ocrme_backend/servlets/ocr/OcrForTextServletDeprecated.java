@@ -24,7 +24,7 @@ import java.util.Arrays;
  */
 
 @Deprecated
-public class OcrForTextServlet extends HttpServlet {
+public class OcrForTextServletDeprecated extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse response) {

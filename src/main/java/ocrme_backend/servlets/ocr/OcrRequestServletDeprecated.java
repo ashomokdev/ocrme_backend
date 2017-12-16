@@ -28,6 +28,10 @@ import java.security.GeneralSecurityException;
 /**
  * takes image bytes, that is why deprecated - use OcrRequestServlet instead of this.
  */
+
+/**
+ * for usage uncommit in web.xml firstly
+ */
 @Deprecated
 public class OcrRequestServletDeprecated extends HttpServlet {
 

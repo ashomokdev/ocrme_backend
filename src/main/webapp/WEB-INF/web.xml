@@ -5,15 +5,15 @@
          http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1" id="data-fabric-web-tool">
 
-  <servlet>
-    <servlet-name>OcrForTextServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.ocr.OcrForTextServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>OcrForTextServlet</servlet-name>
-    <url-pattern>/ocr_for_text</url-pattern>
-  </servlet-mapping>
+  <!--<servlet>-->
+    <!--<servlet-name>OcrForTextServlet</servlet-name>-->
+    <!--<servlet-class>ocrme_backend.servlets.ocr.OcrForTextServletDeprecated</servlet-class>-->
+    <!--<load-on-startup>1</load-on-startup>-->
+  <!--</servlet>-->
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>OcrForTextServlet</servlet-name>-->
+    <!--<url-pattern>/ocr_for_text_deprecated</url-pattern>-->
+  <!--</servlet-mapping>-->
 
   <servlet>
     <servlet-name>OcrRequestServlet</servlet-name>
@@ -58,6 +58,11 @@
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
+
+  <context-param>
+    <param-name>ocrme.dir.pdf</param-name>
+    <param-value>${ocrme.dir.pdf}</param-value>
+  </context-param>
 
   <context-param>
     <param-name>ocrme.bucket.pdf</param-name>

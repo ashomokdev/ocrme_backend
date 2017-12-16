@@ -291,7 +291,7 @@ public class OcrProcessorImpl implements OCRProcessor {
                             orientation = EXIF_ORIENTATION_NORMAL;
                         }
                     }
-                    logger.log(Level.INFO, "orientation: " + orientation);
+                    logger.log(Level.FINE, "orientation: " + orientation);
 
                     // Calculate the center
                     float centerX = 0, centerY = 0;
