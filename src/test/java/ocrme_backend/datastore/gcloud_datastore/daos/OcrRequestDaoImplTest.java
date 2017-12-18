@@ -113,18 +113,58 @@ public class OcrRequestDaoImplTest {
         Assert.assertTrue(result.result.size() == 3);
     }
 
+    /**
+     * test without cursor usage
+     *
+     * @throws Exception
+     */
     @Test
     public void listOCRRequestsByUser() throws Exception {
-        //todo
+        for (int i = 0; i < 20; i++) {
+            addRequestToDb();
+        }
+
+        addRequestToDb("123");
+
+        String startCursor = null;
+
+        Result<OcrRequest> result =
+                dao.listOCRRequestsByUser("1234dfgdgdg567890", startCursor);
+        String cursor = result.cursor;
+        Result<OcrRequest> result2 =
+                dao.listOCRRequestsByUser("1234dfgdgdg567890", cursor);
+        String cursor2 = result2.cursor;
+        Result<OcrRequest> result3 =
+                dao.listOCRRequestsByUser("1234dfgdgdg567890", cursor2);
+
+        Result<OcrRequest> resultEmpty =
+                dao.listOCRRequestsByUser("no user", startCursor);
+
+        Result<OcrRequest> result4 =
+                dao.listOCRRequestsByUser("123", startCursor);
+
+
+        Assert.assertTrue(result.result.size() > 3);
+        Assert.assertTrue(result2.result.size() > 3);
+        Assert.assertTrue(result3.result.size() == 0);
+        Assert.assertTrue(resultEmpty.result.size() == 0);
+        Assert.assertTrue(result4.result.size() == 1);
     }
 
+
     private Long addRequestToDb() throws SQLException {
+        return addRequestToDb("1234dfgdgdg567890");
+    }
+
+    private Long addRequestToDb(String createdById) throws SQLException {
         String inputImageUrl = "https://www.googleapis.com/download/storage/v1/b/bucket-fromtesta8d4835c-7b99-4a22-8458-f915b63bb4ac/o/2017-06-27-071400998-img.jpg?generation=1498547642256093&alt=media";
         String textResult = "dummy text result";
 
         OcrRequest request = new OcrRequest.Builder()
                 .sourceImageUrl(inputImageUrl)
-                .textResult(Optional.ofNullable(textResult))
+                .textResult(Optional.of(textResult))
+                .createdBy("bieliaievays@gmail.com")
+                .createdById(createdById)
                 .build();
 
         OcrRequestDao dao = new OcrRequestDaoImpl();

@@ -133,9 +133,6 @@ public class CloudStorageHelper {
      */
     public Blob uploadFileForBlob(byte[] bytes, String fileName, String directoryName, final String bucketName)
             throws IOException, ServletException {
-
-        logger.log(Level.INFO, "dir name is:" + directoryName); //todo remove
-
         String timeStamp = getTimeStamp();
 
         final String destinationFilename = directoryName + "/" + timeStamp + fileName;
