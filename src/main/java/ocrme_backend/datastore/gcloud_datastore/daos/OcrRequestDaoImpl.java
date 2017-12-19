@@ -15,6 +15,8 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
     private DatastoreService datastore;
     private static final String OCR_REQUEST_KIND = "OcrRequest";
     private static Logger logger;
+    public static final int requestCountLimit = 12; //divided by 2 and 3 - good for small screens (2 per row)
+    // and tablet screens (3 per row)
 
     public OcrRequestDaoImpl() {
         datastore = DatastoreServiceFactory.getDatastoreService(); // Authorized Datastore service
@@ -95,7 +97,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
 
     @Override
     public Result<OcrRequest> listOCRRequests(String startCursorString) {
-        FetchOptions fetchOptions = FetchOptions.Builder.withLimit(10); // Only show 10 at a time
+        FetchOptions fetchOptions = FetchOptions.Builder.withLimit(requestCountLimit); // Only show requestCountLimit at a time
         if (startCursorString != null && !startCursorString.equals("")) {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursorString)); // Where we left off
         }
@@ -106,7 +108,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
 
         List<OcrRequest> resultBooks = entitiesToOCRRequests(results);     // Retrieve and convert Entities
         Cursor cursor = results.getCursor();              // Where to start next time
-        if (cursor != null && resultBooks.size() == 10) {         // Are we paging? Save Cursor
+        if (cursor != null && resultBooks.size() == requestCountLimit) {         // Are we paging? Save Cursor
             String cursorString = cursor.toWebSafeString();               // Cursors are WebSafe
             return new Result<>(resultBooks, cursorString);
         } else {
@@ -115,7 +117,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
     }
     @Override
     public Result<OcrRequest> listOCRRequestsByUser(String userId, String startCursorString) {
-        FetchOptions fetchOptions = FetchOptions.Builder.withLimit(10); // Only show 10 at a time
+        FetchOptions fetchOptions = FetchOptions.Builder.withLimit(requestCountLimit); // Only show requestCountLimit at a time
         if (startCursorString != null && !startCursorString.equals("")) {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursorString)); // Where we left off
         }
@@ -131,7 +133,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
 
         List<OcrRequest> resultOcrRequests = entitiesToOCRRequests(results);     // Retrieve and convert Entities
         Cursor cursor = results.getCursor();              // Where to start next time
-        if (cursor != null && resultOcrRequests.size() == 10) {         // Are we paging? Save Cursor
+        if (cursor != null && resultOcrRequests.size() == requestCountLimit) {         // Are we paging? Save Cursor
             String cursorString = cursor.toWebSafeString();               // Cursors are WebSafe
             return new Result<>(resultOcrRequests, cursorString);
         } else {

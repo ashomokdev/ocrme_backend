@@ -1,10 +1,5 @@
 package ocrme_backend.servlets.ocr;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseToken;
 import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
@@ -22,8 +17,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
+import static ocrme_backend.utils.FirebaseAuthUtil.getUserEmail;
+import static ocrme_backend.utils.FirebaseAuthUtil.getUserId;
+
 
 /**
  * Created by iuliia on 7/13/17.
@@ -171,57 +170,6 @@ public class OcrRequestManager {
                         .build());
         logger.log(WARNING, "data saved in DB, entity id = " + requestId);
     }
-
-    public @Nullable
-    String getUserId(@Nullable String idTokenString) {
-        String userId = null;
-        FirebaseToken decodedToken = getUserDecodedToken(idTokenString);
-        if (decodedToken != null) {
-            userId = decodedToken.getUid();
-        }
-        logger.log(INFO, "User id: " + userId);
-        return userId;
-    }
-
-    public @Nullable
-    String getUserEmail(@Nullable String idTokenString) {
-        String email = null;
-        FirebaseToken decodedToken = getUserDecodedToken(idTokenString);
-        if (decodedToken != null) {
-            email = decodedToken.getEmail();
-        }
-        logger.log(INFO, "User email: " + email);
-        return email;
-    }
-
-    private @Nullable
-    FirebaseToken getUserDecodedToken(@Nullable String idTokenString) {
-        FirebaseToken decodedToken = null;
-        if (idTokenString != null) {
-            try {
-                initFirebase();
-            } catch (Exception e) {
-                //already initialized - ignore
-            }
-            try {
-                decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync(idTokenString).get();
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.log(WARNING, "error in getUserDecodedToken: " + e.getMessage());
-            }
-        }
-        return decodedToken;
-    }
-
-    private void initFirebase() throws IOException {
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.getApplicationDefault())
-                .setDatabaseUrl("https://imagetotext-149919.firebaseio.com")
-                .build();
-
-        FirebaseApp.initializeApp(options);
-    }
-
 
     private String getSourceImageUrl() {
         String inputImageUrl;
