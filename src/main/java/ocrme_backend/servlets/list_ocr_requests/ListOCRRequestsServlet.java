@@ -24,8 +24,7 @@ public class ListOCRRequestsServlet extends HttpServlet {
 
             ListOCRRequestsManager manager = new ListOCRRequestsManager(
                     requestBean.getUserToken(),
-                    requestBean.getStartCursor(),
-                    req.getSession());
+                    requestBean.getStartCursor());
 
             ListOCRResponse listOCRResponse = manager.process();
             response.setContentType("application/json");
