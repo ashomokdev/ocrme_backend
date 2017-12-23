@@ -4,6 +4,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_datastore.objects.Result;
+import ocrme_backend.servlets.ocr.OcrResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -113,50 +115,90 @@ public class OcrRequestDaoImplTest {
         Assert.assertTrue(result.result.size() == 3);
     }
 
-    /**
-     * test without cursor usage
-     *
-     * @throws Exception
-     */
     @Test
     public void listOCRRequestsByUser() throws Exception {
-        for (int i = 0; i < 20; i++) {
-            addRequestToDb();
-        }
 
-        addRequestToDb("123");
+        for (int i = 0; i < 40; i++) {
+            addRequestToDb(String.valueOf(i), "OK");
+        }
+        addRequestToDb("0", "UNKNOWN_ERROR");
+        addRequestToDb("1", "OK");
 
         String startCursor = null;
 
-        Result<OcrRequest> result =
-                dao.listOCRRequestsByUser("1234dfgdgdg567890", startCursor);
-        String cursor = result.cursor;
-        Result<OcrRequest> result2 =
-                dao.listOCRRequestsByUser("1234dfgdgdg567890", cursor);
-        String cursor2 = result2.cursor;
-        Result<OcrRequest> result3 =
-                dao.listOCRRequestsByUser("1234dfgdgdg567890", cursor2);
-
-        Result<OcrRequest> resultEmpty =
-                dao.listOCRRequestsByUser("no user", startCursor);
-
-        Result<OcrRequest> result4 =
-                dao.listOCRRequestsByUser("123", startCursor);
-
-
-        Assert.assertTrue(result.result.size() > 3);
-        Assert.assertTrue(result2.result.size() > 3);
-        Assert.assertTrue(result3.result.size() == 0);
-        Assert.assertTrue(resultEmpty.result.size() == 0);
-        Assert.assertTrue(result4.result.size() == 1);
+        //START test status and result size
+        Result<OcrRequest> resultFor0 =
+                dao.listOCRRequestsByUser("0", startCursor);
+        Result<OcrRequest> resultFor1 =
+                dao.listOCRRequestsByUser("1", startCursor);
+        Assert.assertTrue(resultFor0.result.size() == 1);
+        Assert.assertTrue(resultFor1.result.size() == 2);
+        //END test status and result size
     }
 
+    @Test
+    public void listOCRRequestsByUserTestCursor() throws Exception {
+        for (int i = 0; i < 40; i++) {
+            addRequestToDb("0", "OK");
+            addRequestToDb("0", "UNKNOWN_ERROR");
+        }
+
+        Result<OcrRequest> resultFirstPart =
+                dao.listOCRRequestsByUser("0", null);
+
+        Assert.assertTrue(resultFirstPart.result.size() == 12);
+        String endCursorFirst = resultFirstPart.cursor;
+        Assert.assertTrue(endCursorFirst != null);
+
+        Result<OcrRequest> resultSecondPart =
+                dao.listOCRRequestsByUser("0", endCursorFirst);
+        Assert.assertTrue(resultSecondPart.result.size() == 12);
+        String endCursorSecond = resultSecondPart.cursor;
+        Assert.assertNotNull(endCursorSecond);
+        Assert.assertNotEquals(endCursorSecond, endCursorFirst);
+    }
+
+    @Test
+    public void listOCRRequestsByUserTestStatus() throws Exception {
+
+        addRequestToDb("0", "OK");
+        addRequestToDb("0", "OK");
+        addRequestToDb("0", "UNKNOWN_ERROR");
+
+        Result<OcrRequest> result =
+                dao.listOCRRequestsByUser("0", null);
+
+        for (int i = 0; i < result.result.size(); i++) {
+            Assert.assertEquals(result.result.get(i).getStatus(), "OK");
+        }
+
+        Assert.assertTrue(result.result.size() == 2);
+    }
+
+    @Test
+    public void listOCRRequestsByUserTestSequence() throws Exception {
+        String userId = "123";
+        ArrayList<Long> ids = new ArrayList<>();
+        int count = 50;
+        for (int i = 0; i < count; i++) {
+            long id = addRequestToDb(userId);
+            ids.add(id);
+        }
+
+        Result<OcrRequest> result =
+                dao.listOCRRequestsByUser(userId, null);
+
+        for (int i = 0; i < result.result.size(); i++) {
+            Assert.assertEquals(ids.get(count-1-i), result.result.get(i).getId());
+        }
+    }
 
     private Long addRequestToDb() throws SQLException {
         return addRequestToDb("1234dfgdgdg567890");
     }
 
-    private Long addRequestToDb(String createdById) throws SQLException {
+
+    private Long addRequestToDb(String createdById, String status) throws SQLException {
         String inputImageUrl = "https://www.googleapis.com/download/storage/v1/b/bucket-fromtesta8d4835c-7b99-4a22-8458-f915b63bb4ac/o/2017-06-27-071400998-img.jpg?generation=1498547642256093&alt=media";
         String textResult = "dummy text result";
 
@@ -165,10 +207,17 @@ public class OcrRequestDaoImplTest {
                 .textResult(Optional.of(textResult))
                 .createdBy("bieliaievays@gmail.com")
                 .createdById(createdById)
+                .status(status)
+                .pdfResultGsUrl("new value")
+                .pdfResultMediaUrl("new value")
                 .build();
 
         OcrRequestDao dao = new OcrRequestDaoImpl();
         return dao.create(request);
+    }
+
+    private Long addRequestToDb(String createdById) throws SQLException {
+        return addRequestToDb(createdById, OcrResponse.Status.OK.name());
     }
 
     private String getTestCapturedLog() throws IOException {

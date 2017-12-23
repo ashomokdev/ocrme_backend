@@ -1,10 +1,8 @@
 package ocrme_backend.servlets.list_ocr_requests;
 
 import com.google.gson.Gson;
-import ocrme_backend.servlets.ocr.OcrRequestBean;
-import ocrme_backend.servlets.ocr.OcrRequestManager;
-import ocrme_backend.servlets.ocr.OcrResponse;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +12,11 @@ import java.io.IOException;
 /**
  * Created by iuliia on 12/18/17.
  */
-public class ListOCRRequestsServlet extends HttpServlet {
-    @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse response) {
 
+public class ListOCRRequestsServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
         try {
             BufferedReader reader = req.getReader();
             ListOCRRequestsBean requestBean = new Gson().fromJson(reader, ListOCRRequestsBean.class);

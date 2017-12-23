@@ -2,6 +2,7 @@ package ocrme_backend.datastore.gcloud_datastore.objects;
 
 import com.google.appengine.api.datastore.Text;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,13 +11,14 @@ import java.util.Optional;
 /**
  * Created by iuliia on 6/19/17.
  */
-public class OcrRequest {
+public class OcrRequest implements Serializable {
 
     // [START ocrRequest]
     private String sourceImageUrl;
     private String[] languages;
     private Text textResult;
-    private String pdfResultUrl;
+    private String pdfResultGsUrl;
+    private String pdfResultMediaUrl;
     private Long id;
     private String timeStamp;
     private String createdBy;
@@ -28,7 +30,8 @@ public class OcrRequest {
     public static final String SOURCE_IMAGE_URL = "sourceImageUrl";
     public static final String LANGUAGES = "languages";
     public static final String TEXT_RESULT = "textResult";
-    public static final String PDF_RESULT_URL = "pdfResultUrl";
+    public static final String PDF_RESULT_GS_URL = "pdfResultGsUrl";
+    public static final String PDF_RESULT_MEDIA_URL = "pdfResultMediaUrl";
     public static final String ID = "id";
     public static final String TIME_STAMP = "timeStamp";
     public static final String CREATED_BY_ID = "createdById";
@@ -41,7 +44,8 @@ public class OcrRequest {
         this.sourceImageUrl = builder.inputImageUrl;
         this.languages = builder.languages;
         this.textResult = builder.textResult;
-        this.pdfResultUrl = builder.pdfResultUrl;
+        this.pdfResultGsUrl = builder.pdfResultGsUrl;
+        this.pdfResultMediaUrl = builder.pdfResultMediaUrl;
         this.id = builder.id;
         this.createdBy = builder.createdBy;
         this.createdById = builder.createdById;
@@ -65,8 +69,12 @@ public class OcrRequest {
         return textResult;
     }
 
-    public String getPdfResultUrl() {
-        return pdfResultUrl;
+    public String getPdfResultGsUrl() {
+        return pdfResultGsUrl;
+    }
+
+    public String getPdfResultMediaUrl() {
+        return pdfResultMediaUrl;
     }
 
     public Long getId() {
@@ -89,11 +97,28 @@ public class OcrRequest {
         return status;
     }
 
+    @Override
+    public String toString() {
+        return "OcrRequest{" +
+                "sourceImageUrl='" + sourceImageUrl + '\'' +
+                ", languages=" + Arrays.toString(languages) +
+                ", textResult=" + textResult +
+                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
+                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
+                ", id=" + id +
+                ", timeStamp='" + timeStamp + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdById='" + createdById + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
+
     public static class Builder {
         private String inputImageUrl;
         private String[] languages;
         private Text textResult;
-        private String pdfResultUrl;
+        private String pdfResultGsUrl;
+        private String pdfResultMediaUrl;
         private Long id;
         private String createdBy;
         private String createdById;
@@ -115,8 +140,13 @@ public class OcrRequest {
             return this;
         }
 
-        public Builder pdfResultUrl(String pdfResultUrl) {
-            this.pdfResultUrl = pdfResultUrl;
+        public Builder pdfResultGsUrl(String pdfResultGsUrl) {
+            this.pdfResultGsUrl = pdfResultGsUrl;
+            return this;
+        }
+
+        public Builder pdfResultMediaUrl(String pdfResultMediaUrl) {
+            this.pdfResultMediaUrl = pdfResultMediaUrl;
             return this;
         }
 
@@ -148,19 +178,5 @@ public class OcrRequest {
         public OcrRequest build() {
             return new OcrRequest(this);
         }
-    }
-
-    @Override
-    public String toString() {
-        return
-                "input image url: " + sourceImageUrl +
-                "\nlanguages: " +  Arrays.toString(languages) +
-                "\ntext result: " + textResult +
-                "\npdf result url: " + pdfResultUrl +
-                "\nid: " + id +
-                "\ncreated by: " + createdBy +
-                "\ncreated by id: " + createdById +
-                "\nstatus: " + status +
-                "\ntime stamp: " + timeStamp;
     }
 }

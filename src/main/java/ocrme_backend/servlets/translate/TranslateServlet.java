@@ -15,6 +15,8 @@ import java.io.IOException;
  * curl -H "Content-Type: application/json" -X POST -d '{"targetLang":"de", "sourceLang":"de","targetLang":"es", "sourceText":"Mit Macht kommt große Verantwortung."}' http://localhost:8080/translate
  * curl -H "Content-Type: application/json" -X POST -d '{"targetLang":"de", "sourceText":"Mit Macht kommt große Verantwortung."}' http://localhost:8080/translate
  */
+
+//todo make get instead of post
 public class TranslateServlet extends HttpServlet {
 
     @Override

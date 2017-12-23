@@ -26,8 +26,8 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>ListOcrRequestsServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.list_ocr_requests</servlet-class>
+    <servlet-name>ListOCRRequestsServlet</servlet-name>
+    <servlet-class>ocrme_backend.servlets.list_ocr_requests.ListOCRRequestsServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>

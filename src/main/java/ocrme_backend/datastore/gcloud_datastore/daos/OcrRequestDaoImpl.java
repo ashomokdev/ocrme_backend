@@ -3,6 +3,7 @@ package ocrme_backend.datastore.gcloud_datastore.daos;
 import com.google.appengine.api.datastore.*;
 import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_datastore.objects.Result;
+import ocrme_backend.servlets.ocr.OcrResponse;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -28,10 +29,12 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
                 .id(entity.getKey().getId())
                 .sourceImageUrl((String) entity.getProperty(OcrRequest.SOURCE_IMAGE_URL))
                 .textResult (Optional.ofNullable(((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue()))
-                .pdfResultUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_URL))
+                .pdfResultGsUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_GS_URL))
+                .pdfResultMediaUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_MEDIA_URL))
                 .createdBy((String) entity.getProperty(OcrRequest.CREATED_BY))
                 .createdById((String) entity.getProperty(OcrRequest.CREATED_BY_ID))
                 .timeStamp((String) entity.getProperty(OcrRequest.TIME_STAMP))
+                .status((String) entity.getProperty(OcrRequest.STATUS))
                 .build();
     }
 
@@ -40,7 +43,8 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         Entity entity = new Entity(OCR_REQUEST_KIND);  // Key will be assigned once written
         entity.setProperty(OcrRequest.SOURCE_IMAGE_URL, request.getSourceImageUrl());
         entity.setProperty(OcrRequest.TEXT_RESULT, request.getTextResult());
-        entity.setProperty(OcrRequest.PDF_RESULT_URL, request.getPdfResultUrl());
+        entity.setProperty(OcrRequest.PDF_RESULT_GS_URL, request.getPdfResultGsUrl());
+        entity.setProperty(OcrRequest.PDF_RESULT_MEDIA_URL, request.getPdfResultMediaUrl());
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
         entity.setProperty(OcrRequest.CREATED_BY_ID,  request.getCreatedById());
         entity.setProperty(OcrRequest.TIME_STAMP,  request.getTimeStamp());
@@ -68,7 +72,8 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         Entity entity = new Entity(key);         // Convert OcrRequest to an Entity
         entity.setProperty(OcrRequest.SOURCE_IMAGE_URL, request.getSourceImageUrl());
         entity.setProperty(OcrRequest.TEXT_RESULT, request.getTextResult());
-        entity.setProperty(OcrRequest.PDF_RESULT_URL, request.getPdfResultUrl());
+        entity.setProperty(OcrRequest.PDF_RESULT_GS_URL, request.getPdfResultGsUrl());
+        entity.setProperty(OcrRequest.PDF_RESULT_MEDIA_URL, request.getPdfResultMediaUrl());
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
         entity.setProperty(OcrRequest.CREATED_BY_ID,  request.getCreatedById());
         entity.setProperty(OcrRequest.TIME_STAMP,  request.getTimeStamp());
@@ -115,19 +120,35 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
             return new Result<>(resultBooks);
         }
     }
+
+    /**
+     * get requests by user with OK status only
+     * @param userId
+     * @param startCursorString
+     * @return
+     */
     @Override
     public Result<OcrRequest> listOCRRequestsByUser(String userId, String startCursorString) {
         FetchOptions fetchOptions = FetchOptions.Builder.withLimit(requestCountLimit); // Only show requestCountLimit at a time
         if (startCursorString != null && !startCursorString.equals("")) {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursorString)); // Where we left off
+            logger.log(Level.INFO, "start cursor: " + startCursorString);
         }
+
+        Query.FilterPredicate userIdFilter = new Query.FilterPredicate(
+                OcrRequest.CREATED_BY_ID, Query.FilterOperator.EQUAL, userId);
+        Query.FilterPredicate okStatusFilter = new Query.FilterPredicate(
+                OcrRequest.STATUS, Query.FilterOperator.EQUAL, OcrResponse.Status.OK.name());
+        Query.CompositeFilter compositeFilter =
+                new Query.CompositeFilter(
+                        Query.CompositeFilterOperator.AND, Arrays.asList(userIdFilter, okStatusFilter));
+
         Query query = new Query(OCR_REQUEST_KIND) // We only care about OCRRequests
                 // Only for this user
-                .setFilter(new Query.FilterPredicate(
-                        OcrRequest.CREATED_BY_ID, Query.FilterOperator.EQUAL, userId))
+                .setFilter(compositeFilter)
                 // a custom datastore index is required since you are filtering by one property
                 // but ordering by another
-                .addSort(OcrRequest.TIME_STAMP, Query.SortDirection.ASCENDING);
+                .addSort(OcrRequest.TIME_STAMP, Query.SortDirection.DESCENDING);
         PreparedQuery preparedQuery = datastore.prepare(query);
         QueryResultIterator<Entity> results = preparedQuery.asQueryResultIterator(fetchOptions);
 
@@ -135,6 +156,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         Cursor cursor = results.getCursor();              // Where to start next time
         if (cursor != null && resultOcrRequests.size() == requestCountLimit) {         // Are we paging? Save Cursor
             String cursorString = cursor.toWebSafeString();               // Cursors are WebSafe
+            logger.log(Level.INFO, "end cursor: " + cursorString);
             return new Result<>(resultOcrRequests, cursorString);
         } else {
             return new Result<>(resultOcrRequests);

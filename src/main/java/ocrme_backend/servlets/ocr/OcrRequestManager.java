@@ -164,7 +164,8 @@ public class OcrRequestManager {
                         .languages(languages)
                         .createdById(userId)
                         .createdBy(email)
-                        .pdfResultUrl(response.getPdfResultGsUrl())
+                        .pdfResultGsUrl(response.getPdfResultGsUrl())
+                        .pdfResultMediaUrl(response.getPdfResultMediaUrl())
                         .status(response.getStatus().name())
                         .textResult(Optional.ofNullable(response.getTextResult()))
                         .build());

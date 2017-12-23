@@ -20,5 +20,12 @@ public interface OcrRequestDao {
 
     Result<OcrRequest> listOCRRequests(String startCursor) throws SQLException;
 
+    /**
+     * most recent get first
+     * @param userId
+     * @param startCursor
+     * @return
+     * @throws SQLException
+     */
     Result<OcrRequest> listOCRRequestsByUser(String userId, String startCursor) throws SQLException;
 }
