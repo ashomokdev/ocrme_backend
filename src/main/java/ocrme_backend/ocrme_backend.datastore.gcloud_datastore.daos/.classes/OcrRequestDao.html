@@ -1,0 +1,78 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: OcrRequestDao</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">ocrme_backend.datastore.gcloud_datastore.daos</a> ]
+</div>
+
+<h1>Coverage Summary for Class: OcrRequestDao (ocrme_backend.datastore.gcloud_datastore.daos)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">OcrRequestDao</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package ocrme_backend.datastore.gcloud_datastore.daos;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
+<i>4</i>&nbsp;import ocrme_backend.datastore.gcloud_datastore.objects.Result;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.sql.SQLException;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;/**
+<i>9</i>&nbsp; * Created by iuliia on 6/22/17.
+<i>10</i>&nbsp; * CRUD operations
+<i>11</i>&nbsp; */
+<i>12</i>&nbsp;public interface OcrRequestDao {
+<i>13</i>&nbsp;    Long create(OcrRequest ocrRequest) throws SQLException;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    OcrRequest read(Long ocrRequestId) throws SQLException;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;    void update(OcrRequest ocrRequest) throws SQLException;
+<i>18</i>&nbsp;
+<i>19</i>&nbsp;    void delete(Long ocrRequestId) throws SQLException;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    Result&lt;OcrRequest&gt; listOCRRequests(String startCursor) throws SQLException;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * most recent get first
+<i>25</i>&nbsp;     * @param userId
+<i>26</i>&nbsp;     * @param startCursor
+<i>27</i>&nbsp;     * @return
+<i>28</i>&nbsp;     * @throws SQLException
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    Result&lt;OcrRequest&gt; listOCRRequestsByUser(String userId, String startCursor) throws SQLException;
+<i>31</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2017-12-23 23:26</div>
+</div>
+</body>
+</html>

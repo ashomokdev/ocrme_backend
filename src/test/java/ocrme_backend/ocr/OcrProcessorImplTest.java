@@ -29,38 +29,6 @@ public class OcrProcessorImplTest {
         ocrProcessor = new OcrProcessorImpl();
     }
 
-    //todo delete test
-    @Test
-    public void rotate() {
-        BoundingPoly poly = new BoundingPoly();
-        ArrayList<Vertex> vertices = new ArrayList<>();
-
-        Vertex v0 = new Vertex();
-        v0.setX(10);
-        v0.setY(10);
-
-        Vertex v1 = new Vertex();
-        v1.setX(50);
-        v1.setY(10);
-
-
-        Vertex v2 = new Vertex();
-        v2.setX(50);
-        v2.setY(20);
-
-        Vertex v3 = new Vertex();
-        v3.setX(10);
-        v3.setY(20);
-
-        vertices.add(v0);
-        vertices.add(v1);
-        vertices.add(v2);
-        vertices.add(v3);
-
-        poly.setVertices(vertices);
-
-    }
-
     @Test
     public void doOCR() throws Exception {
         byte[] file = FileProvider.getImageFile().getImageBytes();

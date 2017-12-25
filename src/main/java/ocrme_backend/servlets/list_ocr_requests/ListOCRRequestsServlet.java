@@ -16,7 +16,7 @@ import java.io.IOException;
 public class ListOCRRequestsServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
         try {
             BufferedReader reader = req.getReader();
             ListOCRRequestsBean requestBean = new Gson().fromJson(reader, ListOCRRequestsBean.class);
