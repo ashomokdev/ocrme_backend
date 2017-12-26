@@ -1,10 +1,9 @@
 package ocrme_backend.servlets.list_ocr_requests;
 
 import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
-import ocrme_backend.datastore.gcloud_datastore.objects.Result;
-import ocrme_backend.servlets.ocr.OcrResponse;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,13 +11,46 @@ import java.util.List;
  */
 public class ListOCRResponse implements Serializable {
     String endCursor;
-    List<OcrRequest> requestList;
+    List<MyDoc> requestList;
     private Status status;
 
     public enum Status {
         OK,
         USER_NOT_FOUND,
         UNKNOWN_ERROR
+    }
+
+    public static class MyDoc {
+        private String sourceImageUrl;
+        private String[] languages;
+        private String textResult;
+        private String pdfResultGsUrl;
+        private String pdfResultMediaUrl;
+        private Long id;
+        private String timeStamp;
+
+        @Override
+        public String toString() {
+            return "OcrRequest{" +
+                    "sourceImageUrl='" + sourceImageUrl + '\'' +
+                    ", languages=" + Arrays.toString(languages) +
+                    ", textResult='" + textResult + '\'' +
+                    ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
+                    ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
+                    ", id=" + id +
+                    ", timeStamp='" + timeStamp + '\'' +
+                    '}';
+        }
+
+        public MyDoc(OcrRequest ocrRequest) {
+            this.sourceImageUrl = ocrRequest.getSourceImageUrl();
+            this.languages = ocrRequest.getLanguages();
+            this.textResult = ocrRequest.getTextResult().getValue();
+            this.pdfResultGsUrl = ocrRequest.getPdfResultGsUrl();
+            this.pdfResultMediaUrl = ocrRequest.getPdfResultMediaUrl();
+            this.id = ocrRequest.getId();
+            this.timeStamp = ocrRequest.getTimeStamp();
+        }
     }
 
     public String getEndCursor() {
@@ -29,11 +61,11 @@ public class ListOCRResponse implements Serializable {
         this.endCursor = endCursor;
     }
 
-    public List<OcrRequest> getRequestList() {
+    public List<MyDoc> getRequestList() {
         return requestList;
     }
 
-    public void setRequestList(List<OcrRequest> requestList) {
+    public void setRequestList(List<MyDoc> requestList) {
         this.requestList = requestList;
     }
 
