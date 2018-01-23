@@ -1,9 +1,11 @@
 package ocrme_backend.datastore.gcloud_datastore.daos;
 
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_datastore.objects.Result;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Created by iuliia on 6/22/17.
@@ -17,6 +19,8 @@ public interface OcrRequestDao {
     void update(OcrRequest ocrRequest) throws SQLException;
 
     void delete(Long ocrRequestId) throws SQLException;
+
+    void delete(List<Long> ocrRequestIds);
 
     Result<OcrRequest> listOCRRequests(String startCursor) throws SQLException;
 

@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class OcrRequestManager {
     String idTokenString;
     private String imageFilename;
     private byte[] imageBytes;
-    private String[] languages;
+    private List<String> languages;
     private HttpSession session;
     private final Logger logger = Logger.getLogger(OcrRequestManager.class.getName());
     private String gcsImageUri; //download uri of image, stored in google cloud storage
@@ -43,8 +44,12 @@ public class OcrRequestManager {
     public OcrRequestManager(String imageFilename, byte[] imageBytes, String[] languages, HttpSession session) {
         this.imageFilename = imageFilename;
         this.imageBytes = imageBytes;
-        this.languages = languages;
         this.session = session;
+
+        this.languages = new ArrayList<>();
+        if (languages != null) {
+            this.languages = Arrays.asList(languages);
+        }
     }
 
     /**
@@ -66,8 +71,11 @@ public class OcrRequestManager {
     public OcrRequestManager(String idTokenString, String gcsImageUri, String[] languages, HttpSession session) {
         this.idTokenString = idTokenString;
         this.gcsImageUri = gcsImageUri;
-        this.languages = languages;
         this.session = session;
+        this.languages = new ArrayList<>();
+        if (languages != null) {
+            this.languages = Arrays.asList(languages);
+        }
     }
 
     public OcrResponse process() throws IOException, ServletException {
@@ -79,7 +87,7 @@ public class OcrRequestManager {
             switch (ocrStatus) {
                 case OK:
                     response.setStatus(OcrResponse.Status.OK);
-                    doStaff(ocrResult, response);
+                    writeResponse(ocrResult, response);
                     break;
                 case TEXT_NOT_FOUND:
                     response.setStatus(OcrResponse.Status.TEXT_NOT_FOUND);
@@ -105,15 +113,13 @@ public class OcrRequestManager {
         return response;
     }
 
-    private void doStaff(OcrData ocrResult, OcrResponse response) {
-        String simpleTextResult = ocrResult.getSimpleText();
-        response.setTextResult(simpleTextResult);
+    //todo refactor for better reading
+    private void writeResponse(OcrData data, OcrResponse response) {
+        PdfBuilderOutputData pdfBuilderOutputData = writeOcrResult(data, response);
+        writeStatus(response, pdfBuilderOutputData);
+    }
 
-        PdfBuilderOutputData pdfBuilderOutputData = makePdf(ocrResult.getPdfBuilderInputData());
-        String pdfGsUrl = pdfBuilderOutputData.getGsUrl();
-        String pdfMediaUrl = pdfBuilderOutputData.getMediaUrl();
-        response.setPdfResultGsUrl(pdfGsUrl);
-        response.setPdfResultMediaUrl(pdfMediaUrl);
+    private void writeStatus(OcrResponse response, PdfBuilderOutputData pdfBuilderOutputData) {
         PdfBuilderOutputData.Status status = pdfBuilderOutputData.getStatus();
         switch (status) {
             case OK:
@@ -135,6 +141,24 @@ public class OcrRequestManager {
         }
     }
 
+    private PdfBuilderOutputData writeOcrResult(OcrData data, OcrResponse response) {
+        PdfBuilderOutputData pdfBuilderOutputData = makePdf(data.getPdfBuilderInputData());
+        String pdfGsUrl = pdfBuilderOutputData.getGsUrl();
+        String pdfMediaUrl = pdfBuilderOutputData.getMediaUrl();
+
+        String sourceImageUrl = getSourceImageUrl();
+        OcrResult ocrResult = new OcrResult.Builder()
+                .textResult(data.getSimpleText())
+                .pdfResultMediaUrl(pdfMediaUrl)
+                .pdfResultGsUrl(pdfGsUrl)
+                .languages(languages)
+                .sourceImageUrl(sourceImageUrl)
+                .build();
+
+        response.setOcrResult(ocrResult);
+        return pdfBuilderOutputData;
+    }
+
     //upload request imageBytes file to google cloud storage
     private String uploadRequestImageToStorage(String filename, byte[] file) {
         String url = "";
@@ -151,24 +175,29 @@ public class OcrRequestManager {
     }
 
     private void addToDb(OcrResponse response) {
-        String sourceImageUrl = getSourceImageUrl();
+
+        Optional<OcrResult> ocrResultOptional = Optional.ofNullable(response.getOcrResult());
 
         String userId = getUserId(idTokenString);
         String email = getUserEmail(idTokenString);
 
         //put request data to Db
         DbPusher dbPusher = new DbPusher();
+        OcrResult dummyOcrResult = new OcrResult.Builder().build();
         long requestId = dbPusher.add(
                 new OcrRequest.Builder()
-                        .sourceImageUrl(sourceImageUrl)
-                        .languages(languages)
+                        .sourceImageUrl(ocrResultOptional.orElse(dummyOcrResult).getSourceImageUrl())
+                        .languages(ocrResultOptional.orElse(dummyOcrResult).getLanguages())
                         .createdById(userId)
                         .createdBy(email)
-                        .pdfResultGsUrl(response.getPdfResultGsUrl())
-                        .pdfResultMediaUrl(response.getPdfResultMediaUrl())
+                        .pdfResultGsUrl(ocrResultOptional.orElse(dummyOcrResult).getPdfResultGsUrl())
+                        .pdfResultMediaUrl(ocrResultOptional.orElse(dummyOcrResult).getPdfResultMediaUrl())
                         .status(response.getStatus().name())
-                        .textResult(Optional.ofNullable(response.getTextResult()))
+                        .textResult(Optional.ofNullable(ocrResultOptional.orElse(dummyOcrResult).getTextResult()))
+                        .timeStamp(ocrResultOptional.orElse(dummyOcrResult).getTimeStamp())
                         .build());
+
+
         logger.log(WARNING, "data saved in DB, entity id = " + requestId);
     }
 
@@ -185,17 +214,12 @@ public class OcrRequestManager {
     private OcrData processForOcrResult()
             throws InterruptedException, java.util.concurrent.ExecutionException, IOException, GeneralSecurityException {
 
-        List<String> languagesList = null;
-        if (languages != null) {
-            languagesList = Arrays.asList(languages);
-        }
-
         OCRProcessor processor = new OcrProcessorImpl();
         OcrData ocrData;
         if (gcsImageUri == null) {
-            ocrData = processor.ocrForData(imageBytes, languagesList);
+            ocrData = processor.ocrForData(imageBytes, languages);
         } else {
-            ocrData = processor.ocrForData(gcsImageUri, languagesList);
+            ocrData = processor.ocrForData(gcsImageUri, languages);
         }
         logger.log(INFO, "ocr result obtained");
         return ocrData;

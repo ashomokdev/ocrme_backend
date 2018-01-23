@@ -1,11 +1,13 @@
 package ocrme_backend.datastore.gcloud_datastore.objects;
 
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.repackaged.com.google.datastore.v1.ArrayValue;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,7 +17,7 @@ public class OcrRequest implements Serializable {
 
     // [START ocrRequest]
     private String sourceImageUrl;
-    private String[] languages;
+    private List<String> languages;
     private Text textResult;
     private String pdfResultGsUrl;
     private String pdfResultMediaUrl;
@@ -39,7 +41,6 @@ public class OcrRequest implements Serializable {
     public static final String STATUS = "status";
     // [END keys]
 
-    // We use a Builder pattern here to simplify and standardize construction of Book objects.
     private OcrRequest(Builder builder) {
         this.sourceImageUrl = builder.inputImageUrl;
         this.languages = builder.languages;
@@ -61,7 +62,7 @@ public class OcrRequest implements Serializable {
         return sourceImageUrl;
     }
 
-    public String[] getLanguages() {
+    public List<String> getLanguages() {
         return languages;
     }
 
@@ -101,7 +102,7 @@ public class OcrRequest implements Serializable {
     public String toString() {
         return "OcrRequest{" +
                 "sourceImageUrl='" + sourceImageUrl + '\'' +
-                ", languages=" + Arrays.toString(languages) +
+                ", languages=" + languages +
                 ", textResult=" + textResult +
                 ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
                 ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
@@ -115,7 +116,7 @@ public class OcrRequest implements Serializable {
 
     public static class Builder {
         private String inputImageUrl;
-        private String[] languages;
+        private List<String> languages;
         private Text textResult;
         private String pdfResultGsUrl;
         private String pdfResultMediaUrl;
@@ -130,7 +131,7 @@ public class OcrRequest implements Serializable {
             return this;
         }
 
-        public Builder languages(String[] languages) {
+        public Builder languages(List<String> languages) {
             this.languages = languages;
             return this;
         }

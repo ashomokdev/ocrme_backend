@@ -27,8 +27,9 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
     public OcrRequest entityToOCRRequest(Entity entity) {
         return new OcrRequest.Builder()
                 .id(entity.getKey().getId())
+                .languages((List<String>)entity.getProperty(OcrRequest.LANGUAGES))
                 .sourceImageUrl((String) entity.getProperty(OcrRequest.SOURCE_IMAGE_URL))
-                .textResult (Optional.ofNullable(((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue()))
+                .textResult(Optional.ofNullable(((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue()))
                 .pdfResultGsUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_GS_URL))
                 .pdfResultMediaUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_MEDIA_URL))
                 .createdBy((String) entity.getProperty(OcrRequest.CREATED_BY))
@@ -46,9 +47,10 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         entity.setProperty(OcrRequest.PDF_RESULT_GS_URL, request.getPdfResultGsUrl());
         entity.setProperty(OcrRequest.PDF_RESULT_MEDIA_URL, request.getPdfResultMediaUrl());
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
-        entity.setProperty(OcrRequest.CREATED_BY_ID,  request.getCreatedById());
-        entity.setProperty(OcrRequest.TIME_STAMP,  request.getTimeStamp());
+        entity.setProperty(OcrRequest.CREATED_BY_ID, request.getCreatedById());
+        entity.setProperty(OcrRequest.TIME_STAMP, request.getTimeStamp());
         entity.setProperty(OcrRequest.STATUS, request.getStatus());
+        entity.setProperty(OcrRequest.LANGUAGES, request.getLanguages());
 
         Key ocrRequestKey = datastore.put(entity); // Save the Entity
 
@@ -75,9 +77,10 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         entity.setProperty(OcrRequest.PDF_RESULT_GS_URL, request.getPdfResultGsUrl());
         entity.setProperty(OcrRequest.PDF_RESULT_MEDIA_URL, request.getPdfResultMediaUrl());
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
-        entity.setProperty(OcrRequest.CREATED_BY_ID,  request.getCreatedById());
-        entity.setProperty(OcrRequest.TIME_STAMP,  request.getTimeStamp());
+        entity.setProperty(OcrRequest.CREATED_BY_ID, request.getCreatedById());
+        entity.setProperty(OcrRequest.TIME_STAMP, request.getTimeStamp());
         entity.setProperty(OcrRequest.STATUS, request.getStatus());
+        entity.setProperty(OcrRequest.LANGUAGES, request.getLanguages());
 
         datastore.put(entity);                   // Update the Entity
         logger.log(Level.INFO, "ocrRequest \n{0} \nupdated", request);
@@ -90,6 +93,17 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         Key key = KeyFactory.createKey(OCR_REQUEST_KIND, requestId);        // Create the Key
         datastore.delete(key);                      // Delete the Entity
         logger.log(Level.INFO, "ocrRequest \n{0} \ndeleted", requestId);
+    }
+
+    @Override
+    public void delete(List<Long> ocrRequestIds) {
+        List<Key> keys = new ArrayList<>();
+        for (Long id : ocrRequestIds) {
+            logger.log(Level.INFO, "ocrRequest \n{0} \n will be deleted", id);
+            keys.add(KeyFactory.createKey(OCR_REQUEST_KIND, id));
+        }
+        datastore.delete(keys);
+
     }
 
     public List<OcrRequest> entitiesToOCRRequests(Iterator<Entity> results) {
@@ -123,6 +137,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
 
     /**
      * get requests by user with OK status only
+     *
      * @param userId
      * @param startCursorString
      * @return

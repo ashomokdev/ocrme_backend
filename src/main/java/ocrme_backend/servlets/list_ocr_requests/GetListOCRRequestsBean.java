@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 /**
  * Created by iuliia on 12/18/17.
  */
-public class ListOCRRequestsBean {
+public class GetListOCRRequestsBean {
     private String userToken;
 
     private @Nullable String startCursor;

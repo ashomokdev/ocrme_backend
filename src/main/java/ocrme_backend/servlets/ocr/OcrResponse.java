@@ -7,10 +7,16 @@ import java.io.Serializable;
  */
 public class OcrResponse implements Serializable {
 
-    private String textResult;
-    private String pdfResultGsUrl;
-    private String pdfResultMediaUrl;
     private Status status;
+    private OcrResult ocrResult;
+
+    @Override
+    public String toString() {
+        return "OcrResponse{" +
+                "status=" + status +
+                ", ocrResult=" + ocrResult +
+                '}';
+    }
 
     public enum Status {
         OK,
@@ -20,41 +26,19 @@ public class OcrResponse implements Serializable {
         UNKNOWN_ERROR
     }
 
-    public void setTextResult(String textResult) {
-        this.textResult = textResult;
+
+    public OcrResult getOcrResult() {
+        return ocrResult;
     }
-    public void setPdfResultGsUrl(String pdfResultGsUrl) {
-        this.pdfResultGsUrl = pdfResultGsUrl;
+    public void setOcrResult(OcrResult ocrResult) {
+        this.ocrResult = ocrResult;
     }
     public void setStatus(Status status) {
         this.status = status;
     }
-
-    public String getTextResult() {
-        return textResult;
-    }
-    public String getPdfResultGsUrl() {
-        return pdfResultGsUrl;
-    }
     public Status getStatus() {
         return status;
     }
-    public String getPdfResultMediaUrl() {
-        return pdfResultMediaUrl;
-    }
-    public void setPdfResultMediaUrl(String pdfResultMediaUrl) {
-        this.pdfResultMediaUrl = pdfResultMediaUrl;
-    }
 
-
-    @Override
-    public String toString() {
-        return "OcrResponse{" +
-                "textResult='" + textResult + '\'' +
-                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
-                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
-                ", status=" + status +
-                '}';
-    }
 
 }
