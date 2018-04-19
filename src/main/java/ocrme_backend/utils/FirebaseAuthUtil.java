@@ -63,7 +63,7 @@ public class FirebaseAuthUtil {
     private static void initFirebase() throws IOException {
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.getApplicationDefault())
-                .setDatabaseUrl("https://imagetotext-149919.firebaseio.com")
+                .setDatabaseUrl("https://ocrme-77a2b.firebaseio.com")
                 .build();
 
         FirebaseApp.initializeApp(options);

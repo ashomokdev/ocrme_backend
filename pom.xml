@@ -10,7 +10,7 @@
     <artifactId>ocrmeGVisionAppEngine</artifactId>
 
     <properties>
-        <app.id>imagetotext-149919</app.id>
+        <app.id>ocrme-77a2b</app.id>
         <app.version>1</app.version>
         <skipTests>true</skipTests>
         <appengine.version>1.9.52</appengine.version>
@@ -21,9 +21,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <archiveClasses>true</archiveClasses>
-        <ocrme.bucket.pdf>imagetotext-149919.appspot.com</ocrme.bucket.pdf>
+        <ocrme.bucket.pdf>ocrme-77a2b.appspot.com</ocrme.bucket.pdf>
         <ocrme.dir.pdf>pdf-results</ocrme.dir.pdf>
-        <ocrme.bucket.request_images>imagetotext-149919.appspot.com</ocrme.bucket.request_images>
+        <ocrme.bucket.request_images>ocrme-77a2b.appspot.com</ocrme.bucket.request_images>
         <ocrme.dir.request_images>request_images</ocrme.dir.request_images>
         <font.path>/WEB-INF/fonts/FreeSans.ttf</font.path>
     </properties>
@@ -216,14 +216,6 @@
                 <configuration>
                     <enableJarClasses>false</enableJarClasses>
                     <version>${app.version}</version>
-                    <!-- Comment in the below snippet to bind to all IPs instead of just localhost -->
-                    <!-- address>0.0.0.0</address>
-                    <port>8080</port -->
-                    <!-- Comment in the below snippet to enable local debugging with a remote debugger
-                         like those included with Eclipse or IntelliJ -->
-                    <!-- jvmFlags>
-                      <jvmFlag>-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n</jvmFlag>
-                    </jvmFlags -->
                 </configuration>
             </plugin>
             <plugin>
@@ -232,10 +224,5 @@
                 <version>${gcloud.plugin.version}</version>
             </plugin>
         </plugins>
-        <!--<testResources>-->
-            <!--<testResource>-->
-                  <!--<directory>${basedir}/target/test-classes/fonts</directory>-->
-            <!--</testResource>-->
-        <!--</testResources>-->
     </build>
 </project>
