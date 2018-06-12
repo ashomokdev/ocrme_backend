@@ -17,7 +17,10 @@ import java.nio.file.Paths;
 /**
  * Created by iuliia on 6/23/17.
  */
+
+//todo refactoring needs -provide secret file, font file with simple get to this class
 public class FileProvider {
+    public static String pathToSecretKeys = "secret_data/secret.properties";
 
     public static String getTestImageByName(String filename) throws Exception {
         URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/" + filename);
@@ -60,11 +63,11 @@ public class FileProvider {
     }
 
     public static ByteArrayOutputStream getImageAsStream() throws IOException {
-        return getFileAsStream("test_imgs/img.jpg");
+        return getFileAsyteArrayOutputStream("test_imgs/img.jpg");
     }
 
     public static ByteArrayOutputStream getPdfAsStream() throws IOException {
-        return getFileAsStream("pdfs/ru.pdf");
+        return getFileAsyteArrayOutputStream("pdfs/ru.pdf");
     }
 
 
@@ -99,7 +102,7 @@ public class FileProvider {
                 .getContextClassLoader().getResourceAsStream("fonts/" + fontFileName);
     }
 
-    private static ByteArrayOutputStream getFileAsStream(String filePath) throws IOException {
+    private static ByteArrayOutputStream getFileAsyteArrayOutputStream(String filePath) throws IOException {
         URL url = Thread.currentThread().getContextClassLoader().getResource(filePath);
         File file = new File(url.getPath());
         Path path = Paths.get(file.getPath());
@@ -109,5 +112,10 @@ public class FileProvider {
         baos.write(bytes, 0, bytes.length);
 
         return baos;
+    }
+
+    public static InputStream getFileAsInputStream(String filePath) throws IOException {
+        return Thread.currentThread()
+                .getContextClassLoader().getResourceAsStream(filePath);
     }
 }

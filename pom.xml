@@ -11,7 +11,7 @@
 
     <properties>
         <app.id>ocrme-77a2b</app.id>
-        <app.version>1</app.version>
+        <app.version>2</app.version>
         <skipTests>true</skipTests>
         <appengine.version>1.9.52</appengine.version>
         <gcloud.plugin.version>2.0.9.133.v201611104</gcloud.plugin.version>
@@ -167,6 +167,25 @@
         <!-- for hot reload of the web application-->
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${basedir}/secret.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>

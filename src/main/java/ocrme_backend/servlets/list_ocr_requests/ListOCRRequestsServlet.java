@@ -1,8 +1,6 @@
 package ocrme_backend.servlets.list_ocr_requests;
 
 import com.google.gson.Gson;
-import ocrme_backend.servlets.translate.SupportedLanguagesRequestManager;
-import ocrme_backend.servlets.translate.SupportedLanguagesResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

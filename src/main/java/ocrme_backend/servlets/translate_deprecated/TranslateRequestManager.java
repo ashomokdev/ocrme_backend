@@ -1,6 +1,4 @@
-package ocrme_backend.servlets.translate;
-
-import ocrme_backend.translate.Translator;
+package ocrme_backend.servlets.translate_deprecated;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

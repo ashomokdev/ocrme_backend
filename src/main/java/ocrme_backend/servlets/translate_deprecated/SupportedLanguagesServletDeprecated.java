@@ -1,4 +1,4 @@
-package ocrme_backend.servlets.translate;
+package ocrme_backend.servlets.translate_deprecated;
 
 import com.google.gson.Gson;
 
@@ -14,14 +14,15 @@ import java.io.IOException;
  * curl https://imagetotext-149919.appspot.com/supported_languages?device_language_code=de
  */
 
-public class SupportedLanguagesServlet extends HttpServlet {
+@Deprecated
+public class SupportedLanguagesServletDeprecated extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse response) {
         try {
             String deviceLanguageCode = req.getParameter("device_language_code");
 
-            SupportedLanguagesResponse supportedLanguages =
-                    SupportedLanguagesRequestManager.getSupportedLanguages(deviceLanguageCode);
+            SupportedLanguagesResponseDeprecated supportedLanguages =
+                    SupportedLanguagesRequestManagerDeprecated.getSupportedLanguages(deviceLanguageCode);
             String json = new Gson().toJson(supportedLanguages);
 
             response.setContentType("text/html;charset=UTF-8");

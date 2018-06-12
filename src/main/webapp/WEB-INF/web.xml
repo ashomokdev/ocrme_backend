@@ -15,15 +15,15 @@
     <!--<url-pattern>/ocr_for_text_deprecated</url-pattern>-->
   <!--</servlet-mapping>-->
 
-  <servlet>
-    <servlet-name>OcrRequestServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.ocr.OcrRequestServletDeprecated</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>OcrRequestServlet</servlet-name>
-    <url-pattern>/ocr_request_deprecated</url-pattern>
-  </servlet-mapping>
+  <!--<servlet>-->
+    <!--<servlet-name>OcrRequestServletDeprecated</servlet-name>-->
+    <!--<servlet-class>ocrme_backend.servlets.ocr.OcrRequestServletDeprecated</servlet-class>-->
+    <!--<load-on-startup>1</load-on-startup>-->
+  <!--</servlet>-->
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>OcrRequestServletDeprecated</servlet-name>-->
+    <!--<url-pattern>/ocr_request_deprecated</url-pattern>-->
+  <!--</servlet-mapping>-->
 
   <servlet>
     <servlet-name>ListOCRRequestsServlet</servlet-name>
@@ -47,7 +47,7 @@
 
   <servlet>
     <servlet-name>TranslateServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.translate.TranslateServlet</servlet-class>
+    <servlet-class>ocrme_backend.servlets.translate_deprecated.TranslateServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
@@ -57,7 +57,7 @@
 
   <servlet>
     <servlet-name>SupportedLanguagesServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.translate.SupportedLanguagesServlet</servlet-class>
+    <servlet-class>ocrme_backend.servlets.translate_deprecated.SupportedLanguagesServletDeprecated</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
@@ -87,6 +87,11 @@
   <context-param>
     <param-name>font.path</param-name>
     <param-value>${font.path}</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>bing.key</param-name>
+    <param-value>${bing.key}</param-value>
   </context-param>
 
 

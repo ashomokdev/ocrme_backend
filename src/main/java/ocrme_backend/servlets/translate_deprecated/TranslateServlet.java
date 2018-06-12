@@ -1,4 +1,4 @@
-package ocrme_backend.servlets.translate;
+package ocrme_backend.servlets.translate_deprecated;
 
 import com.google.gson.Gson;
 
@@ -16,6 +16,7 @@ import java.io.IOException;
  * curl -H "Content-Type: application/json" -X POST -d '{"targetLang":"de", "sourceText":"Mit Macht kommt große Verantwortung."}' http://localhost:8080/translate
  */
 
+@Deprecated
 public class TranslateServlet extends HttpServlet {
 
     @Override

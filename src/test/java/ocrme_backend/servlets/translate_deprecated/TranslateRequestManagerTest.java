@@ -1,4 +1,4 @@
-package ocrme_backend.servlets.translate;
+package ocrme_backend.servlets.translate_deprecated;
 
 import org.junit.Test;
 

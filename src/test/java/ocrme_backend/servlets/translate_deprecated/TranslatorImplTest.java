@@ -1,12 +1,12 @@
-package ocrme_backend.translate;
+package ocrme_backend.servlets.translate_deprecated;
 
 import com.google.cloud.translate.Language;
 import com.google.cloud.translate.TranslateException;
+import ocrme_backend.servlets.translate_deprecated.Translator;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import java.io.ByteArrayOutputStream;

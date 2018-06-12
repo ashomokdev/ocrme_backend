@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 import static ocrme_backend.utils.FirebaseAuthUtil.getUserEmail;
@@ -166,6 +165,7 @@ public class OcrRequestManager {
             CloudStorageHelper helper = new CloudStorageHelper();
             String bucketName = session.getServletContext().getInitParameter(BUCKET_FOR_REQUEST_IMAGES_PARAMETER);
             String directoryName = session.getServletContext().getInitParameter(DIR_FOR_REQUEST_IMAGES_PARAMETER);
+
             helper.createBucket(bucketName);
             url = helper.uploadFile(file, filename, directoryName, bucketName);
         } catch (IOException | ServletException e) {

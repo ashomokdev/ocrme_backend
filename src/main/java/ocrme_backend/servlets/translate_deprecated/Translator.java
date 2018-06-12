@@ -1,4 +1,4 @@
-package ocrme_backend.translate;
+package ocrme_backend.servlets.translate_deprecated;
 
 
 import com.google.cloud.translate.*;
@@ -76,7 +76,7 @@ public class Translator {
         Translate.TranslateOption srcLang = Translate.TranslateOption.sourceLanguage(sourceLang);
         Translate.TranslateOption tgtLang = Translate.TranslateOption.targetLanguage(targetLang);
 
-        // Use translate `model` parameter with `base` and `nmt` options.
+        // Use translate_deprecated `model` parameter with `base` and `nmt` options.
         Translate.TranslateOption model = Translate.TranslateOption.model("nmt");
 
         Translation translation = translate.translate(sourceText, srcLang, tgtLang, model);

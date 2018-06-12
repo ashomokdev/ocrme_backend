@@ -1,4 +1,4 @@
-package ocrme_backend.servlets.translate;
+package ocrme_backend.servlets.translate_deprecated;
 
 import com.google.cloud.translate.Language;
 
@@ -8,7 +8,8 @@ import java.util.List;
 /**
  * Created by iuliia on 6/27/17.
  */
-public class SupportedLanguagesResponse implements Serializable {
+@Deprecated
+public class SupportedLanguagesResponseDeprecated implements Serializable {
 
     private List<Language> supportedLanguages;
     private Status status;

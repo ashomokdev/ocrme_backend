@@ -13,5 +13,6 @@
 
     <resource-files>
         <include path="WEB-INF/fonts"/>
+        <include path="WEB-INF"/>
     </resource-files>
 </appengine-web-app>
