@@ -26,6 +26,8 @@
         <ocrme.bucket.request_images>ocrme-77a2b.appspot.com</ocrme.bucket.request_images>
         <ocrme.dir.request_images>request_images</ocrme.dir.request_images>
         <font.path>/WEB-INF/fonts/FreeSans.ttf</font.path>
+        <bing.key.parameter>bing.key</bing.key.parameter>
+        <secret.key.filepath>/WEB-INF/secret_data/secret.properties</secret.key.filepath>
     </properties>
 
     <prerequisites>

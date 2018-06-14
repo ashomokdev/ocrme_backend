@@ -1,14 +1,14 @@
 package ocrme_backend.servlets.translate.supported_languages;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -21,13 +21,14 @@ import static java.util.logging.Level.WARNING;
 public class SupportedLanguagesRequestManager {
 
     private String subscriptionKey;
-    private final Logger logger = Logger.getLogger(SupportedLanguagesRequestManager.class.getName());
+    private final Logger logger =
+            Logger.getLogger(SupportedLanguagesRequestManager.class.getName());
 
-    //todo move to pom
-    static String host = "https://api.cognitive.microsofttranslator.com";
-    static String path = "/languages?api-version=3.0&scope=translation";
-    public static final String SECRET_KEY_PARAMETER = "bing.key";
-    public static final String SECRET_KEYS_FILE_PATH = "/WEB-INF/secret_data/secret.properties";
+    private static String host = "https://api.cognitive.microsofttranslator.com";
+    private static String path = "/languages?api-version=3.0&scope=translation";
+
+    public static final String SECRET_KEY_PARAMETER = "bing.key.parameter";
+    public static final String SECRET_KEYS_FILE_PATH = "secret.key.filepath";
 
     //todo use DI framework (Dagger) and inject session
     /**
@@ -35,19 +36,22 @@ public class SupportedLanguagesRequestManager {
      */
     public SupportedLanguagesRequestManager(HttpSession session) throws IOException {
 
+        String secretKeyFilepath = session.getServletContext().getInitParameter(SECRET_KEYS_FILE_PATH);
         Properties props = new Properties();
-        props.load(session.getServletContext().getResourceAsStream(SECRET_KEYS_FILE_PATH));
-        subscriptionKey = props.getProperty(SECRET_KEY_PARAMETER);
+        props.load(session.getServletContext().getResourceAsStream(secretKeyFilepath));
+
+        String bingKeyParameter = session.getServletContext().getInitParameter(SECRET_KEY_PARAMETER);
+        subscriptionKey = props.getProperty(bingKeyParameter);
 
         if (subscriptionKey == null || subscriptionKey.isEmpty()) {
             logger.log(WARNING, "subscriptionKey was not obtained");
         }
     }
 
-    public String GetLanguages() throws Exception {
+    private String getLanguagesAsJson() throws Exception {
 
         URL url = new URL(host + path);
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
         connection.setDoOutput(true);
@@ -64,29 +68,25 @@ public class SupportedLanguagesRequestManager {
         return response.toString();
     }
 
-    public static String prettify(String json_text) {
+    private List<SupportedLanguagesResponse.Language> getLanguages(String json_text) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(json_text).getAsJsonObject();
 
         JsonObject translation = json.getAsJsonObject("translation");
-        translation.entrySet().stream()
+
+        return translation.entrySet().stream()
                 .map(entry -> new SupportedLanguagesResponse.Language(entry.getKey(),
                         entry.getValue().getAsJsonObject().get("name").getAsString()))
                 .collect(Collectors.toList());
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        return gson.toJson(json);
     }
 
     public SupportedLanguagesResponse getSupportedLanguages() {
 
         SupportedLanguagesResponse response = new SupportedLanguagesResponse();
         try {
-
-            String languages = prettify(GetLanguages());
-//            List<Language> languages = Translator.getSupportedLanguages(inputLanguage);
-//            response.setSupportedLanguages(languages);
+            List<SupportedLanguagesResponse.Language> languages =
+                    getLanguages(getLanguagesAsJson());
+            response.setSupportedLanguages(languages);
             response.setStatus(SupportedLanguagesResponse.Status.OK);
         } catch (Exception e) {
             e.printStackTrace();

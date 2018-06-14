@@ -31,11 +31,11 @@ public class SupportedLanguagesResponse implements Serializable {
         this.status = status;
     }
 
-    public class Language implements Serializable{
+    public static class Language implements Serializable{
         private final String code;
         private final String name;
 
-        private Language(String code, String name) {
+        public Language(String code, String name) {
             this.code = code;
             this.name = name;
         }

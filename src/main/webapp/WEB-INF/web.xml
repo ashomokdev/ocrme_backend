@@ -25,6 +25,16 @@
     <!--<url-pattern>/ocr_request_deprecated</url-pattern>-->
   <!--</servlet-mapping>-->
 
+  <!--<servlet>-->
+    <!--<servlet-name>SupportedLanguagesServlet</servlet-name>-->
+    <!--<servlet-class>ocrme_backend.servlets.translate_deprecated.SupportedLanguagesServletDeprecated</servlet-class>-->
+    <!--<load-on-startup>1</load-on-startup>-->
+  <!--</servlet>-->
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>SupportedLanguagesServlet</servlet-name>-->
+    <!--<url-pattern>/supported_languages</url-pattern>-->
+  <!--</servlet-mapping>-->
+
   <servlet>
     <servlet-name>ListOCRRequestsServlet</servlet-name>
     <servlet-class>ocrme_backend.servlets.list_ocr_requests.ListOCRRequestsServlet</servlet-class>
@@ -57,7 +67,7 @@
 
   <servlet>
     <servlet-name>SupportedLanguagesServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.translate_deprecated.SupportedLanguagesServletDeprecated</servlet-class>
+    <servlet-class>ocrme_backend.servlets.translate.supported_languages.SupportedLanguagesServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
@@ -90,9 +100,12 @@
   </context-param>
 
   <context-param>
-    <param-name>bing.key</param-name>
-    <param-value>${bing.key}</param-value>
+    <param-name>secret.key.filepath</param-name>
+    <param-value>${secret.key.filepath}</param-value>
   </context-param>
 
-
+  <context-param>
+    <param-name>bing.key.parameter</param-name>
+    <param-value>${bing.key.parameter}</param-value>
+  </context-param>
 </web-app>
