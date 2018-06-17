@@ -1,4 +1,4 @@
-package ocrme_backend.servlets.translate_deprecated;
+package ocrme_backend.servlets.translate.translate;
 
 /**
  * Created by iuliia on 5/22/17.

@@ -13,10 +13,10 @@ import java.util.logging.Logger;
  * Created by iuliia on 6/21/17.
  */
 public class OcrRequestDaoImpl implements OcrRequestDao {
-    private DatastoreService datastore;
+    public static final int requestCountLimit = 12; //divided by 2 and 3 - good for small screens (2 per row)
     private static final String OCR_REQUEST_KIND = "OcrRequest";
     private static Logger logger;
-    public static final int requestCountLimit = 12; //divided by 2 and 3 - good for small screens (2 per row)
+    private DatastoreService datastore;
     // and tablet screens (3 per row)
 
     public OcrRequestDaoImpl() {
@@ -27,7 +27,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
     public OcrRequest entityToOCRRequest(Entity entity) {
         return new OcrRequest.Builder()
                 .id(entity.getKey().getId())
-                .languages((List<String>)entity.getProperty(OcrRequest.LANGUAGES))
+                .languages((List<String>) entity.getProperty(OcrRequest.LANGUAGES))
                 .sourceImageUrl((String) entity.getProperty(OcrRequest.SOURCE_IMAGE_URL))
                 .textResult(Optional.ofNullable(((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue()))
                 .pdfResultGsUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_GS_URL))

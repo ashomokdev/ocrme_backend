@@ -14,23 +14,25 @@ public class SupportedLanguagesResponseDeprecated implements Serializable {
     private List<Language> supportedLanguages;
     private Status status;
 
-    public enum Status {
-        OK,
-        UNKNOWN_ERROR
+    public List<Language> getSupportedLanguages() {
+        return supportedLanguages;
     }
 
     public void setSupportedLanguages(List<Language> supportedLanguages) {
         this.supportedLanguages = supportedLanguages;
     }
+
+    public Status getStatus() {
+        return status;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
     }
 
-    public List<Language> getSupportedLanguages() {
-        return supportedLanguages;
-    }
-    public Status getStatus() {
-        return status;
+    public enum Status {
+        OK,
+        UNKNOWN_ERROR
     }
 
 }

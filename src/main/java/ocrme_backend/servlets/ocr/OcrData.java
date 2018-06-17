@@ -10,15 +10,9 @@ import javax.annotation.Nullable;
 public class OcrData {
 
     private PdfBuilderInputData pdfBuilderInputData;
-    private @Nullable String simpleText;
+    private @Nullable
+    String simpleText;
     private Status status;
-
-    public enum Status {
-        OK,
-        TEXT_NOT_FOUND,
-        INVALID_LANGUAGE_HINTS,
-        UNKNOWN_ERROR
-    }
 
     public OcrData(PdfBuilderInputData pdfBuilderInputData, String simpleText, Status status) {
         this.pdfBuilderInputData = pdfBuilderInputData;
@@ -29,10 +23,20 @@ public class OcrData {
     public PdfBuilderInputData getPdfBuilderInputData() {
         return pdfBuilderInputData;
     }
-    public @Nullable String getSimpleText() {
+
+    public @Nullable
+    String getSimpleText() {
         return simpleText;
     }
+
     public Status getStatus() {
         return status;
+    }
+
+    public enum Status {
+        OK,
+        TEXT_NOT_FOUND,
+        INVALID_LANGUAGE_HINTS,
+        UNKNOWN_ERROR
     }
 }

@@ -28,16 +28,16 @@ import static ocrme_backend.utils.FirebaseAuthUtil.getUserId;
  * Created by iuliia on 7/13/17.
  */
 public class OcrRequestManager {
+    public static final String BUCKET_FOR_REQUEST_IMAGES_PARAMETER = "ocrme.bucket.request_images";
+    public static final String DIR_FOR_REQUEST_IMAGES_PARAMETER = "ocrme.dir.request_images";
+    private final Logger logger = Logger.getLogger(OcrRequestManager.class.getName());
     private @Nullable
     String idTokenString;
     private String imageFilename;
     private byte[] imageBytes;
     private List<String> languages;
     private HttpSession session;
-    private final Logger logger = Logger.getLogger(OcrRequestManager.class.getName());
     private String gcsImageUri; //download uri of image, stored in google cloud storage
-    public static final String BUCKET_FOR_REQUEST_IMAGES_PARAMETER = "ocrme.bucket.request_images";
-    public static final String DIR_FOR_REQUEST_IMAGES_PARAMETER = "ocrme.dir.request_images";
 
     @Deprecated
     public OcrRequestManager(String imageFilename, byte[] imageBytes, String[] languages, HttpSession session) {

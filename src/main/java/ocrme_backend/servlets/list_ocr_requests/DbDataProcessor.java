@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class DbDataProcessor {
 
-    public  static Result<OcrRequest> listOCRRequestsByUser(String userId, String startCursor) throws SQLException {
+    public static Result<OcrRequest> listOCRRequestsByUser(String userId, String startCursor) throws SQLException {
         OcrRequestDao dao = new OcrRequestDaoImpl();
         return dao.listOCRRequestsByUser(userId, startCursor);
     }

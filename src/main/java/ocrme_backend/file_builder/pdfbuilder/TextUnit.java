@@ -35,28 +35,28 @@ public class TextUnit {
         return llx;
     }
 
-    float getLly() {
-        return lly;
-    }
-
-    float getUrx() {
-        return urx;
-    }
-
-    float getUry() {
-        return ury;
-    }
-
     public void setLlx(float llx) {
         this.llx = llx;
+    }
+
+    float getLly() {
+        return lly;
     }
 
     public void setLly(float lly) {
         this.lly = lly;
     }
 
+    float getUrx() {
+        return urx;
+    }
+
     public void setUrx(float urx) {
         this.urx = urx;
+    }
+
+    float getUry() {
+        return ury;
     }
 
     public void setUry(float ury) {

@@ -87,7 +87,6 @@ public class PdfBuilderInputData {
     }
 
 
-
     /**
      * @return Simple text without new-line symbols.
      */

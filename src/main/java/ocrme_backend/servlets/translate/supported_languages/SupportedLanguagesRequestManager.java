@@ -3,9 +3,10 @@ package ocrme_backend.servlets.translate.supported_languages;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -20,17 +21,17 @@ import static java.util.logging.Level.WARNING;
  */
 public class SupportedLanguagesRequestManager {
 
-    private String subscriptionKey;
-    private final Logger logger =
-            Logger.getLogger(SupportedLanguagesRequestManager.class.getName());
-
-    private static String host = "https://api.cognitive.microsofttranslator.com";
-    private static String path = "/languages?api-version=3.0&scope=translation";
-
     public static final String SECRET_KEY_PARAMETER = "bing.key.parameter";
     public static final String SECRET_KEYS_FILE_PATH = "secret.key.filepath";
+    private static String host = "https://api.cognitive.microsofttranslator.com";
+    private static String path = "/languages?api-version=3.0";
+    private static String params = "&scope=translation";
+    private final Logger logger =
+            Logger.getLogger(SupportedLanguagesRequestManager.class.getName());
+    private String subscriptionKey;
 
     //todo use DI framework (Dagger) and inject session
+
     /**
      * @param session
      */
@@ -50,7 +51,7 @@ public class SupportedLanguagesRequestManager {
 
     private String getLanguagesAsJson() throws Exception {
 
-        URL url = new URL(host + path);
+        URL url = new URL(host + path + params);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
@@ -68,9 +69,9 @@ public class SupportedLanguagesRequestManager {
         return response.toString();
     }
 
-    private List<SupportedLanguagesResponse.Language> getLanguages(String json_text) {
+    private List<SupportedLanguagesResponse.Language> getLanguages(String jsonText) {
         JsonParser parser = new JsonParser();
-        JsonObject json = parser.parse(json_text).getAsJsonObject();
+        JsonObject json = parser.parse(jsonText).getAsJsonObject();
 
         JsonObject translation = json.getAsJsonObject("translation");
 

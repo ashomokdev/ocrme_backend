@@ -1,6 +1,5 @@
 package ocrme_backend.datastore.gcloud_datastore.daos;
 
-import com.google.appengine.api.datastore.EntityNotFoundException;
 import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 import ocrme_backend.datastore.gcloud_datastore.objects.Result;
 
@@ -26,6 +25,7 @@ public interface OcrRequestDao {
 
     /**
      * most recent get first
+     *
      * @param userId
      * @param startCursor
      * @return

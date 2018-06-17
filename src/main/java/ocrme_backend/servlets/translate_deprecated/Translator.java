@@ -11,6 +11,8 @@ import java.util.Optional;
 /**
  * Created by iuliia on 5/19/17.
  */
+
+@Deprecated
 public class Translator {
 
     /**
@@ -31,6 +33,7 @@ public class Translator {
 
     /**
      * Detect the language of input text.
+     *
      * @param sourceText source text to be detected for language
      * @return code of detected Language or "en" if no results
      */

@@ -21,11 +21,11 @@ import java.util.logging.Logger;
  * builds pdf and save in Google cloud storage
  */
 public class PdfBuilderSyncTask {
+    public static final String BUCKET_FOR_PDFS_PARAMETER = "ocrme.bucket.pdf";
+    public static final String DIRECTORY_FOR_PDFS_PARAMETER = "ocrme.dir.pdf";
     private static Logger logger;
     private HttpSession session;
     private PdfBuilderInputData data;
-    public static final String BUCKET_FOR_PDFS_PARAMETER = "ocrme.bucket.pdf";
-    public static final String DIRECTORY_FOR_PDFS_PARAMETER = "ocrme.dir.pdf";
 
     public PdfBuilderSyncTask(PdfBuilderInputData data, HttpSession session) {
         this.data = data;
@@ -42,7 +42,7 @@ public class PdfBuilderSyncTask {
             result.setStatus(Status.OK);
             logger.log(Level.INFO, "pdf generated, url for download: " + fileUploadedResult.mediaLink);
         } catch (TextNotFoundException e) {
-           result.setStatus(Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA);
+            result.setStatus(Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA);
             logger.log(Level.INFO, "pdf not generated, empty data");
         } catch (LanguageNotSupportedException e) {
             result.setStatus(Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED);
@@ -82,7 +82,7 @@ public class PdfBuilderSyncTask {
             helper.createBucket(bucketName);
             Blob blob = helper.uploadFileForBlob(file, fileName, directoryName, bucketName);
             result = new FileUploadedResult(
-                   "gs://"+ blob.getBucket() + "/"+ blob.getName(),
+                    "gs://" + blob.getBucket() + "/" + blob.getName(),
                     blob.getMediaLink()
             );
         } catch (Exception e) {
@@ -95,6 +95,7 @@ public class PdfBuilderSyncTask {
 
     /**
      * check if pdf file contains any text
+     *
      * @param outputStream
      * @return
      */
@@ -118,7 +119,7 @@ public class PdfBuilderSyncTask {
     public class LanguageNotSupportedException extends Exception {
     }
 
-    private class FileUploadedResult{
+    private class FileUploadedResult {
         String gsLink;
         String mediaLink;
 

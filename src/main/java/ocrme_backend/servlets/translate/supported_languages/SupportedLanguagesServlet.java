@@ -1,8 +1,6 @@
 package ocrme_backend.servlets.translate.supported_languages;
 
 import com.google.gson.Gson;
-import ocrme_backend.servlets.translate_deprecated.SupportedLanguagesRequestManagerDeprecated;
-import ocrme_backend.servlets.translate_deprecated.SupportedLanguagesResponseDeprecated;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

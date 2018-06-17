@@ -18,8 +18,24 @@ public class PdfBuilderOutputData {
      */
     private String mediaUrl;
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getGsUrl() {
+        return gsUrl;
+    }
+
     public void setGsUrl(String gsUrl) {
         this.gsUrl = gsUrl;
+    }
+
+    public String getMediaUrl() {
+        return mediaUrl;
     }
 
     public void setMediaUrl(String mediaUrl) {
@@ -31,21 +47,5 @@ public class PdfBuilderOutputData {
         PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED,
         PDF_CAN_NOT_BE_CREATED_EMPTY_DATA,
         UNKNOWN_ERROR
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public String getGsUrl() {
-        return gsUrl;
-    }
-
-    public String getMediaUrl() {
-        return mediaUrl;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 }

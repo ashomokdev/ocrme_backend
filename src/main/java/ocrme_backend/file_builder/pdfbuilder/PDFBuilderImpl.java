@@ -24,8 +24,8 @@ import java.util.logging.Logger;
 public class PDFBuilderImpl implements PDFBuilder {
 
     public static final String FONT_PATH_PARAMETER = "font.path";
-    private final HttpSession session;
     public static final String uploadsDir = "/temp/";
+    private final HttpSession session;
     private final Logger logger = Logger.getLogger(PDFBuilderImpl.class.getName());
 
     public PDFBuilderImpl(HttpSession session) {

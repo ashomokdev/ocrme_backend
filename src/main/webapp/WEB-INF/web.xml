@@ -57,7 +57,7 @@
 
   <servlet>
     <servlet-name>TranslateServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.translate_deprecated.TranslateServlet</servlet-class>
+    <servlet-class>ocrme_backend.servlets.translate.translate.TranslateServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>

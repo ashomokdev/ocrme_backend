@@ -8,7 +8,8 @@ import javax.annotation.Nullable;
 public class GetListOCRRequestsBean {
     private String userToken;
 
-    private @Nullable String startCursor;
+    private @Nullable
+    String startCursor;
 
     public String getUserToken() {
         return userToken;

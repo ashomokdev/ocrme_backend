@@ -13,12 +13,6 @@ public class ListOCRResponse implements Serializable {
     List<OcrResult> requestList;
     private Status status;
 
-    public enum Status {
-        OK,
-        USER_NOT_FOUND,
-        UNKNOWN_ERROR
-    }
-
     public String getEndCursor() {
         return endCursor;
     }
@@ -50,5 +44,11 @@ public class ListOCRResponse implements Serializable {
                 ", requestList=" + requestList +
                 ", status=" + status +
                 '}';
+    }
+
+    public enum Status {
+        OK,
+        USER_NOT_FOUND,
+        UNKNOWN_ERROR
     }
 }

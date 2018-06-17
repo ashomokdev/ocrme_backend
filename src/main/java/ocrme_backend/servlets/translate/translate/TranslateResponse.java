@@ -1,4 +1,4 @@
-package ocrme_backend.servlets.translate_deprecated;
+package ocrme_backend.servlets.translate.translate;
 
 /**
  * Created by iuliia on 8/31/17.
@@ -9,11 +9,6 @@ public class TranslateResponse {
     private String targetLanguageCode;
     private Status status;
     private String textResult;
-
-    public enum Status {
-        OK,
-        UNKNOWN_ERROR
-    }
 
     public String getSourceLanguageCode() {
         return sourceLanguageCode;
@@ -45,5 +40,10 @@ public class TranslateResponse {
 
     public void setTextResult(String textResult) {
         this.textResult = textResult;
+    }
+
+    public enum Status {
+        OK,
+        UNKNOWN_ERROR
     }
 }

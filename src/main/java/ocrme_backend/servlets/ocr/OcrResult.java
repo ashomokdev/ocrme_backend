@@ -4,7 +4,6 @@ import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +32,7 @@ public class OcrResult implements Serializable {
         }
         this.timeStamp = timeStamp;
     }
+
     public String getSourceImageUrl() {
         return sourceImageUrl;
     }
@@ -59,6 +59,19 @@ public class OcrResult implements Serializable {
 
     public String getTimeStamp() {
         return timeStamp;
+    }
+
+    @Override
+    public String toString() {
+        return "OcrRequest{" +
+                "sourceImageUrl='" + sourceImageUrl + '\'' +
+                ", languages=" + languages +
+                ", textResult='" + textResult + '\'' +
+                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
+                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
+                ", id=" + id +
+                ", timeStamp='" + timeStamp + '\'' +
+                '}';
     }
 
     public static class Builder {
@@ -109,22 +122,9 @@ public class OcrResult implements Serializable {
             return new OcrResult(this);
         }
     }
-    
-    @Override
-    public String toString() {
-        return "OcrRequest{" +
-                "sourceImageUrl='" + sourceImageUrl + '\'' +
-                ", languages=" + languages +
-                ", textResult='" + textResult + '\'' +
-                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
-                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
-                ", id=" + id +
-                ", timeStamp='" + timeStamp + '\'' +
-                '}';
-    }
 
-    public static class Converter{
-        public static OcrResult convert (OcrRequest ocrRequest) {
+    public static class Converter {
+        public static OcrResult convert(OcrRequest ocrRequest) {
             return new Builder()
                     .sourceImageUrl(ocrRequest.getSourceImageUrl())
                     .languages(ocrRequest.getLanguages())
@@ -136,5 +136,5 @@ public class OcrResult implements Serializable {
                     .build();
         }
     }
-   
+
 }

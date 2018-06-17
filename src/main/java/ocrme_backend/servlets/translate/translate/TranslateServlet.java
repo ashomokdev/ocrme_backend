@@ -1,4 +1,4 @@
-package ocrme_backend.servlets.translate_deprecated;
+package ocrme_backend.servlets.translate.translate;
 
 import com.google.gson.Gson;
 
@@ -11,12 +11,11 @@ import java.io.IOException;
 /**
  * Created by iuliia on 5/22/17.
  * Run next to test in terminal
- * curl -H "Content-Type: application/json" -X POST -d '{"targetLang":"de", sourceLang":"de", "targetLang":"es", "sourceText":"Mit Macht kommt große Verantwortung."}' https://imagetotext-149919.appspot.com/translate
- * curl -H "Content-Type: application/json" -X POST -d '{"targetLang":"de", "sourceLang":"de","targetLang":"es", "sourceText":"Mit Macht kommt große Verantwortung."}' http://localhost:8080/translate
+ * curl -H "Content-Type: application/json" -X POST -d '{"targetLang":"de", sourceLang":"de", "sourceText":"Mit Macht kommt große Verantwortung."}' https://imagetotext-149919.appspot.com/translate
+ * curl -H "Content-Type: application/json" -X POST -d '{"targetLang":"ru", "sourceLang":"de", "sourceText":"Mit Macht kommt große Verantwortung."}' http://localhost:8080/translate
  * curl -H "Content-Type: application/json" -X POST -d '{"targetLang":"de", "sourceText":"Mit Macht kommt große Verantwortung."}' http://localhost:8080/translate
  */
 
-@Deprecated
 public class TranslateServlet extends HttpServlet {
 
     @Override
@@ -24,10 +23,13 @@ public class TranslateServlet extends HttpServlet {
 
         try {
             BufferedReader reader = req.getReader();
-            TranslateRequestBeanDeprecated requestBean = new Gson().fromJson(reader, TranslateRequestBeanDeprecated.class);
 
-            TranslateResponseDeprecated translateResponse =
-                    TranslateRequestManagerDeprecated.translate(
+            TranslateRequestBean requestBean =
+                    new Gson().fromJson(reader, TranslateRequestBean.class);
+
+            TranslateRequestManager manager = new TranslateRequestManager(req.getSession());
+            TranslateResponse translateResponse =
+                    manager.translate(
                             requestBean.getSourceLang(),
                             requestBean.getTargetLang(),
                             requestBean.getSourceText());

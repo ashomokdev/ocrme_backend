@@ -11,27 +11,28 @@ public class SupportedLanguagesResponse implements Serializable {
     private List<Language> supportedLanguages;
     private Status status;
 
+    public List<Language> getSupportedLanguages() {
+        return supportedLanguages;
+    }
+
+    public void setSupportedLanguages(List<Language> supportedLanguages) {
+        this.supportedLanguages = supportedLanguages;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(SupportedLanguagesResponse.Status status) {
+        this.status = status;
+    }
+
     public enum Status {
         OK,
         UNKNOWN_ERROR
     }
 
-    public List<Language> getSupportedLanguages() {
-        return supportedLanguages;
-    }
-    public Status getStatus() {
-        return status;
-    }
-
-
-    public void setSupportedLanguages(List<Language> supportedLanguages) {
-        this.supportedLanguages = supportedLanguages;
-    }
-    public void setStatus(SupportedLanguagesResponse.Status status) {
-        this.status = status;
-    }
-
-    public static class Language implements Serializable{
+    public static class Language implements Serializable {
         private final String code;
         private final String name;
 

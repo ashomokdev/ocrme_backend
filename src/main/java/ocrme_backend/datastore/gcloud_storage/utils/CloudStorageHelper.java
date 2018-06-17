@@ -38,12 +38,13 @@ import java.util.logging.Logger;
 
 public class CloudStorageHelper {
 
-    private final Logger logger = Logger.getLogger(CloudStorageHelper.class.getName());
     private static Storage storage = null;
 
     static {
         storage = StorageOptions.getDefaultInstance().getService();
     }
+
+    private final Logger logger = Logger.getLogger(CloudStorageHelper.class.getName());
 
     /**
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME

@@ -35,8 +35,8 @@ public class OcrProcessorImpl implements OCRProcessor {
     private static final int EXIF_ORIENTATION_270_DEGREE = 6;
     private static final int EXIF_ORIENTATION_90_DEGREE = 8;
     private static final int EXIF_ORIENTATION_180_DEGREE = 3;
-    private final Vision vision;
     private static Logger logger;
+    private final Vision vision;
 
     public OcrProcessorImpl() throws IOException, GeneralSecurityException {
         vision = getVisionService();
@@ -53,6 +53,62 @@ public class OcrProcessorImpl implements OCRProcessor {
         return new Vision.Builder(GoogleNetHttpTransport.newTrustedTransport(), jsonFactory, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
+    }
+
+    /**
+     * 1        2       3      4         5            6           7          8
+     * <p>
+     * 888888  888888      88  88      8888888888  88                  88  8888888888
+     * 88          88      88  88      88  88      88  88          88  88      88  88
+     * 8888      8888    8888  8888    88          8888888888  8888888888          88
+     * 88          88      88  88
+     * 88          88  888888  888888
+     *
+     * @param ea The input EntityAnnotation must be NOT from the first EntityAnnotation of
+     *           annotateImageResponse.getTextAnnotations(), because it is not affected by
+     *           image orientation.
+     * @return Exif orientation (1 or 3 or 6 or 8)
+     */
+
+    public static int getExifOrientation(EntityAnnotation ea) {
+        List<Vertex> vertexList = ea.getBoundingPoly().getVertices();
+        // Calculate the center
+        float centerX = 0, centerY = 0;
+        for (int i = 0; i < 4; i++) {
+            centerX += vertexList.get(i).getX();
+            centerY += vertexList.get(i).getY();
+        }
+        centerX /= 4;
+        centerY /= 4;
+
+        int x0 = vertexList.get(0).getX();
+        int y0 = vertexList.get(0).getY();
+
+        if (x0 < centerX) {
+            if (y0 < centerY) {
+                //       0 -------- 1
+                //       |          |
+                //       3 -------- 2
+                return EXIF_ORIENTATION_NORMAL; // 1
+            } else {
+                //       1 -------- 2
+                //       |          |
+                //       0 -------- 3
+                return EXIF_ORIENTATION_270_DEGREE; // 6
+            }
+        } else {
+            if (y0 < centerY) {
+                //       3 -------- 0
+                //       |          |
+                //       2 -------- 1
+                return EXIF_ORIENTATION_90_DEGREE; // 8
+            } else {
+                //       2 -------- 3
+                //       |          |
+                //       1 -------- 0
+                return EXIF_ORIENTATION_180_DEGREE; // 3
+            }
+        }
     }
 
     @Override
@@ -194,7 +250,6 @@ public class OcrProcessorImpl implements OCRProcessor {
         return batchResponse;
     }
 
-
     private String extractText(BatchAnnotateImagesResponse response) throws AnnotateImageResponseException {
         String message = "";
         AnnotateImageResponse res = response.getResponses().get(0);
@@ -209,62 +264,6 @@ public class OcrProcessorImpl implements OCRProcessor {
             }
         }
         return message;
-    }
-
-    /**
-     * 1        2       3      4         5            6           7          8
-     * <p>
-     * 888888  888888      88  88      8888888888  88                  88  8888888888
-     * 88          88      88  88      88  88      88  88          88  88      88  88
-     * 8888      8888    8888  8888    88          8888888888  8888888888          88
-     * 88          88      88  88
-     * 88          88  888888  888888
-     *
-     * @param ea The input EntityAnnotation must be NOT from the first EntityAnnotation of
-     *           annotateImageResponse.getTextAnnotations(), because it is not affected by
-     *           image orientation.
-     * @return Exif orientation (1 or 3 or 6 or 8)
-     */
-
-    public static int getExifOrientation(EntityAnnotation ea) {
-        List<Vertex> vertexList = ea.getBoundingPoly().getVertices();
-        // Calculate the center
-        float centerX = 0, centerY = 0;
-        for (int i = 0; i < 4; i++) {
-            centerX += vertexList.get(i).getX();
-            centerY += vertexList.get(i).getY();
-        }
-        centerX /= 4;
-        centerY /= 4;
-
-        int x0 = vertexList.get(0).getX();
-        int y0 = vertexList.get(0).getY();
-
-        if (x0 < centerX) {
-            if (y0 < centerY) {
-                //       0 -------- 1
-                //       |          |
-                //       3 -------- 2
-                return EXIF_ORIENTATION_NORMAL; // 1
-            } else {
-                //       1 -------- 2
-                //       |          |
-                //       0 -------- 3
-                return EXIF_ORIENTATION_270_DEGREE; // 6
-            }
-        } else {
-            if (y0 < centerY) {
-                //       3 -------- 0
-                //       |          |
-                //       2 -------- 1
-                return EXIF_ORIENTATION_90_DEGREE; // 8
-            } else {
-                //       2 -------- 3
-                //       |          |
-                //       1 -------- 0
-                return EXIF_ORIENTATION_180_DEGREE; // 3
-            }
-        }
     }
 
     List<TextUnit> extractData(BatchAnnotateImagesResponse response) throws AnnotateImageResponseException {
@@ -338,7 +337,7 @@ public class OcrProcessorImpl implements OCRProcessor {
                                 lly = getLly(poly);
                                 urx = getUrx(poly);
                                 ury = getUry(poly);
-                            }else if (orientation == EXIF_ORIENTATION_270_DEGREE){
+                            } else if (orientation == EXIF_ORIENTATION_270_DEGREE) {
                                 //invert by x
                                 poly = rotate(centerX, centerY, poly, Math.toRadians(-270));
                                 poly = invertSymmetricallyBy0Y(centerX, poly);
@@ -359,7 +358,6 @@ public class OcrProcessorImpl implements OCRProcessor {
         }
         return data;
     }
-
 
 
     private float getLlx(BoundingPoly poly) {
@@ -418,7 +416,7 @@ public class OcrProcessorImpl implements OCRProcessor {
             }
 
             Collections.sort(xs);
-            float urx = (xs.get(xs.size()-1) + xs.get(xs.size()-2)) / 2;
+            float urx = (xs.get(xs.size() - 1) + xs.get(xs.size() - 2)) / 2;
             return urx;
         } catch (Exception e) {
             return 0;
@@ -439,7 +437,7 @@ public class OcrProcessorImpl implements OCRProcessor {
             }
 
             Collections.sort(ys);
-            float ury = (ys.get(ys.size()-1) +ys.get(ys.size()-2)) / 2;
+            float ury = (ys.get(ys.size() - 1) + ys.get(ys.size() - 2)) / 2;
             return ury;
         } catch (Exception e) {
             return 0;
@@ -491,10 +489,9 @@ public class OcrProcessorImpl implements OCRProcessor {
     }
 
     /**
-     *
      * @param centerX
      * @param poly
-     * @return  text units inverted symmetrically by 0Y coordinates.
+     * @return text units inverted symmetrically by 0Y coordinates.
      */
     private BoundingPoly invertSymmetricallyBy0Y(float centerX, BoundingPoly poly) {
         List<Vertex> vertices = poly.getVertices();

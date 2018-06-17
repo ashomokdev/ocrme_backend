@@ -6,13 +6,15 @@ import javax.annotation.Nullable;
 /**
  * Created by iuliia on 8/31/17.
  */
-public class TranslateRequestManager {
-    public static TranslateResponse translate(
+
+@Deprecated
+public class TranslateRequestManagerDeprecated {
+    public static TranslateResponseDeprecated translate(
             @Nullable String sourceLanguageCode,
             @Nonnull String targetLanguageCode,
             String sourceText) {
 
-        TranslateResponse response = new TranslateResponse();
+        TranslateResponseDeprecated response = new TranslateResponseDeprecated();
         try {
             if (sourceLanguageCode == null || sourceLanguageCode.isEmpty()) {
                 sourceLanguageCode = detectSourceLanguage(sourceText);
@@ -29,11 +31,11 @@ public class TranslateRequestManager {
             response.setSourceLanguageCode(sourceLanguageCode);
             response.setTargetLanguageCode(targetLanguageCode);
             response.setTextResult(targetText);
-            response.setStatus(TranslateResponse.Status.OK);
+            response.setStatus(TranslateResponseDeprecated.Status.OK);
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.setStatus(TranslateResponse.Status.UNKNOWN_ERROR);
+            response.setStatus(TranslateResponseDeprecated.Status.UNKNOWN_ERROR);
         }
         return response;
     }

@@ -1,11 +1,9 @@
 package ocrme_backend.datastore.gcloud_datastore.objects;
 
 import com.google.appengine.api.datastore.Text;
-import com.google.appengine.repackaged.com.google.datastore.v1.ArrayValue;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -14,19 +12,6 @@ import java.util.Optional;
  * Created by iuliia on 6/19/17.
  */
 public class OcrRequest implements Serializable {
-
-    // [START ocrRequest]
-    private String sourceImageUrl;
-    private List<String> languages;
-    private Text textResult;
-    private String pdfResultGsUrl;
-    private String pdfResultMediaUrl;
-    private Long id;
-    private String timeStamp;
-    private String createdBy;
-    private String createdById;
-    private String status;
-    // [END ocrRequest]
 
     // [START keys]
     public static final String SOURCE_IMAGE_URL = "sourceImageUrl";
@@ -39,6 +24,18 @@ public class OcrRequest implements Serializable {
     public static final String CREATED_BY_ID = "createdById";
     public static final String CREATED_BY = "createdBy";
     public static final String STATUS = "status";
+    // [END ocrRequest]
+    // [START ocrRequest]
+    private String sourceImageUrl;
+    private List<String> languages;
+    private Text textResult;
+    private String pdfResultGsUrl;
+    private String pdfResultMediaUrl;
+    private Long id;
+    private String timeStamp;
+    private String createdBy;
+    private String createdById;
+    private String status;
     // [END keys]
 
     private OcrRequest(Builder builder) {
@@ -137,7 +134,7 @@ public class OcrRequest implements Serializable {
         }
 
         public Builder textResult(Optional<String> textResult) {
-            this.textResult = new Text (textResult.orElse(""));
+            this.textResult = new Text(textResult.orElse(""));
             return this;
         }
 
