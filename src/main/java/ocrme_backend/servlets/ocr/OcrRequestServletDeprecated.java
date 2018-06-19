@@ -25,6 +25,8 @@ import java.security.GeneralSecurityException;
  * curl -i -X POST -H "Content-Type: multipart/form-data" -F "file=@/home/iuliia/Documents/idea_projects/ocr_me/ocrmeGVisionAppEngine/src/test/resources/test_imgs/rus.jpg" https://imagetotext-149919.appspot.com/ocr_request?language=ru
  * <p>
  * takes image bytes, that is why deprecated - use OcrRequestServlet instead of this.
+ * <p>
+ * takes image bytes, that is why deprecated - use OcrRequestServlet instead of this.
  */
 
 /**

@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -129,11 +130,8 @@ public class CloudStorageHelper {
      * @param directoryName string or "" if none
      * @param bucketName
      * @return Blob
-     * @throws IOException
-     * @throws ServletException
      */
-    public Blob uploadFileForBlob(byte[] bytes, String fileName, String directoryName, final String bucketName)
-            throws IOException, ServletException {
+    public Blob uploadFileForBlob(byte[] bytes, String fileName, String directoryName, final String bucketName) {
         String timeStamp = getTimeStamp();
 
         final String destinationFilename = directoryName + "/" + timeStamp + fileName;
@@ -141,7 +139,7 @@ public class CloudStorageHelper {
         BlobInfo blobInfo = BlobInfo
                 .newBuilder(bucketName, destinationFilename)
                 // Modify access list to allow all users with link to read file
-                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
+                .setAcl(new ArrayList<>(Collections.singletonList(Acl.of(User.ofAllUsers(), Role.READER))))
                 .build();
 
         // create the blob in one request.

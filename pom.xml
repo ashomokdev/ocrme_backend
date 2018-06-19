@@ -23,8 +23,6 @@
         <archiveClasses>true</archiveClasses>
         <ocrme.bucket.pdf>ocrme-77a2b.appspot.com</ocrme.bucket.pdf>
         <ocrme.dir.pdf>pdf-results</ocrme.dir.pdf>
-        <ocrme.bucket.request_images>ocrme-77a2b.appspot.com</ocrme.bucket.request_images>
-        <ocrme.dir.request_images>request_images</ocrme.dir.request_images>
         <font.path>/WEB-INF/fonts/FreeSans.ttf</font.path>
         <bing.key.parameter>bing.key</bing.key.parameter>
         <secret.key.filepath>/WEB-INF/secret_data/secret.properties</secret.key.filepath>
@@ -57,6 +55,13 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>6.0</version>
+            <scope>provided</scope>
+        </dependency>
+
 
         <!--Google Translate API-->
         <dependency>
