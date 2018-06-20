@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 
 @Deprecated
-public class TranslateServlet extends HttpServlet {
+public class TranslateServletDeprecated extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
