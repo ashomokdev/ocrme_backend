@@ -11,12 +11,12 @@ Material design.
 
 ## Content of project
 ### Servlets:
-*	ListOCRRequestsServlet - retrive data (list of OCR requests) from Google Datastore using userToken
-*	OcrForTextServletDeprecated - (Deprecated - use OcrRequestServlet instead) retrive text from image file using language param (optional)
-*	OcrRequestServlet - retrive OcrResponse from Google Cloud Storage Uri using language (optional) and user's token (optional)
-*	SupportedLanguagesServlet - retrive list of languages which supported by Microsoft Bing Translation API
-*	TranslateServlet - provide TranslateResponse for sourceText and targetLanguage using Microsoft Bing Translation API
-*	TranslateServletDeprecated - (Deprecated because of price - use OcrRequestServlet instead) provide TranslateResponseDeprecated for sourceText and targetLanguage using Google Translation API
+*	**ListOCRRequestsServlet** - retrive data (list of OCR requests) from Google Datastore using userToken
+*	**OcrForTextServletDeprecated** - (Deprecated - use OcrRequestServlet instead) retrive text from image file using language param (optional)
+*	**OcrRequestServlet** - retrive OcrResponse from Google Cloud Storage Uri using language (optional) and user's token (optional)
+*	**SupportedLanguagesServlet** - retrive list of languages which supported by Microsoft Bing Translation API
+*	**TranslateServlet** - provide TranslateResponse for sourceText and targetLanguage using Microsoft Bing Translation API
+*	**TranslateServletDeprecated** - (Deprecated because of price - use OcrRequestServlet instead) provide TranslateResponseDeprecated for sourceText and targetLanguage using Google Translation API
 
 ## Technologies:
 **Note:** This is Google App Engine Backend app for Android app. This project shows code of Backend app only. 
