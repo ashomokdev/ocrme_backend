@@ -16,7 +16,7 @@ Material design.
 *	**OcrRequestServlet** - retrive OcrResponse from Google Cloud Storage Uri using language (optional) and user's token (optional)
 *	**SupportedLanguagesServlet** - retrive list of languages which supported by Microsoft Bing Translation API
 *	**TranslateServlet** - provide TranslateResponse for sourceText and targetLanguage using Microsoft Bing Translation API
-*	**TranslateServletDeprecated** - (Deprecated because of price - use OcrRequestServlet instead) provide TranslateResponseDeprecated for sourceText and targetLanguage using Google Translation API
+*	**TranslateServletDeprecated** - (Deprecated because of price - use TranslateServlet instead) provide TranslateResponseDeprecated for sourceText and targetLanguage using Google Translation API
 
 ## Technologies:
 **Note:** This is Google App Engine Backend app for Android app. This project shows code of Backend app only. 
