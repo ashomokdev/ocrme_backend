@@ -13,7 +13,7 @@ settings.gradle
 .idea/misc.xml
 /target
 target
-secret_data/
+secret.properties
 
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
