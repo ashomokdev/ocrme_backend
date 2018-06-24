@@ -5,36 +5,6 @@
          http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1" id="data-fabric-web-tool">
 
-  <!--<servlet>-->
-    <!--<servlet-name>OcrForTextServlet</servlet-name>-->
-    <!--<servlet-class>ocrme_backend.servlets.ocr.OcrForTextServletDeprecated</servlet-class>-->
-    <!--<load-on-startup>1</load-on-startup>-->
-  <!--</servlet>-->
-  <!--<servlet-mapping>-->
-    <!--<servlet-name>OcrForTextServlet</servlet-name>-->
-    <!--<url-pattern>/ocr_for_text_deprecated</url-pattern>-->
-  <!--</servlet-mapping>-->
-
-  <!--<servlet>-->
-    <!--<servlet-name>OcrRequestServletDeprecated</servlet-name>-->
-    <!--<servlet-class>ocrme_backend.servlets.ocr.OcrRequestServletDeprecated</servlet-class>-->
-    <!--<load-on-startup>1</load-on-startup>-->
-  <!--</servlet>-->
-  <!--<servlet-mapping>-->
-    <!--<servlet-name>OcrRequestServletDeprecated</servlet-name>-->
-    <!--<url-pattern>/ocr_request_deprecated</url-pattern>-->
-  <!--</servlet-mapping>-->
-
-  <!--<servlet>-->
-    <!--<servlet-name>SupportedLanguagesServlet</servlet-name>-->
-    <!--<servlet-class>ocrme_backend.servlets.translate_deprecated.SupportedLanguagesServletDeprecated</servlet-class>-->
-    <!--<load-on-startup>1</load-on-startup>-->
-  <!--</servlet>-->
-  <!--<servlet-mapping>-->
-    <!--<servlet-name>SupportedLanguagesServlet</servlet-name>-->
-    <!--<url-pattern>/supported_languages</url-pattern>-->
-  <!--</servlet-mapping>-->
-
   <servlet>
     <servlet-name>ListOCRRequestsServlet</servlet-name>
     <servlet-class>ocrme_backend.servlets.list_ocr_requests.ListOCRRequestsServlet</servlet-class>

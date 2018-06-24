@@ -1,12 +1,19 @@
 package ocrme_backend.servlets.translate_deprecated;
 
 
+import com.google.auth.appengine.AppEngineCredentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.translate.*;
 import com.google.common.collect.ImmutableList;
+import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by iuliia on 5/19/17.
@@ -14,6 +21,8 @@ import java.util.Optional;
 
 @Deprecated
 public class Translator {
+
+    private static final Logger logger = Logger.getLogger(Translator.class.getName());
 
     /**
      * Translate the source text from source to target language.
@@ -129,7 +138,18 @@ public class Translator {
      *
      * @return Google Translate Service
      */
-    public static Translate createTranslateService() {
-        return TranslateOptions.getDefaultInstance().getService();
+    private static Translate createTranslateService() {
+
+        GoogleCredentials credentials;
+        Translate translate = null;
+        try {
+            credentials = AppEngineCredentials.getApplicationDefault();
+           translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.log(Level.WARNING, "Translator credentials error " + e.getMessage());
+        }
+
+        return translate;
     }
 }

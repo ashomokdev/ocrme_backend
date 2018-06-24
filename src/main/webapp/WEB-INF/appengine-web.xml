@@ -7,12 +7,13 @@
 
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-        <property name="file.encoding" value="UTF-8" />
-        <property name="DEFAULT_ENCODING" value="UTF-8" />
+        <property name="file.encoding" value="UTF-8"/>
+        <property name="DEFAULT_ENCODING" value="UTF-8"/>
     </system-properties>
 
     <resource-files>
         <include path="WEB-INF/fonts"/>
         <include path="WEB-INF"/>
     </resource-files>
+
 </appengine-web-app>

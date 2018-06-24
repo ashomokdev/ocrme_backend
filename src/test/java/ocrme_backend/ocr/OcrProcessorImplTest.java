@@ -1,8 +1,6 @@
 package ocrme_backend.ocr;
 
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
-import com.google.api.services.vision.v1.model.BoundingPoly;
-import com.google.api.services.vision.v1.model.Vertex;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
 import ocrme_backend.servlets.ocr.OcrData;
 import ocrme_backend.utils.FileProvider;
@@ -57,7 +55,7 @@ public class OcrProcessorImplTest {
 
     @Test
     public void ocrFromUri() throws Exception {
-        String imgUri = "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
+        String imgUri = FileProvider.getImageUri();
         BatchAnnotateImagesResponse data = ocrProcessor.ocrForResponse(imgUri, null);
         assertTrue(ocrProcessor.extractData(data).size() > 0);
     }
@@ -71,15 +69,12 @@ public class OcrProcessorImplTest {
         List<TextUnit> text = data.getPdfBuilderInputData().getText();
         assertTrue(text.size() > 0);
 
-
         boolean containsRus = false;
         for (TextUnit unit : text) {
             if (unit.getText().toLowerCase().contains("барышня")) {
                 containsRus = true;
-                return;
             }
         }
         assertTrue(containsRus);
     }
-
 }

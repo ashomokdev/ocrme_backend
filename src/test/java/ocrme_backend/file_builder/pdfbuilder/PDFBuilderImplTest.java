@@ -3,6 +3,7 @@ package ocrme_backend.file_builder.pdfbuilder;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import ocrme_backend.servlets.ocr.OcrData;
+import ocrme_backend.utils.FileProvider;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,8 +19,7 @@ import java.util.List;
 
 import static ocrme_backend.utils.FileProvider.*;
 import static ocrme_backend.utils.PdfBuilderInputDataProvider.ocrForData;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,7 +53,6 @@ public class PDFBuilderImplTest {
     private String rotated_270 = "rotated_270.jpg";
     private String rotated_270_2 = "rotated_270_2.jpg";
 
-    private String defaultFont = "FreeSans.ttf";
 
     private String simpleRusText = "Простой русский текст";
     private String simpleUkrText = "Проста українська мова";
@@ -64,13 +63,14 @@ public class PDFBuilderImplTest {
     ArrayList<String> imageLocalPathArray = new ArrayList<>();
 
     @Before
-    public void init() throws IOException, GeneralSecurityException {
+    public void init() {
         HttpSession session = mock(HttpSession.class);
         pdfBuilder = new PDFBuilderImpl(session);
 
         ServletContext mockServletContext = mock(ServletContext.class);
         when(session.getServletContext()).thenReturn(mockServletContext);
 
+        String defaultFont = FileProvider.getDefaultFont();
         when(mockServletContext.getResourceAsStream(anyString())).thenReturn(getFontAsStream(defaultFont));
     }
 
@@ -245,7 +245,7 @@ public class PDFBuilderImplTest {
 
         //check file not empty
         BufferedReader br = new BufferedReader(new FileReader(path));
-        assertFalse(br.readLine() == null);
+        assertNotNull(br.readLine());
     }
 
     /**

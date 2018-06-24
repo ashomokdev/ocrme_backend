@@ -17,6 +17,9 @@
 package ocrme_backend.datastore.gcloud_storage.utils;
 
 import com.google.api.gax.paging.Page;
+import com.google.auth.Credentials;
+import com.google.auth.appengine.AppEngineCredentials;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
 import com.google.cloud.storage.Acl.Role;
@@ -24,6 +27,7 @@ import com.google.cloud.storage.Acl.User;
 import org.apache.commons.fileupload.FileItemStream;
 
 import javax.servlet.ServletException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -39,13 +43,19 @@ import java.util.logging.Logger;
 
 public class CloudStorageHelper {
 
-    private static Storage storage = null;
-
-    static {
-        storage = StorageOptions.getDefaultInstance().getService();
-    }
-
+    private Storage storage;
     private final Logger logger = Logger.getLogger(CloudStorageHelper.class.getName());
+
+    public CloudStorageHelper() {
+        GoogleCredentials credentials;
+        try {
+            credentials = AppEngineCredentials.getApplicationDefault();
+            storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.log(Level.WARNING, "CloudStorageHelper credentials error " + e.getMessage());
+        }
+    }
 
     /**
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
@@ -65,7 +75,7 @@ public class CloudStorageHelper {
                         BlobInfo
                                 .newBuilder(bucketName, fileName)
                                 // Modify access list to allow all users with link to read file
-                                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
+                                .setAcl(new ArrayList<>(Collections.singletonList(Acl.of(User.ofAllUsers(), Role.READER))))
                                 .build(),
                         fileStream.openStream());
         logger.log(Level.INFO, "File {0} uploaded as {1}", new Object[]{
@@ -80,8 +90,7 @@ public class CloudStorageHelper {
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
      * environment variable, appending a timestamp to end of the uploaded filename.
      */
-    public String uploadFile(InputStream fileStream, String fileName, final String bucketName)
-            throws IOException, ServletException {
+    public String uploadFile(InputStream fileStream, String fileName, final String bucketName) {
 
         String timeStamp = getTimeStamp();
 
@@ -93,7 +102,7 @@ public class CloudStorageHelper {
                         BlobInfo
                                 .newBuilder(bucketName, fileName)
                                 // Modify access list to allow all users with link to read file
-                                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
+                                .setAcl(new ArrayList<>(Collections.singletonList(Acl.of(User.ofAllUsers(), Role.READER))))
                                 .build(),
                         fileStream);
         logger.log(Level.INFO, "File uploaded as " + fileName);
@@ -106,8 +115,7 @@ public class CloudStorageHelper {
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
      * environment variable, appending a timestamp to end of the uploaded filename.
      */
-    public String uploadFile(byte[] bytes, String fileName, final String bucketName)
-            throws IOException, ServletException {
+    public String uploadFile(byte[] bytes, String fileName, final String bucketName) {
         return uploadFile(bytes, fileName, "", bucketName);
     }
 
@@ -115,8 +123,7 @@ public class CloudStorageHelper {
      * Uploads a file to Google Cloud Storage to the bucket specified in the BUCKET_NAME
      * environment variable, appending a timestamp to end of the uploaded filename.
      */
-    public String uploadFile(byte[] bytes, String fileName, String directoryName, final String bucketName)
-            throws IOException, ServletException {
+    public String uploadFile(byte[] bytes, String fileName, String directoryName, final String bucketName) {
 
         return uploadFileForBlob(bytes, fileName, directoryName, bucketName).getMediaLink();
     }
@@ -172,7 +179,7 @@ public class CloudStorageHelper {
         BlobInfo blobInfo = BlobInfo
                 .newBuilder(bucketName, destinationFilename)
                 // Modify access list to allow all users with link to read file
-                .setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
+                .setAcl(new ArrayList<>(Collections.singletonList(Acl.of(User.ofAllUsers(), Role.READER))))
                 .build();
 
         if (Files.size(uploadFrom) > 1_000_000) {
@@ -210,9 +217,6 @@ public class CloudStorageHelper {
      */
     public void createBucket(String bucketName) {
         try {
-            // Instantiates a client
-            Storage storage = StorageOptions.getDefaultInstance().getService();
-
             Bucket bucket = storage.get(bucketName, Storage.BucketGetOption.fields());
 
             //if exists

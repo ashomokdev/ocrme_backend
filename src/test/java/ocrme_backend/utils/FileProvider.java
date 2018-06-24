@@ -22,10 +22,26 @@ import java.nio.file.Paths;
 public class FileProvider {
     public static String pathToSecretKeys = "secret_data/secret.properties";
 
-    public static String getTestImageByName(String filename) throws Exception {
+    private static final String gcsUriTestImage = "gs://ocrme-77a2b.appspot.com/test2/ru.jpg";
+    private static final String gcsUriTestEmptyImage = "gs://ocrme-77a2b.appspot.com/test2/Blank.jpg";
+    private static final String defaultFont = "FreeSans.ttf";
+
+    public static String getTestImageByName(String filename) {
         URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/" + filename);
         assert url != null;
         return url.getPath();
+    }
+
+    public static String getDefaultFont(){
+        return defaultFont;
+    }
+
+    public static String getImageUri(){
+        return gcsUriTestImage;
+    }
+
+    public static String getEmptyImageUri(){
+        return gcsUriTestEmptyImage;
     }
 
     public static ImageFile getRusImageFile() throws Exception {
@@ -53,13 +69,7 @@ public class FileProvider {
         int sourceWidth = bimg.getWidth();
         int sourceHeight = bimg.getHeight();
         byte[] data = Files.readAllBytes(path);
-        ImageFile image = null;
-        if (data != null) {
-            image = new ImageFile(data, sourceWidth, sourceHeight);
-        } else {
-            throw new Exception("file was not obtained");
-        }
-        return image;
+        return new ImageFile(data, sourceWidth, sourceHeight);
     }
 
     public static ByteArrayOutputStream getImageAsStream() throws IOException {
@@ -97,7 +107,7 @@ public class FileProvider {
         return Thread.currentThread().getContextClassLoader().getResource("temp/").getPath();
     }
 
-    public static InputStream getFontAsStream(String fontFileName) throws IOException {
+    public static InputStream getFontAsStream(String fontFileName) {
         return Thread.currentThread()
                 .getContextClassLoader().getResourceAsStream("fonts/" + fontFileName);
     }
@@ -114,7 +124,7 @@ public class FileProvider {
         return baos;
     }
 
-    public static InputStream getFileAsInputStream(String filePath) throws IOException {
+    public static InputStream getFileAsInputStream(String filePath) {
         return Thread.currentThread()
                 .getContextClassLoader().getResourceAsStream(filePath);
     }

@@ -1,5 +1,6 @@
 package ocrme_backend.servlets.ocr;
 
+import ocrme_backend.utils.FileProvider;
 import ocrme_backend.utils.PdfBuilderInputDataProvider;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData;
@@ -25,7 +26,6 @@ import static org.mockito.Mockito.when;
 public class PdfBuilderSyncTaskTest {
 
     private String rusFilename = "rus.jpg";
-    private String defaultFont = "FreeSans.ttf";
 
     private PdfBuilderInputData data;
     private HttpSession session;
@@ -43,6 +43,7 @@ public class PdfBuilderSyncTaskTest {
 
         ServletContext mockServletContext = mock(ServletContext.class);
         when(session.getServletContext()).thenReturn(mockServletContext);
+        String defaultFont = FileProvider.getDefaultFont();
         when(mockServletContext.getResourceAsStream(anyString())).thenReturn(getFontAsStream(defaultFont));
 
         when(mockServletContext.getInitParameter(PdfBuilderSyncTask.BUCKET_FOR_PDFS_PARAMETER)).
@@ -51,33 +52,31 @@ public class PdfBuilderSyncTaskTest {
 
 
     @Test
-    public void testExecute() throws Exception {
+    public void testExecute() {
         PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
-        Assert.assertTrue(result != null);
+        Assert.assertNotNull(result);
         Assert.assertTrue(result.getGsUrl().length() > 0);
-        Assert.assertTrue(result.getStatus().equals(PdfBuilderOutputData.Status.OK));
+        Assert.assertEquals(result.getStatus(), Status.OK);
     }
 
     @Test
-    public void processFileWithNoText() throws Exception {
+    public void processFileWithNoText() {
         data = new PdfBuilderInputData( new ArrayList<>());
 
         PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
 
-        Assert.assertTrue(
-                result.getStatus().equals(Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA));
+        Assert.assertEquals(result.getStatus(), Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA);
     }
 
     @Test
-    public void processFileWithNotSupportedLanguage() throws Exception {
+    public void processFileWithNotSupportedLanguage() {
 
         List<TextUnit> texts = new ArrayList<>();
         texts.add(new TextUnit(simpleChinaText, 20, 200, 200, 20));
         data = new PdfBuilderInputData( texts);
         PdfBuilderOutputData result = new PdfBuilderSyncTask(data, session).execute();
 
-        Assert.assertTrue(
-                result.getStatus().equals(Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED));
+        Assert.assertEquals(result.getStatus(), Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED);
 
     }
 

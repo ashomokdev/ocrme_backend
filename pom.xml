@@ -33,7 +33,11 @@
     </prerequisites>
 
     <dependencies>
-        <!-- Compile/runtime dependencies -->
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-appengine</artifactId>
+            <version>0.9.1</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -62,13 +66,6 @@
             <scope>provided</scope>
         </dependency>
 
-
-        <!--Google Translate API-->
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-translate</artifactId>
-            <version>0.17.2-beta</version>
-        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
