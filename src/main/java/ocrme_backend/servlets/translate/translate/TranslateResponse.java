@@ -1,29 +1,20 @@
 package ocrme_backend.servlets.translate.translate;
 
+import java.io.Serializable;
+
 /**
  * Created by iuliia on 8/31/17.
  */
-public class TranslateResponse {
-
-    private String sourceLanguageCode;
-    private String targetLanguageCode;
+public class TranslateResponse implements Serializable {
     private Status status;
-    private String textResult;
+    private TranslateResult translateResult;
 
-    public String getSourceLanguageCode() {
-        return sourceLanguageCode;
+    public TranslateResult getTranslateResult() {
+        return translateResult;
     }
 
-    public void setSourceLanguageCode(String sourceLanguageCode) {
-        this.sourceLanguageCode = sourceLanguageCode;
-    }
-
-    public String getTargetLanguageCode() {
-        return targetLanguageCode;
-    }
-
-    public void setTargetLanguageCode(String targetLanguageCode) {
-        this.targetLanguageCode = targetLanguageCode;
+    public void setTranslateResult(TranslateResult translateResult) {
+        this.translateResult = translateResult;
     }
 
     public Status getStatus() {
@@ -34,12 +25,12 @@ public class TranslateResponse {
         this.status = status;
     }
 
-    public String getTextResult() {
-        return textResult;
-    }
-
-    public void setTextResult(String textResult) {
-        this.textResult = textResult;
+    @Override
+    public String toString() {
+        return "TranslateResponse{" +
+                "status=" + status +
+                ", translateResult=" + translateResult +
+                '}';
     }
 
     public enum Status {

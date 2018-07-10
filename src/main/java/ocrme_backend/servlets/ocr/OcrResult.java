@@ -19,7 +19,20 @@ public class OcrResult implements Serializable {
     private Long id;
     private String timeStamp;
 
-    private OcrResult(OcrResult.Builder builder) {
+    @Override
+    public String toString() {
+        return "OcrResult{" +
+                "sourceImageUrl='" + sourceImageUrl + '\'' +
+                ", languages=" + languages +
+                ", textResult='" + textResult + '\'' +
+                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
+                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
+                ", id=" + id +
+                ", timeStamp='" + timeStamp + '\'' +
+                '}';
+    }
+
+    private OcrResult(Builder builder) {
         this.sourceImageUrl = builder.inputImageUrl;
         this.languages = builder.languages;
         this.textResult = builder.textResult;
@@ -61,18 +74,6 @@ public class OcrResult implements Serializable {
         return timeStamp;
     }
 
-    @Override
-    public String toString() {
-        return "OcrRequest{" +
-                "sourceImageUrl='" + sourceImageUrl + '\'' +
-                ", languages=" + languages +
-                ", textResult='" + textResult + '\'' +
-                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
-                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
-                ", id=" + id +
-                ", timeStamp='" + timeStamp + '\'' +
-                '}';
-    }
 
     public static class Builder {
         private String inputImageUrl;
@@ -83,37 +84,37 @@ public class OcrResult implements Serializable {
         private Long id;
         private String timeStamp;
 
-        public OcrResult.Builder sourceImageUrl(String inputImageUrl) {
+        Builder sourceImageUrl(String inputImageUrl) {
             this.inputImageUrl = inputImageUrl;
             return this;
         }
 
-        public OcrResult.Builder languages(List<String> languages) {
+        Builder languages(List<String> languages) {
             this.languages = languages;
             return this;
         }
 
-        public OcrResult.Builder textResult(String textResult) {
+        Builder textResult(String textResult) {
             this.textResult = textResult;
             return this;
         }
 
-        public OcrResult.Builder pdfResultGsUrl(String pdfResultGsUrl) {
+        Builder pdfResultGsUrl(String pdfResultGsUrl) {
             this.pdfResultGsUrl = pdfResultGsUrl;
             return this;
         }
 
-        public OcrResult.Builder pdfResultMediaUrl(String pdfResultMediaUrl) {
+        Builder pdfResultMediaUrl(String pdfResultMediaUrl) {
             this.pdfResultMediaUrl = pdfResultMediaUrl;
             return this;
         }
 
-        public OcrResult.Builder id(Long id) {
+        Builder id(Long id) {
             this.id = id;
             return this;
         }
 
-        public OcrResult.Builder timeStamp(String timeStamp) {
+         Builder timeStamp(String timeStamp) {
             this.timeStamp = timeStamp;
             return this;
         }

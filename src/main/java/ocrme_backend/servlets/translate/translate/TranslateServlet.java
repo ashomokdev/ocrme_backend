@@ -27,7 +27,7 @@ public class TranslateServlet extends HttpServlet {
             TranslateRequestBean requestBean =
                     new Gson().fromJson(reader, TranslateRequestBean.class);
 
-            TranslateRequestManager manager = new TranslateRequestManager(req.getSession());
+            TranslateRequestManager manager = new TranslateRequestManager(req.getSession(), requestBean.getIdTokenString());
             TranslateResponse translateResponse =
                     manager.translate(
                             requestBean.getSourceLang(),

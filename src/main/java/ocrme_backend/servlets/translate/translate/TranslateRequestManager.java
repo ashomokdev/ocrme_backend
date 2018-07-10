@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import ocrme_backend.datastore.gcloud_datastore.objects.OcrRequest;
+import ocrme_backend.datastore.gcloud_datastore.objects.TranslateRequest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,10 +19,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
+import static ocrme_backend.utils.FirebaseAuthUtil.getUserEmail;
+import static ocrme_backend.utils.FirebaseAuthUtil.getUserId;
 
 /**
  * DOCS https://docs.microsoft.com/en-us/azure/cognitive-services/translator/reference/v3-0-translate?tabs=curl
@@ -36,19 +42,26 @@ public class TranslateRequestManager {
             Logger.getLogger(TranslateRequestManager.class.getName());
     private String subscriptionKey;
 
+    @Nullable
+    private String idTokenString;
 
     //todo use DI framework (Dagger) and inject session
-    public TranslateRequestManager(HttpSession session) throws IOException {
-        String secretKeyFilepath = session.getServletContext().getInitParameter(SECRET_KEYS_FILE_PATH);
+    TranslateRequestManager(HttpSession session, @Nullable String idTokenString)
+            throws IOException {
+        String secretKeyFilepath =
+                session.getServletContext().getInitParameter(SECRET_KEYS_FILE_PATH);
         Properties props = new Properties();
         props.load(session.getServletContext().getResourceAsStream(secretKeyFilepath));
 
-        String bingKeyParameter = session.getServletContext().getInitParameter(SECRET_KEY_PARAMETER);
+        String bingKeyParameter =
+                session.getServletContext().getInitParameter(SECRET_KEY_PARAMETER);
         subscriptionKey = props.getProperty(bingKeyParameter);
 
         if (subscriptionKey == null || subscriptionKey.isEmpty()) {
             logger.log(WARNING, "subscriptionKey was not obtained");
         }
+
+        this.idTokenString = idTokenString;
     }
 
     public TranslateResponse translate(
@@ -65,7 +78,9 @@ public class TranslateRequestManager {
 
         String jsonResult = postForTranslate(url, content);
 
-        return generateTranslateResponse(jsonResult, sourceLanguageCode, targetLanguageCode);
+        TranslateResponse response = generateTranslateResponse(jsonResult, sourceLanguageCode, targetLanguageCode);
+        addToDb(response);
+        return response;
     }
 
     private TranslateResponse generateTranslateResponse(
@@ -93,9 +108,14 @@ public class TranslateRequestManager {
                         .getAsString();
 
 
-                response.setSourceLanguageCode(sourceLanguageCode);
-                response.setTargetLanguageCode(targetLanguageCode);
-                response.setTextResult(text);
+                TranslateResult translateResult =
+                        new TranslateResult.Builder()
+                        .textResult(text)
+                        .sourceLanguageCode(sourceLanguageCode)
+                        .targetLanguageCode(targetLanguageCode)
+                        .build();
+
+                response.setTranslateResult(translateResult);
                 response.setStatus(TranslateResponse.Status.OK);
 
             } catch (Exception e) {
@@ -120,7 +140,6 @@ public class TranslateRequestManager {
 
         return params;
     }
-
 
     private @Nullable
     String postForTranslate(URL url, String content) {
@@ -153,29 +172,32 @@ public class TranslateRequestManager {
         }
     }
 
-    private String getLanguagesAsJson() throws Exception {
+    private void addToDb(TranslateResponse response) {
 
-        URL url = new URL(host + path);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
-        connection.setDoOutput(true);
+        String userId = getUserId(idTokenString);
+        String email = getUserEmail(idTokenString);
 
-        StringBuilder response = new StringBuilder();
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        Optional<TranslateResult> optionalTranslateResult = Optional.ofNullable(response.getTranslateResult());
+        TranslateResult dummyOcrResult = new TranslateResult.Builder().build();
+        TranslateResult translateResult = optionalTranslateResult.orElse(dummyOcrResult);
 
-        String line;
-        while ((line = in.readLine()) != null) {
-            response.append(line);
-        }
-        in.close();
+        //put request data to Db
+        long requestId = new DbPusher().add(
+                new TranslateRequest.Builder()
+                        .sourceLanguageCode(translateResult.getSourceLanguageCode())
+                        .targetLanguageCode(translateResult.getTargetLanguageCode())
+                        .createdById(userId)
+                        .createdBy(email)
+                        .status(response.getStatus().name())
+                        .targetText(Optional.ofNullable(translateResult.getTextResult()))
+                        .timeStamp(translateResult.getTimeStamp())
+                        .build());
 
-        return response.toString();
+        logger.log(INFO, "OcrReques data saved in DB, entity id = " + requestId);
     }
 
     public static class RequestBody {
         String Text;
-
         public RequestBody(String text) {
             this.Text = text;
         }

@@ -16,17 +16,17 @@ import static java.util.logging.Level.WARNING;
 /**
  * Created by iuliia on 12/18/17.
  */
-public class ListOCRRequestsManager {
+class ListOCRRequestsManager {
 
     private final Logger logger = Logger.getLogger(ListOCRRequestsManager.class.getName());
 
-    public ListOCRRequestsManager() {
+    ListOCRRequestsManager() {
     }
 
-    public ListOCRResponse processForGet(String idTokenString, @Nullable String startCursor) {
+    ListOCRResponse processForGet(String idTokenString, @Nullable String startCursor) {
         ListOCRResponse response = new ListOCRResponse();
         try {
-            String userId = FirebaseAuthUtil.getUserId(idTokenString);
+            String userId = getUserId(idTokenString);
             if (userId == null) {
                 response.setStatus(ListOCRResponse.Status.USER_NOT_FOUND);
             } else {
@@ -50,7 +50,11 @@ public class ListOCRRequestsManager {
         return response;
     }
 
-    public void processForDelete(String[] ocrRequestIds) {
+    private String getUserId(String idTokenString) {
+        return FirebaseAuthUtil.getUserId(idTokenString);
+    }
+
+    void processForDelete(String[] ocrRequestIds) {
         try {
             List<Long> ids = new ArrayList<>();
             for (String id : ocrRequestIds) {

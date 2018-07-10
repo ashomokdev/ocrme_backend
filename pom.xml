@@ -11,8 +11,8 @@
 
     <properties>
         <app.id>ocrme-77a2b</app.id>
-        <app.version>2</app.version>
-        <skipTests>true</skipTests>
+        <app.version>4</app.version>
+        <!--<skipTests>true</skipTests>-->
         <appengine.version>1.9.52</appengine.version>
         <gcloud.plugin.version>2.0.9.133.v201611104</gcloud.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

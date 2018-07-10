@@ -1,0 +1,12 @@
+<!-- Indices written at Sun, 1 Jul 2018 20:51:25 UTC -->
+
+<datastore-indexes>
+
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="OcrRequest" ancestor="false" source="auto">
+        <property name="createdById" direction="asc"/>
+        <property name="status" direction="asc"/>
+        <property name="timeStamp" direction="desc"/>
+    </datastore-index>
+
+</datastore-indexes>

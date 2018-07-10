@@ -120,18 +120,18 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         if (startCursorString != null && !startCursorString.equals("")) {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursorString)); // Where we left off
         }
-        Query query = new Query(OCR_REQUEST_KIND) // We only care about Books
+        Query query = new Query(OCR_REQUEST_KIND) // We only care about ocr Requests
                 .addSort(OcrRequest.TIME_STAMP, Query.SortDirection.ASCENDING); // Use default Index "time span"
         PreparedQuery preparedQuery = datastore.prepare(query);
         QueryResultIterator<Entity> results = preparedQuery.asQueryResultIterator(fetchOptions);
 
-        List<OcrRequest> resultBooks = entitiesToOCRRequests(results);     // Retrieve and convert Entities
+        List<OcrRequest> ocrRequests = entitiesToOCRRequests(results);     // Retrieve and convert Entities
         Cursor cursor = results.getCursor();              // Where to start next time
-        if (cursor != null && resultBooks.size() == requestCountLimit) {         // Are we paging? Save Cursor
+        if (cursor != null && ocrRequests.size() == requestCountLimit) {         // Are we paging? Save Cursor
             String cursorString = cursor.toWebSafeString();               // Cursors are WebSafe
-            return new Result<>(resultBooks, cursorString);
+            return new Result<>(ocrRequests, cursorString);
         } else {
-            return new Result<>(resultBooks);
+            return new Result<>(ocrRequests);
         }
     }
 

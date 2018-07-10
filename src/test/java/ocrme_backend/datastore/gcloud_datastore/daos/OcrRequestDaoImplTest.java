@@ -29,7 +29,7 @@ public class OcrRequestDaoImplTest {
     private static StreamHandler customLogHandler;
     private final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-    OcrRequestDao dao = null;
+    private OcrRequestDao dao = null;
 
     @Before
     public void setUp() {
@@ -69,9 +69,9 @@ public class OcrRequestDaoImplTest {
         Long id = addRequestToDb();
 
         OcrRequest obtained = dao.read(id);
-        Assert.assertTrue(obtained.getId() == 1);
-        Assert.assertTrue(obtained.getTextResult().getValue().equals(textResultExpected));
-        Assert.assertTrue(obtained.getSourceImageUrl().equals(inputImageUrlExpected));
+        Assert.assertEquals(1, (long) obtained.getId());
+        Assert.assertEquals(obtained.getTextResult().getValue(), textResultExpected);
+        Assert.assertEquals(obtained.getSourceImageUrl(), inputImageUrlExpected);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class OcrRequestDaoImplTest {
         String textResultUpdated = "dummy text result updated";
         OcrRequest updated = new OcrRequest.Builder()
                 .id(id)
-                .textResult(Optional.ofNullable(textResultUpdated))
+                .textResult(Optional.of(textResultUpdated))
                 .build();
 
         dao.update(updated);
@@ -94,11 +94,11 @@ public class OcrRequestDaoImplTest {
     public void deleteOCRRequest() throws Exception {
         Long id = addRequestToDb();
         Result<OcrRequest> resultAdded = dao.listOCRRequests("");
-        Assert.assertTrue(resultAdded.result.size() == 1);
+        Assert.assertEquals(1, resultAdded.result.size());
 
         dao.delete(id);
         Result<OcrRequest> resultDeleted = dao.listOCRRequests("");
-        Assert.assertTrue(resultDeleted.result.size() == 0);
+        Assert.assertEquals(0, resultDeleted.result.size());
 
         String capturedLog = getTestCapturedLog();
         Assert.assertTrue(capturedLog.contains("deleted"));
@@ -112,7 +112,7 @@ public class OcrRequestDaoImplTest {
         addRequestToDb();
 
         Result<OcrRequest> result = dao.listOCRRequests("");
-        Assert.assertTrue(result.result.size() == 3);
+        Assert.assertEquals(3, result.result.size());
     }
 
     @Test
@@ -131,8 +131,8 @@ public class OcrRequestDaoImplTest {
                 dao.listOCRRequestsByUser("0", startCursor);
         Result<OcrRequest> resultFor1 =
                 dao.listOCRRequestsByUser("1", startCursor);
-        Assert.assertTrue(resultFor0.result.size() == 1);
-        Assert.assertTrue(resultFor1.result.size() == 2);
+        Assert.assertEquals(1, resultFor0.result.size());
+        Assert.assertEquals(2, resultFor1.result.size());
         //END test status and result size
     }
 
@@ -146,13 +146,13 @@ public class OcrRequestDaoImplTest {
         Result<OcrRequest> resultFirstPart =
                 dao.listOCRRequestsByUser("0", null);
 
-        Assert.assertTrue(resultFirstPart.result.size() == 12);
+        Assert.assertEquals(12, resultFirstPart.result.size());
         String endCursorFirst = resultFirstPart.cursor;
-        Assert.assertTrue(endCursorFirst != null);
+        Assert.assertNotNull(endCursorFirst);
 
         Result<OcrRequest> resultSecondPart =
                 dao.listOCRRequestsByUser("0", endCursorFirst);
-        Assert.assertTrue(resultSecondPart.result.size() == 12);
+        Assert.assertEquals(12, resultSecondPart.result.size());
         String endCursorSecond = resultSecondPart.cursor;
         Assert.assertNotNull(endCursorSecond);
         Assert.assertNotEquals(endCursorSecond, endCursorFirst);
@@ -172,7 +172,7 @@ public class OcrRequestDaoImplTest {
             Assert.assertEquals(result.result.get(i).getStatus(), "OK");
         }
 
-        Assert.assertTrue(result.result.size() == 2);
+        Assert.assertEquals(2, result.result.size());
     }
 
     @Test
@@ -220,7 +220,7 @@ public class OcrRequestDaoImplTest {
         return addRequestToDb(createdById, OcrResponse.Status.OK.name());
     }
 
-    private String getTestCapturedLog() throws IOException {
+    private String getTestCapturedLog() {
         customLogHandler.flush();
         return logCapturingStream.toString();
     }

@@ -58,16 +58,15 @@ public class OcrRequestManager {
         }
     }
 
-    public OcrResponse process() {
-
+    OcrResponse process() {
         OcrResponse response = new OcrResponse();
         try {
-            OcrData ocrResult = processForOcrResult();
-            OcrData.Status ocrStatus = ocrResult.getStatus();
+            OcrData ocrData = processForOcrResult();
+            OcrData.Status ocrStatus = ocrData.getStatus();
             switch (ocrStatus) {
                 case OK:
                     response.setStatus(OcrResponse.Status.OK);
-                    writeResponse(ocrResult, response);
+                    writeResponse(ocrData, response);
                     break;
                 case TEXT_NOT_FOUND:
                     response.setStatus(OcrResponse.Status.TEXT_NOT_FOUND);
@@ -93,9 +92,11 @@ public class OcrRequestManager {
         return response;
     }
 
-    //todo refactor for better reading
     private void writeResponse(OcrData data, OcrResponse response) {
-        PdfBuilderOutputData pdfBuilderOutputData = writeOcrResult(data, response);
+        PdfBuilderOutputData pdfBuilderOutputData = makePdf(data.getPdfBuilderInputData());
+        OcrResult ocrResult = generateOcrResult(pdfBuilderOutputData, data);
+        response.setOcrResult(ocrResult);
+
         writeStatus(response, pdfBuilderOutputData);
     }
 
@@ -121,22 +122,18 @@ public class OcrRequestManager {
         }
     }
 
-    private PdfBuilderOutputData writeOcrResult(OcrData data, OcrResponse response) {
-        PdfBuilderOutputData pdfBuilderOutputData = makePdf(data.getPdfBuilderInputData());
+    private OcrResult generateOcrResult(PdfBuilderOutputData pdfBuilderOutputData, OcrData data) {
         String pdfGsUrl = pdfBuilderOutputData.getGsUrl();
         String pdfMediaUrl = pdfBuilderOutputData.getMediaUrl();
 
         String sourceImageUrl = getSourceImageUrl();
-        OcrResult ocrResult = new OcrResult.Builder()
+        return new OcrResult.Builder()
                 .textResult(data.getSimpleText())
                 .pdfResultMediaUrl(pdfMediaUrl)
                 .pdfResultGsUrl(pdfGsUrl)
                 .languages(languages)
                 .sourceImageUrl(sourceImageUrl)
                 .build();
-
-        response.setOcrResult(ocrResult);
-        return pdfBuilderOutputData;
     }
 
     private void addToDb(OcrResponse response) {
@@ -162,21 +159,17 @@ public class OcrRequestManager {
                         .timeStamp(ocrResult.getTimeStamp())
                         .build());
 
-        logger.log(INFO, "Data saved in DB, entity id = " + requestId);
+        logger.log(INFO, "OcrReques data saved in DB, entity id = " + requestId);
     }
 
     private String getSourceImageUrl() {
-        String inputImageUrl;
-        inputImageUrl = gcsImageUri;
-        return inputImageUrl;
+        return gcsImageUri;
     }
 
-    private OcrData processForOcrResult()
-            throws IOException, GeneralSecurityException {
+    private OcrData processForOcrResult() throws IOException, GeneralSecurityException {
 
         OCRProcessor processor = new OcrProcessorImpl();
-        OcrData ocrData;
-        ocrData = processor.ocrForData(gcsImageUri, languages);
+        OcrData ocrData = processor.ocrForData(gcsImageUri, languages);
         logger.log(INFO, "ocr result obtained");
         return ocrData;
     }
