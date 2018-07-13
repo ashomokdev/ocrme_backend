@@ -1,5 +1,6 @@
 package ocrme_backend.file_builder.pdfbuilder;
 
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import ocrme_backend.servlets.ocr.OcrData;
@@ -11,15 +12,16 @@ import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static ocrme_backend.utils.FileProvider.*;
+import static ocrme_backend.utils.FileProvider.getFontAsStream;
+import static ocrme_backend.utils.FileProvider.getPathToTemp;
 import static ocrme_backend.utils.PdfBuilderInputDataProvider.ocrForData;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,7 +38,7 @@ public class PDFBuilderImplTest {
     private String a4FileName = "a4.jpg";
     private String columnsFileName = "columns.png";
     private String columns_90 = "columns_90.png";
-    private String columns_180= "columns_180.png";
+    private String columns_180 = "columns_180.png";
     private String columns_270 = "columns_270.png";
     private String rusFilename = "rus.jpg";
     private String cut_meFilename = "cut_me.jpg";
@@ -205,7 +207,6 @@ public class PDFBuilderImplTest {
     /**
      * test build pdf from PdfBuilderInputData
      *
-     *
      * @param imageFileName
      * @param data
      * @throws IOException
@@ -213,6 +214,22 @@ public class PDFBuilderImplTest {
     private String testBuildPdf(String imageFileName, PdfBuilderInputData data) throws IOException {
         ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data);
 
+        return saveFileForPath(imageFileName, stream);
+    }
+
+    /**
+     * test build pdf from byte[]
+     *
+     * @param data
+     * @throws IOException
+     */
+    private String testBuildPdf(String imageFileName, byte[] data) throws IOException, DocumentException {
+        ByteArrayOutputStream stream = pdfBuilder.buildPdfStream(data);
+
+        return saveFileForPath(imageFileName, stream);
+    }
+
+    private String saveFileForPath(String imageFileName, ByteArrayOutputStream stream) throws IOException {
         String pdfFileName = imageFileName + ".pdf";
         File destination = new File(getPathToTemp(), pdfFileName);
         try (OutputStream outputStream = new FileOutputStream(destination)) {
@@ -222,7 +239,7 @@ public class PDFBuilderImplTest {
 
         testFileExistsAndNotEmpty(path);
         imageLocalPathArray.add(path);
-        return  path;
+        return path;
     }
 
     /**
@@ -263,5 +280,11 @@ public class PDFBuilderImplTest {
             allText = PdfTextExtractor.getTextFromPage(reader, page);
         }
         return allText.contains(text);
+    }
+
+    @Test
+    public void buildPdfStream() throws IOException, DocumentException {
+        byte[] bytes = FileProvider.getImageAsStream().toByteArray();
+        testBuildPdf("img.jpg", bytes);
     }
 }

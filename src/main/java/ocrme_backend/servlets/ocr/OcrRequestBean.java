@@ -6,7 +6,7 @@ package ocrme_backend.servlets.ocr;
 public class OcrRequestBean {
     private String[] languages;
 
-    private String gcsImageUri;
+    private String gcsImageUri; //example "gs://ocrme-77a2b.appspot.com/ocr_request_images/000c121b-357d-4ac0-a3f2-24e0f6d5cea185dffb40-e754-478f-b5b7-850fab211438.jpg"
 
     private String idTokenString;
 

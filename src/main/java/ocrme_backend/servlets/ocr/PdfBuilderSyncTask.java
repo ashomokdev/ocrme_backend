@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * builds pdf and save in Google cloud storage
  */
 public class PdfBuilderSyncTask {
-    public static final String BUCKET_FOR_PDFS_PARAMETER = "ocrme.bucket.pdf";
+    public static final String BUCKET_FOR_PDFS_PARAMETER = "ocrme.bucket";
     public static final String DIRECTORY_FOR_PDFS_PARAMETER = "ocrme.dir.pdf";
     private static Logger logger;
     private HttpSession session;
@@ -72,7 +72,7 @@ public class PdfBuilderSyncTask {
     }
 
 
-    private FileUploadedResult uploadToGoogleStorage(byte[] file) throws Exception {
+    private FileUploadedResult uploadToGoogleStorage(byte[] file) {
         String fileName = "file.pdf";
         FileUploadedResult result;
         try {
@@ -113,10 +113,10 @@ public class PdfBuilderSyncTask {
         return (allText == null) || allText.length() < 1;
     }
 
-    public class TextNotFoundException extends Exception {
+    private class TextNotFoundException extends Exception {
     }
 
-    public class LanguageNotSupportedException extends Exception {
+    private class LanguageNotSupportedException extends Exception {
     }
 
     private class FileUploadedResult {

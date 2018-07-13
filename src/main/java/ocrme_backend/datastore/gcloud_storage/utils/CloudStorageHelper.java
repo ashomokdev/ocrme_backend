@@ -17,17 +17,17 @@
 package ocrme_backend.datastore.gcloud_storage.utils;
 
 import com.google.api.gax.paging.Page;
-import com.google.auth.Credentials;
 import com.google.auth.appengine.AppEngineCredentials;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.ReadChannel;
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
 import com.google.cloud.storage.Acl.Role;
 import com.google.cloud.storage.Acl.User;
 import org.apache.commons.fileupload.FileItemStream;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletException;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -35,7 +35,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Level;
@@ -155,6 +154,65 @@ public class CloudStorageHelper {
         logger.log(Level.INFO, "File uploaded as " + destinationFilename);
 
         return blob;
+    }
+
+    @Nullable
+    byte[] downloadFile(String gcsUri) throws IOException {
+        Blob blob = getBlob(gcsUri);
+
+        ReadChannel reader;
+        byte[] result = null;
+        if (blob != null) {
+            reader = blob.reader();
+            ByteBuffer bytes = ByteBuffer.allocate(64 * 1024);
+
+            while (reader.read(bytes) > 0) {
+                bytes.flip();
+                result = bytes.array();
+                bytes.clear();
+            }
+
+        }
+        return result;
+    }
+
+    @Nullable
+    Blob getBlob(String gcsUri) {
+        //gcsUri is "gs://" + blob.getBucket() + "/" + blob.getName(),
+        //example "gs://ocrme-77a2b.appspot.com/ocr_request_images/000c121b-357d-4ac0-a3f2-24e0f6d5cea185dffb40-e754-478f-b5b7-850fab211438.jpg"
+
+        String bucketName = parseGcsUriForBucketName(gcsUri);
+        String fileName = parseGcsUriForFilename(gcsUri);
+
+        if (bucketName != null && fileName != null) {
+            return storage.get(BlobId.of(bucketName, fileName));
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    String parseGcsUriForFilename(String gcsUri) {
+        String fileName = null;
+        String prefix = "gs://";
+        if (gcsUri.startsWith(prefix)) {
+            int startIndexForBucket = gcsUri.indexOf(prefix) + prefix.length() + 1;
+            int startIndex = gcsUri.indexOf("/", startIndexForBucket) + 1;
+            fileName = gcsUri.substring(startIndex);
+        }
+        return fileName;
+    }
+
+    @Nullable
+    String parseGcsUriForBucketName(String gcsUri) {
+        String bucketName = null;
+        String prefix = "gs://";
+        if (gcsUri.startsWith(prefix)) {
+            int startIndex = gcsUri.indexOf(prefix) + prefix.length();
+            int endIndex = gcsUri.indexOf("/", startIndex);
+            bucketName = gcsUri.substring(startIndex, endIndex);
+        }
+        return bucketName;
     }
 
     /**

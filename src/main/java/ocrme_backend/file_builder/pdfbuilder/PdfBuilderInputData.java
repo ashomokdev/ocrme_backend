@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class PdfBuilderInputData {
 
+    //todo use max height and width to save space - create and add reduseSize method call after reorganizePoints();
     public static final float maxHeightAllowed = PageSize.A4.getHeight();
     public static final float maxWidthAllowed = PageSize.A4.getWidth();
 
@@ -63,7 +64,7 @@ public class PdfBuilderInputData {
             }
 
             //check if text goes out of boundaries
-            float boundariesSize = (maxLly - minUry) / 8;
+            float boundariesSize = (maxLly - minUry) / 8; //1/8 of image size
             float dx = boundariesSize - minLlx; //if dx > 0 - text out of boundaries (closed to edges or non visible,
             // otherwise text is too far from boundaries - image should be cut )
             float dy = boundariesSize - minUry; //if dy > 0 - text out of boundaries (closed to edges or non visible,

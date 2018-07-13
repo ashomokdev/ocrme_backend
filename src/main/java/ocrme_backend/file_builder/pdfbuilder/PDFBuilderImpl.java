@@ -1,9 +1,10 @@
 package ocrme_backend.file_builder.pdfbuilder;
 
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.*;
 import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nullable;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -33,32 +35,46 @@ public class PDFBuilderImpl implements PDFBuilder {
     }
 
     /**
-     * Bapp engine did not support writing to file system. Use buildPdfStream instead.
-     *
-     * @param data
-     * @return path
+     * @param bytes - file bytes
+     * @return ByteArrayOutputStream stream
      */
     @Nullable
     @Override
-    @Deprecated
-    public String buildPdfFile(PdfBuilderInputData data) {
+    //todo reduce image byte[] first using imaje reducing java library (not itext)
+    public ByteArrayOutputStream buildPdfStream(byte[] bytes) throws IOException, DocumentException {
 
-        String filename = generateFileName();
-        String path = createTempFile(filename);
+        Image image = scaleToA4(Image.getInstance(bytes));
+        image.setAbsolutePosition(0, 0);
+        image.setBorderWidth(0);
 
-        Document document = new Document(new Rectangle(data.getmWidth(), data.getmHeight())); //specified size  Document doc = new Document(new Rectangle(570, 924f)); http://developers.itextpdf.com/question/how-add-text-inside-rectangle
-        try {
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(path));
-            document.open();
-            addMetaData(document);
-            addContent(writer, data.getText());
-            document.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        float width = image.getScaledWidth();
+        float height =  image.getScaledHeight();
+        Document document = new Document(new RectangleReadOnly(width, height));
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        PdfWriter pdfWriter = PdfWriter.getInstance(document, stream);
+        pdfWriter.setFullCompression();
+        document.open();
+        document.add(image);
+        document.close();
+
+        return stream;
+    }
+
+    private Image scaleToA4(Image image) {
+        float inputWidth = image.getWidth();
+        float inputHeight = image.getHeight();
+
+        float maxDimension = inputHeight > inputWidth ? inputHeight : inputWidth;
+        float maxDimensionA4 = PageSize.A4.getHeight();
+
+        float scaleCoefficient = maxDimension / maxDimensionA4;
+        boolean needReduceSize = scaleCoefficient > 1;
+        if (needReduceSize) {
+            inputHeight = inputHeight / scaleCoefficient;
+            inputWidth = inputWidth / scaleCoefficient;
+            image.scaleToFit(new RectangleReadOnly(inputWidth, inputHeight));
         }
-
-        return path;
+        return image;
     }
 
     /**
@@ -84,7 +100,7 @@ public class PDFBuilderImpl implements PDFBuilder {
     }
 
     /**
-     * add simple string to Pdf file
+     * add simple string to newly created Pdf file
      *
      * @param path of pdf file
      */

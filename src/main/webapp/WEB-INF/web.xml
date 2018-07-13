@@ -55,8 +55,8 @@
   </context-param>
 
   <context-param>
-    <param-name>ocrme.bucket.pdf</param-name>
-    <param-value>${ocrme.bucket.pdf}</param-value>
+    <param-name>ocrme.bucket</param-name>
+    <param-value>${ocrme.bucket}</param-value>
   </context-param>
 
   <context-param>
