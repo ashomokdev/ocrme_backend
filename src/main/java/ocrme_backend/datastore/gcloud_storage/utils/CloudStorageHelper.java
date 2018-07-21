@@ -171,7 +171,6 @@ public class CloudStorageHelper {
                 result = bytes.array();
                 bytes.clear();
             }
-
         }
         return result;
     }

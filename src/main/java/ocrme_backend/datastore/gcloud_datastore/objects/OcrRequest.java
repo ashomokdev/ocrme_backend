@@ -19,6 +19,8 @@ public class OcrRequest implements Serializable {
     public static final String TEXT_RESULT = "textResult";
     public static final String PDF_RESULT_GS_URL = "pdfResultGsUrl";
     public static final String PDF_RESULT_MEDIA_URL = "pdfResultMediaUrl";
+    public static final String PDF_IMAGE_RESULT_GS_URL = "pdfImageResultGsUrl";
+    public static final String PDF_IMAGE_RESULT_MEDIA_URL = "pdfImageResultMediaUrl";
     public static final String ID = "id";
     public static final String TIME_STAMP = "timeStamp";
     public static final String CREATED_BY_ID = "createdById";
@@ -31,6 +33,8 @@ public class OcrRequest implements Serializable {
     private Text textResult;
     private String pdfResultGsUrl;
     private String pdfResultMediaUrl;
+    private String pdfImageResultGsUrl;
+    private String pdfImageResultMediaUrl;
     private Long id;
     private String timeStamp;
     private String createdBy;
@@ -44,6 +48,8 @@ public class OcrRequest implements Serializable {
         this.textResult = builder.textResult;
         this.pdfResultGsUrl = builder.pdfResultGsUrl;
         this.pdfResultMediaUrl = builder.pdfResultMediaUrl;
+        this.pdfImageResultGsUrl = builder.pdfImageResultGsUrl;
+        this.pdfImageResultMediaUrl = builder.pdfImageResultMediaUrl;
         this.id = builder.id;
         this.createdBy = builder.createdBy;
         this.createdById = builder.createdById;
@@ -75,6 +81,14 @@ public class OcrRequest implements Serializable {
         return pdfResultMediaUrl;
     }
 
+    public String getPdfImageResultGsUrl() {
+        return pdfImageResultGsUrl;
+    }
+
+    public String getPdfImageResultMediaUrl() {
+        return pdfImageResultMediaUrl;
+    }
+
     public Long getId() {
         return id;
     }
@@ -103,6 +117,8 @@ public class OcrRequest implements Serializable {
                 ", textResult=" + textResult +
                 ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
                 ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
+                ", pdfImageResultGsUrl='" + pdfImageResultGsUrl + '\'' +
+                ", pdfImageResultMediaUrl='" + pdfImageResultMediaUrl + '\'' +
                 ", id=" + id +
                 ", timeStamp='" + timeStamp + '\'' +
                 ", createdBy='" + createdBy + '\'' +
@@ -111,12 +127,15 @@ public class OcrRequest implements Serializable {
                 '}';
     }
 
+
     public static class Builder {
         private String inputImageUrl;
         private List<String> languages;
         private Text textResult;
         private String pdfResultGsUrl;
         private String pdfResultMediaUrl;
+        private String pdfImageResultGsUrl;
+        private String pdfImageResultMediaUrl;
         private Long id;
         private String createdBy;
         private String createdById;
@@ -145,6 +164,16 @@ public class OcrRequest implements Serializable {
 
         public Builder pdfResultMediaUrl(String pdfResultMediaUrl) {
             this.pdfResultMediaUrl = pdfResultMediaUrl;
+            return this;
+        }
+
+        public Builder pdfImageResultGsUrl(String pdfImageResultGsUrl) {
+            this.pdfImageResultGsUrl = pdfImageResultGsUrl;
+            return this;
+        }
+
+        public Builder pdfImageResultMediaUrl(String pdfImageResultMediaUrl) {
+            this.pdfImageResultMediaUrl = pdfImageResultMediaUrl;
             return this;
         }
 

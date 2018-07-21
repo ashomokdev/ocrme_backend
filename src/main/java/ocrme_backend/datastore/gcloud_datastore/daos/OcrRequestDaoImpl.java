@@ -32,6 +32,8 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
                 .textResult(Optional.ofNullable(((Text) entity.getProperty(OcrRequest.TEXT_RESULT)).getValue()))
                 .pdfResultGsUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_GS_URL))
                 .pdfResultMediaUrl((String) entity.getProperty(OcrRequest.PDF_RESULT_MEDIA_URL))
+                .pdfImageResultGsUrl((String) entity.getProperty(OcrRequest.PDF_IMAGE_RESULT_GS_URL))
+                .pdfImageResultMediaUrl((String) entity.getProperty(OcrRequest.PDF_IMAGE_RESULT_MEDIA_URL))
                 .createdBy((String) entity.getProperty(OcrRequest.CREATED_BY))
                 .createdById((String) entity.getProperty(OcrRequest.CREATED_BY_ID))
                 .timeStamp((String) entity.getProperty(OcrRequest.TIME_STAMP))
@@ -46,6 +48,8 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         entity.setProperty(OcrRequest.TEXT_RESULT, request.getTextResult());
         entity.setProperty(OcrRequest.PDF_RESULT_GS_URL, request.getPdfResultGsUrl());
         entity.setProperty(OcrRequest.PDF_RESULT_MEDIA_URL, request.getPdfResultMediaUrl());
+        entity.setProperty(OcrRequest.PDF_IMAGE_RESULT_GS_URL, request.getPdfImageResultGsUrl());
+        entity.setProperty(OcrRequest.PDF_IMAGE_RESULT_MEDIA_URL, request.getPdfImageResultMediaUrl());
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
         entity.setProperty(OcrRequest.CREATED_BY_ID, request.getCreatedById());
         entity.setProperty(OcrRequest.TIME_STAMP, request.getTimeStamp());
@@ -76,6 +80,8 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
         entity.setProperty(OcrRequest.TEXT_RESULT, request.getTextResult());
         entity.setProperty(OcrRequest.PDF_RESULT_GS_URL, request.getPdfResultGsUrl());
         entity.setProperty(OcrRequest.PDF_RESULT_MEDIA_URL, request.getPdfResultMediaUrl());
+        entity.setProperty(OcrRequest.PDF_IMAGE_RESULT_GS_URL, request.getPdfImageResultGsUrl());
+        entity.setProperty(OcrRequest.PDF_IMAGE_RESULT_MEDIA_URL, request.getPdfImageResultMediaUrl());
         entity.setProperty(OcrRequest.CREATED_BY, request.getCreatedBy());
         entity.setProperty(OcrRequest.CREATED_BY_ID, request.getCreatedById());
         entity.setProperty(OcrRequest.TIME_STAMP, request.getTimeStamp());

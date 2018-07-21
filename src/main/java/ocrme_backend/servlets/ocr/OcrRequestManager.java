@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.INFO;
+import static ocrme_backend.servlets.ocr.OcrData.Status.OK;
 import static ocrme_backend.utils.FirebaseAuthUtil.getUserEmail;
 import static ocrme_backend.utils.FirebaseAuthUtil.getUserId;
 
@@ -24,7 +25,7 @@ import static ocrme_backend.utils.FirebaseAuthUtil.getUserId;
 /**
  * Created by iuliia on 7/13/17.
  */
-public class OcrRequestManager {
+class OcrRequestManager {
     private final Logger logger = Logger.getLogger(OcrRequestManager.class.getName());
     private @Nullable
     String idTokenString;
@@ -33,22 +34,13 @@ public class OcrRequestManager {
     private String gcsImageUri; //download uri of image, stored in google cloud storage
 
     /**
-     * @param gcsImageUri download uri of image, stored in google cloud storage
-     * @param languages
-     * @param session
-     */
-    @Deprecated
-    public OcrRequestManager(String gcsImageUri, String[] languages, HttpSession session) {
-        this(null, gcsImageUri, languages, session);
-    }
-
-    /**
      * @param idTokenString for associate request with user. Docs https://developers.google.com/identity/sign-in/android/backend-auth
      * @param gcsImageUri   download uri of image, stored in google cloud storage
      * @param languages
      * @param session
      */
-    public OcrRequestManager(String idTokenString, String gcsImageUri, String[] languages, HttpSession session) {
+    OcrRequestManager(String idTokenString, String gcsImageUri, String[] languages,
+                      HttpSession session) {
         this.idTokenString = idTokenString;
         this.gcsImageUri = gcsImageUri;
         this.session = session;
@@ -63,24 +55,15 @@ public class OcrRequestManager {
         try {
             OcrData ocrData = processForOcrResult();
             OcrData.Status ocrStatus = ocrData.getStatus();
-            switch (ocrStatus) {
-                case OK:
-                    response.setStatus(OcrResponse.Status.OK);
-                    writeResponse(ocrData, response);
-                    break;
-                case TEXT_NOT_FOUND:
-                    response.setStatus(OcrResponse.Status.TEXT_NOT_FOUND);
-                    break;
-                case INVALID_LANGUAGE_HINTS:
-                    response.setStatus(OcrResponse.Status.INVALID_LANGUAGE_HINTS);
-                    break;
-                case UNKNOWN_ERROR:
-                    response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
-                    break;
-                default:
-                    logger.log(INFO, "Unexpected status received.");
-                    response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
-                    break;
+            if (ocrStatus.equals(OK)) {
+                response.setStatus(OcrResponse.Status.OK);
+
+                PdfBuilderOutputData pdfBuilderOutputData = makePdf(ocrData.getPdfBuilderInputData());
+                OcrResult ocrResult = createOcrResult(pdfBuilderOutputData, ocrData);
+                response.setOcrResult(ocrResult);
+                writePdfStatus(response, pdfBuilderOutputData);
+            } else {
+                processAsDefective(ocrStatus, response);
             }
         } catch (Exception e) {
             response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
@@ -92,15 +75,28 @@ public class OcrRequestManager {
         return response;
     }
 
-    private void writeResponse(OcrData data, OcrResponse response) {
-        PdfBuilderOutputData pdfBuilderOutputData = makePdf(data.getPdfBuilderInputData());
-        OcrResult ocrResult = generateOcrResult(pdfBuilderOutputData, data);
-        response.setOcrResult(ocrResult);
-
-        writeStatus(response, pdfBuilderOutputData);
+    private void processAsDefective(OcrData.Status ocrStatus, OcrResponse response) {
+        switch (ocrStatus) {
+            case OK:
+                response.setStatus(OcrResponse.Status.OK);
+                break;
+            case TEXT_NOT_FOUND:
+                response.setStatus(OcrResponse.Status.TEXT_NOT_FOUND);
+                break;
+            case INVALID_LANGUAGE_HINTS:
+                response.setStatus(OcrResponse.Status.INVALID_LANGUAGE_HINTS);
+                break;
+            case UNKNOWN_ERROR:
+                response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
+                break;
+            default:
+                logger.log(INFO, "Unexpected status received.");
+                response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
+                break;
+        }
     }
 
-    private void writeStatus(OcrResponse response, PdfBuilderOutputData pdfBuilderOutputData) {
+    private void writePdfStatus(OcrResponse response, PdfBuilderOutputData pdfBuilderOutputData) {
         PdfBuilderOutputData.Status status = pdfBuilderOutputData.getStatus();
         switch (status) {
             case OK:
@@ -122,7 +118,7 @@ public class OcrRequestManager {
         }
     }
 
-    private OcrResult generateOcrResult(PdfBuilderOutputData pdfBuilderOutputData, OcrData data) {
+    private OcrResult createOcrResult(PdfBuilderOutputData pdfBuilderOutputData, OcrData data) {
         String pdfGsUrl = pdfBuilderOutputData.getGsUrl();
         String pdfMediaUrl = pdfBuilderOutputData.getMediaUrl();
 
@@ -154,6 +150,8 @@ public class OcrRequestManager {
                         .createdBy(email)
                         .pdfResultGsUrl(ocrResult.getPdfResultGsUrl())
                         .pdfResultMediaUrl(ocrResult.getPdfResultMediaUrl())
+                        .pdfImageResultGsUrl(ocrResult.getPdfImageResultGsUrl())
+                        .pdfImageResultMediaUrl(ocrResult.getPdfImageResultMediaUrl())
                         .status(response.getStatus().name())
                         .textResult(Optional.ofNullable(ocrResult.getTextResult()))
                         .timeStamp(ocrResult.getTimeStamp())
@@ -167,7 +165,6 @@ public class OcrRequestManager {
     }
 
     private OcrData processForOcrResult() throws IOException, GeneralSecurityException {
-
         OCRProcessor processor = new OcrProcessorImpl();
         OcrData ocrData = processor.ocrForData(gcsImageUri, languages);
         logger.log(INFO, "ocr result obtained");

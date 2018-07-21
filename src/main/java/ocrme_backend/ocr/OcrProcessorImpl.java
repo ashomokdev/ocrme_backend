@@ -70,7 +70,7 @@ public class OcrProcessorImpl implements OCRProcessor {
      * @return Exif orientation (1 or 3 or 6 or 8)
      */
 
-    public static int getExifOrientation(EntityAnnotation ea) {
+    private static int getExifOrientation(EntityAnnotation ea) {
         List<Vertex> vertexList = ea.getBoundingPoly().getVertices();
         // Calculate the center
         float centerX = 0, centerY = 0;
@@ -171,6 +171,7 @@ public class OcrProcessorImpl implements OCRProcessor {
         return ocrForData(gcsImageUri, null);
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public OcrData ocrForData(String gcsImageUri, @Nullable List<String> languages) {
         OcrData data;

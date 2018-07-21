@@ -16,21 +16,11 @@ public class OcrResult implements Serializable {
     private String textResult;
     private String pdfResultGsUrl;
     private String pdfResultMediaUrl;
+    private String pdfImageResultGsUrl;
+    private String pdfImageResultMediaUrl;
     private Long id;
     private String timeStamp;
 
-    @Override
-    public String toString() {
-        return "OcrResult{" +
-                "sourceImageUrl='" + sourceImageUrl + '\'' +
-                ", languages=" + languages +
-                ", textResult='" + textResult + '\'' +
-                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
-                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
-                ", id=" + id +
-                ", timeStamp='" + timeStamp + '\'' +
-                '}';
-    }
 
     private OcrResult(Builder builder) {
         this.sourceImageUrl = builder.inputImageUrl;
@@ -38,6 +28,8 @@ public class OcrResult implements Serializable {
         this.textResult = builder.textResult;
         this.pdfResultGsUrl = builder.pdfResultGsUrl;
         this.pdfResultMediaUrl = builder.pdfResultMediaUrl;
+        this.pdfImageResultGsUrl = builder.pdfImageResultGsUrl;
+        this.pdfImageResultMediaUrl = builder.pdfImageResultMediaUrl;
         this.id = builder.id;
         String timeStamp = builder.timeStamp;
         if (timeStamp == null) {
@@ -66,12 +58,35 @@ public class OcrResult implements Serializable {
         return pdfResultMediaUrl;
     }
 
+    public String getPdfImageResultGsUrl() {
+        return pdfImageResultGsUrl;
+    }
+
+    public String getPdfImageResultMediaUrl() {
+        return pdfImageResultMediaUrl;
+    }
+
     public Long getId() {
         return id;
     }
 
     public String getTimeStamp() {
         return timeStamp;
+    }
+
+    @Override
+    public String toString() {
+        return "OcrResult{" +
+                "sourceImageUrl='" + sourceImageUrl + '\'' +
+                ", languages=" + languages +
+                ", textResult='" + textResult + '\'' +
+                ", pdfResultGsUrl='" + pdfResultGsUrl + '\'' +
+                ", pdfResultMediaUrl='" + pdfResultMediaUrl + '\'' +
+                ", pdfImageResultGsUrl='" + pdfImageResultGsUrl + '\'' +
+                ", pdfImageResultMediaUrl='" + pdfImageResultMediaUrl + '\'' +
+                ", id=" + id +
+                ", timeStamp='" + timeStamp + '\'' +
+                '}';
     }
 
 
@@ -81,6 +96,8 @@ public class OcrResult implements Serializable {
         private String textResult;
         private String pdfResultGsUrl;
         private String pdfResultMediaUrl;
+        private String pdfImageResultGsUrl;
+        private String pdfImageResultMediaUrl;
         private Long id;
         private String timeStamp;
 
@@ -109,6 +126,16 @@ public class OcrResult implements Serializable {
             return this;
         }
 
+        Builder pdfImageResultGsUrl(String pdfImageResultGsUrl) {
+            this.pdfImageResultGsUrl = pdfImageResultGsUrl;
+            return this;
+        }
+
+        Builder pdfImageResultMediaUrl(String pdfImageResultMediaUrl) {
+            this.pdfImageResultMediaUrl = pdfImageResultMediaUrl;
+            return this;
+        }
+
         Builder id(Long id) {
             this.id = id;
             return this;
@@ -132,6 +159,8 @@ public class OcrResult implements Serializable {
                     .textResult(ocrRequest.getTextResult().getValue())
                     .pdfResultGsUrl(ocrRequest.getPdfResultGsUrl())
                     .pdfResultMediaUrl(ocrRequest.getPdfResultMediaUrl())
+                    .pdfImageResultGsUrl(ocrRequest.getPdfImageResultGsUrl())
+                    .pdfImageResultMediaUrl(ocrRequest.getPdfImageResultMediaUrl())
                     .id(ocrRequest.getId())
                     .timeStamp(ocrRequest.getTimeStamp())
                     .build();
