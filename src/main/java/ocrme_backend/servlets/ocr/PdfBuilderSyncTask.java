@@ -10,6 +10,8 @@ import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData.Status;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,20 +22,32 @@ import java.util.logging.Logger;
  * Created by iuliia on 7/13/17.
  * builds pdf and save in Google cloud storage
  */
-public class PdfBuilderSyncTask {
+
+//todo inject session using di framework
+class PdfBuilderSyncTask {
     public static final String BUCKET_FOR_PDFS_PARAMETER = "ocrme.bucket";
     public static final String DIRECTORY_FOR_PDFS_PARAMETER = "ocrme.dir.pdf";
     private static Logger logger;
+    @Nonnull
     private HttpSession session;
+    @Nullable
     private PdfBuilderInputData data;
+    @Nullable
+    private String gcsImageUri;
 
-    public PdfBuilderSyncTask(PdfBuilderInputData data, HttpSession session) {
+    PdfBuilderSyncTask(PdfBuilderInputData data, HttpSession session) {
         this.data = data;
         this.session = session;
         logger = Logger.getLogger(PdfBuilderSyncTask.class.getName());
     }
 
-    public PdfBuilderOutputData execute() {
+    PdfBuilderSyncTask(String gcsImageUri, HttpSession session) {
+        this.gcsImageUri = gcsImageUri;
+        this.session = session;
+        logger = Logger.getLogger(PdfBuilderSyncTask.class.getName());
+    }
+
+    PdfBuilderOutputData execute() {
         PdfBuilderOutputData result = new PdfBuilderOutputData();
         try {
             FileUploadedResult fileUploadedResult = buildPdf();
@@ -56,18 +70,43 @@ public class PdfBuilderSyncTask {
     }
 
     private FileUploadedResult buildPdf() throws Exception {
+        if (gcsImageUri != null) {
+            return buildImagePdf(gcsImageUri);
+        } else if (data != null) {
+            return buildTextPdf(data);
+        } else {
+            throw new Exception("Error: Wrong input data for building Pdf.");
+        }
+    }
 
+    private FileUploadedResult buildImagePdf(String gcsImageUri) throws Exception {
+        if (gcsImageUri == null || gcsImageUri.isEmpty()) {
+            throw new Exception("Error. gcsImageUri == null or empty");
+        } else {
+            byte[] imageBytes = new CloudStorageHelper().downloadFile(gcsImageUri);
+            if (imageBytes != null) {
+                PDFBuilderImpl pdfBuilder = new PDFBuilderImpl(session);
+                ByteArrayOutputStream outputStream = pdfBuilder.buildPdfStream(imageBytes);
+
+                if (outputStream == null) {
+                    throw new Exception("Can not build pdf from image for some reason");
+                }
+                return uploadToGoogleStorage(outputStream.toByteArray());
+            }
+        }
+        return null;
+    }
+
+    private FileUploadedResult buildTextPdf(PdfBuilderInputData data) throws TextNotFoundException, LanguageNotSupportedException {
         if (data.getText() == null || data.getText().size() == 0) {
             throw new TextNotFoundException();
         }
-
         PDFBuilder pdfBuilder = new PDFBuilderImpl(session);
         ByteArrayOutputStream outputStream = pdfBuilder.buildPdfStream(data);
 
-        if (isFileEmpty(outputStream)) {
+        if (outputStream != null && isFileEmpty(outputStream)) {
             throw new LanguageNotSupportedException();
         }
-
         return uploadToGoogleStorage(outputStream.toByteArray());
     }
 

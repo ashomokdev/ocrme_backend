@@ -57,7 +57,7 @@ public class CloudStorageHelperTest {
     }
 
     @Test
-    public void deleteBucket() throws Exception {
+    public void deleteBucket() {
         helper.createBucket(bucketName);
         helper.deleteBucket(bucketName);
 
@@ -124,7 +124,7 @@ public class CloudStorageHelperTest {
     }
 
     @Test
-    public void downloadFile() throws IOException {
+    public void testParsers(){
         //parse real url and check
         String gcsImageUri = "gs://ocrme-77a2b.appspot.com/ocr_request_images/000c121b-357d-4ac0-a3f2-24e0f6d5cea185dffb40-e754-478f-b5b7-850fab211438.jpg";
 
@@ -133,13 +133,18 @@ public class CloudStorageHelperTest {
 
         Assert.assertEquals("ocr_request_images/000c121b-357d-4ac0-a3f2-24e0f6d5cea185dffb40-e754-478f-b5b7-850fab211438.jpg", filename);
         Assert.assertEquals("ocrme-77a2b.appspot.com", bucketName);
+    }
+
+    @Test
+    public void downloadFile() throws IOException {
 
         //crete mock blob
         helper.createBucket(bucketName);
+
         ByteArrayOutputStream stream = FileProvider.getImageAsStream();
         String url = helper.uploadFile(FileUtils.toInputStream(stream), "filename.jpg", bucketName);
         Blob mockBlob = helper.uploadFileForBlob(
-                stream.toByteArray(), "filename.jpg", "directoryName", bucketName);
+                stream.toByteArray(), "filename.jpg", "test", bucketName);
 
         when(helper.getBlob(url)).thenReturn(mockBlob);
 

@@ -157,7 +157,7 @@ public class CloudStorageHelper {
     }
 
     @Nullable
-    byte[] downloadFile(String gcsUri) throws IOException {
+    public byte[] downloadFile(String gcsUri) throws IOException {
         Blob blob = getBlob(gcsUri);
 
         ReadChannel reader;

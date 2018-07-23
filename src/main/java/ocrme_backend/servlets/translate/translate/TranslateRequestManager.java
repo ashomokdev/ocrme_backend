@@ -193,7 +193,7 @@ public class TranslateRequestManager {
                         .timeStamp(translateResult.getTimeStamp())
                         .build());
 
-        logger.log(INFO, "OcrReques data saved in DB, entity id = " + requestId);
+        logger.log(INFO, "Translate Requests data saved in DB, entity id = " + requestId);
     }
 
     public static class RequestBody {

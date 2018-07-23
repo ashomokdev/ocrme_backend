@@ -17,10 +17,9 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.INFO;
-import static ocrme_backend.servlets.ocr.OcrData.Status.OK;
+import static java.util.logging.Level.WARNING;
 import static ocrme_backend.utils.FirebaseAuthUtil.getUserEmail;
 import static ocrme_backend.utils.FirebaseAuthUtil.getUserId;
-
 
 /**
  * Created by iuliia on 7/13/17.
@@ -55,19 +54,38 @@ class OcrRequestManager {
         try {
             OcrData ocrData = processForOcrResult();
             OcrData.Status ocrStatus = ocrData.getStatus();
-            if (ocrStatus.equals(OK)) {
+            if (ocrStatus.equals(OcrData.Status.OK)) {
                 response.setStatus(OcrResponse.Status.OK);
 
-                PdfBuilderOutputData pdfBuilderOutputData = makePdf(ocrData.getPdfBuilderInputData());
-                OcrResult ocrResult = createOcrResult(pdfBuilderOutputData, ocrData);
+                PdfBuilderOutputData textPdfData =
+                        makePdf(ocrData.getPdfBuilderInputData());
+                String textPdfGsUrl = textPdfData.getGsUrl();
+                String textPdfMediaUrl = textPdfData.getMediaUrl();
+
+                PdfBuilderOutputData imagePdfData = makePdf(gcsImageUri);
+                String imagePdfGsUrl = imagePdfData.getGsUrl();
+                String imagePdfMediaUrl = imagePdfData.getMediaUrl();
+
+                OcrResult ocrResult = new OcrResult.Builder()
+                        .textResult(ocrData.getSimpleText())
+                        .pdfResultMediaUrl(textPdfMediaUrl)
+                        .pdfResultGsUrl(textPdfGsUrl)
+                        .pdfImageResultGsUrl(imagePdfGsUrl)
+                        .pdfImageResultMediaUrl(imagePdfMediaUrl)
+                        .languages(languages)
+                        .sourceImageUrl(gcsImageUri)
+                        .build();
+
                 response.setOcrResult(ocrResult);
-                writePdfStatus(response, pdfBuilderOutputData);
+                writePdfStatus(response, textPdfData, imagePdfData);
+
             } else {
                 processAsDefective(ocrStatus, response);
             }
         } catch (Exception e) {
             response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
             e.printStackTrace();
+            logger.log(WARNING, "Error: " + e.getMessage());
         } finally {
             addToDb(response);
         }
@@ -96,40 +114,30 @@ class OcrRequestManager {
         }
     }
 
-    private void writePdfStatus(OcrResponse response, PdfBuilderOutputData pdfBuilderOutputData) {
-        PdfBuilderOutputData.Status status = pdfBuilderOutputData.getStatus();
-        switch (status) {
-            case OK:
-                response.setStatus(OcrResponse.Status.OK);
-                break;
-            case PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED:
-                response.setStatus(OcrResponse.Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED);
-                break;
-            case PDF_CAN_NOT_BE_CREATED_EMPTY_DATA:
-                response.setStatus(OcrResponse.Status.TEXT_NOT_FOUND);
-                break;
-            case UNKNOWN_ERROR:
-                response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
-                break;
-            default:
-                response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
-                logger.log(INFO, "Unexpected status received.");
-                break;
+    private void writePdfStatus(OcrResponse response,
+                                PdfBuilderOutputData textPdfData,
+                                PdfBuilderOutputData imagePdfData) {
+
+        PdfBuilderOutputData.Status textPdfStatus = textPdfData.getStatus();
+        PdfBuilderOutputData.Status imagePdfStatus = imagePdfData.getStatus();
+
+        if (textPdfStatus.equals(PdfBuilderOutputData.Status.OK) &&
+                imagePdfStatus.equals(PdfBuilderOutputData.Status.OK)) {
+            response.setStatus(OcrResponse.Status.OK);
+        } else if (textPdfStatus.equals(PdfBuilderOutputData.Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED) ||
+                imagePdfStatus.equals(PdfBuilderOutputData.Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED)) {
+            response.setStatus(OcrResponse.Status.PDF_CAN_NOT_BE_CREATED_LANGUAGE_NOT_SUPPORTED);
+        } else if (textPdfStatus.equals(PdfBuilderOutputData.Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA) ||
+                imagePdfStatus.equals(PdfBuilderOutputData.Status.PDF_CAN_NOT_BE_CREATED_EMPTY_DATA)) {
+            response.setStatus(OcrResponse.Status.TEXT_NOT_FOUND);
+        } else if (textPdfStatus.equals(PdfBuilderOutputData.Status.UNKNOWN_ERROR) ||
+                imagePdfStatus.equals(PdfBuilderOutputData.Status.UNKNOWN_ERROR)) {
+            response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
         }
-    }
-
-    private OcrResult createOcrResult(PdfBuilderOutputData pdfBuilderOutputData, OcrData data) {
-        String pdfGsUrl = pdfBuilderOutputData.getGsUrl();
-        String pdfMediaUrl = pdfBuilderOutputData.getMediaUrl();
-
-        String sourceImageUrl = getSourceImageUrl();
-        return new OcrResult.Builder()
-                .textResult(data.getSimpleText())
-                .pdfResultMediaUrl(pdfMediaUrl)
-                .pdfResultGsUrl(pdfGsUrl)
-                .languages(languages)
-                .sourceImageUrl(sourceImageUrl)
-                .build();
+        else {
+            response.setStatus(OcrResponse.Status.UNKNOWN_ERROR);
+            logger.log(WARNING, "Unexpected status received.");
+        }
     }
 
     private void addToDb(OcrResponse response) {
@@ -160,10 +168,6 @@ class OcrRequestManager {
         logger.log(INFO, "OcrReques data saved in DB, entity id = " + requestId);
     }
 
-    private String getSourceImageUrl() {
-        return gcsImageUri;
-    }
-
     private OcrData processForOcrResult() throws IOException, GeneralSecurityException {
         OCRProcessor processor = new OcrProcessorImpl();
         OcrData ocrData = processor.ocrForData(gcsImageUri, languages);
@@ -175,7 +179,16 @@ class OcrRequestManager {
         PdfBuilderSyncTask pdfBuilderSyncTask = new PdfBuilderSyncTask(ocrResult, session);
         PdfBuilderOutputData pdfBuilderOutputData = pdfBuilderSyncTask.execute();
 
-        logger.log(INFO, "pdf file generation finished.");
+        logger.log(INFO, "text pdf file generation finished.");
+        return pdfBuilderOutputData;
+    }
+
+
+    private PdfBuilderOutputData makePdf(String gcsImageUri) {
+        PdfBuilderSyncTask pdfBuilderSyncTask = new PdfBuilderSyncTask(gcsImageUri, session);
+        PdfBuilderOutputData pdfBuilderOutputData = pdfBuilderSyncTask.execute();
+
+        logger.log(INFO, "image pdf file generation finished.");
         return pdfBuilderOutputData;
     }
 }

@@ -19,7 +19,7 @@ import java.io.IOException;
 
 //example "gs://bucket-for-requests-test/2017-07-26-12-37-36-806-2017-07-26-12-37-36-806-ru.jpg";
 
-public class OcrRequestServlet extends HttpServlet {
+public class OcrServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
 

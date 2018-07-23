@@ -72,6 +72,8 @@ public class OcrRequestDaoImplTest {
         Assert.assertEquals(1, (long) obtained.getId());
         Assert.assertEquals(obtained.getTextResult().getValue(), textResultExpected);
         Assert.assertEquals(obtained.getSourceImageUrl(), inputImageUrlExpected);
+        Assert.assertEquals(obtained.getPdfImageResultGsUrl(), "mock pdfImageResultGsUrl");
+        Assert.assertEquals(obtained.getPdfImageResultMediaUrl(), "mock pdfImageResultMediaUrl");
     }
 
     @Test
@@ -207,6 +209,8 @@ public class OcrRequestDaoImplTest {
                 .textResult(Optional.of(textResult))
                 .createdBy("bieliaievays@gmail.com")
                 .createdById(createdById)
+                .pdfImageResultGsUrl("mock pdfImageResultGsUrl")
+                .pdfImageResultMediaUrl("mock pdfImageResultMediaUrl")
                 .status(status)
                 .pdfResultGsUrl("new value")
                 .pdfResultMediaUrl("new value")

@@ -26,4 +26,21 @@ public class TranslateRequestBean {
     public String getSourceText() {
         return sourceText;
     }
+
+    public void setSourceLang(String sourceLang) {
+        this.sourceLang = sourceLang;
+    }
+
+    public void setTargetLang(String targetLang) {
+        this.targetLang = targetLang;
+    }
+
+    public void setSourceText(String sourceText) {
+        this.sourceText = sourceText;
+    }
+
+    public void setIdTokenString(@Nullable String idTokenString) {
+        this.idTokenString = idTokenString;
+    }
+
 }

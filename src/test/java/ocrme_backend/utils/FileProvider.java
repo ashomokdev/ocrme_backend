@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 public class FileProvider {
     public static String pathToSecretKeys = "secret_data/secret.properties";
 
-    private static final String gcsUriTestImage = "gs://ocrme-77a2b.appspot.com/test2/ru.jpg";
-    private static final String gcsUriTestEmptyImage = "gs://ocrme-77a2b.appspot.com/test2/Blank.jpg";
+    private static final String gcsUriTestImage = "gs://ocrme-77a2b.appspot.com/test/ru.jpg";
+    private static final String gcsUriTestEmptyImage = "gs://ocrme-77a2b.appspot.com/test/Blank.jpg";
     private static final String defaultFont = "FreeSans.ttf";
 
     public static String getTestImageByName(String filename) {

@@ -16,12 +16,12 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>OcrRequestServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.ocr.OcrRequestServlet</servlet-class>
+    <servlet-name>OcrServlet</servlet-name>
+    <servlet-class>ocrme_backend.servlets.ocr.OcrServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>OcrRequestServlet</servlet-name>
+    <servlet-name>OcrServlet</servlet-name>
     <url-pattern>/ocr_request</url-pattern>
   </servlet-mapping>
 

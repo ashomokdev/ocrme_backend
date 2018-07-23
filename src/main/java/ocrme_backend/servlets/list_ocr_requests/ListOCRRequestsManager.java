@@ -20,8 +20,7 @@ class ListOCRRequestsManager {
 
     private final Logger logger = Logger.getLogger(ListOCRRequestsManager.class.getName());
 
-    ListOCRRequestsManager() {
-    }
+    ListOCRRequestsManager() { }
 
     ListOCRResponse processForGet(String idTokenString, @Nullable String startCursor) {
         ListOCRResponse response = new ListOCRResponse();

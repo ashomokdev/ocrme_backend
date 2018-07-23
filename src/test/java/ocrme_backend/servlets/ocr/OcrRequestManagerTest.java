@@ -64,12 +64,15 @@ public class OcrRequestManagerTest {
         OcrResponse response2 = managerImageUri.process();
         Assert.assertTrue(response2.getOcrResult().getTextResult().length() > 0);
         Assert.assertTrue(response2.getOcrResult().getPdfResultGsUrl().length() > 0);
-        Assert.assertEquals(response2.getStatus(), OcrResponse.Status.OK);
+        Assert.assertTrue(response2.getOcrResult().getPdfResultMediaUrl().length() > 0);
+        Assert.assertTrue(response2.getOcrResult().getPdfImageResultMediaUrl().length() > 0);
+        Assert.assertTrue(response2.getOcrResult().getPdfImageResultGsUrl().length() > 0);
+        Assert.assertEquals(OcrResponse.Status.OK, response2.getStatus());
 
         OcrResponse response3 = managerNoLanguages.process();
         Assert.assertTrue(response3.getOcrResult().getTextResult().length() > 0);
         Assert.assertTrue(response3.getOcrResult().getPdfResultGsUrl().length() > 0);
-        Assert.assertEquals(response3.getStatus(), OcrResponse.Status.OK);
+        Assert.assertEquals( OcrResponse.Status.OK, response3.getStatus());
 
         OcrResponse response4 = managerLanguagesSet.process();
         Assert.assertNull(response4.getOcrResult());

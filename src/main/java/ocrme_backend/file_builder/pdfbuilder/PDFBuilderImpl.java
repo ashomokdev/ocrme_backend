@@ -40,7 +40,9 @@ public class PDFBuilderImpl implements PDFBuilder {
      */
     @Nullable
     @Override
-    //todo reduce image byte[] first using imaje reducing java library (not itext)
+    //todo reduce image byte[] first using image reducing java library (not itext)
+    // OR (better) reduce it on cliend side
+    //so gcsImageUri will store optimized image
     public ByteArrayOutputStream buildPdfStream(byte[] bytes) throws IOException, DocumentException {
 
         Image image = scaleToA4(Image.getInstance(bytes));

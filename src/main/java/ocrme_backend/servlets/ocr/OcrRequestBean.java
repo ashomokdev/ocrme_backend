@@ -21,4 +21,17 @@ public class OcrRequestBean {
     public String getIdTokenString() {
         return idTokenString;
     }
+
+    public void setLanguages(String[] languages) {
+        this.languages = languages;
+    }
+
+    public void setGcsImageUri(String gcsImageUri) {
+        this.gcsImageUri = gcsImageUri;
+    }
+
+    public void setIdTokenString(String idTokenString) {
+        this.idTokenString = idTokenString;
+    }
+
 }
