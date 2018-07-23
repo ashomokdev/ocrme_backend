@@ -148,6 +148,7 @@ public class OcrRequestDaoImpl implements OcrRequestDao {
      * @param startCursorString
      * @return
      */
+    @SuppressWarnings("Duplicates")
     @Override
     public Result<OcrRequest> listOCRRequestsByUser(String userId, String startCursorString) {
         FetchOptions fetchOptions = FetchOptions.Builder.withLimit(requestCountLimit); // Only show requestCountLimit at a time
