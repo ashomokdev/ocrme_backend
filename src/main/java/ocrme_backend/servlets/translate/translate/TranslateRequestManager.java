@@ -69,18 +69,33 @@ public class TranslateRequestManager {
             @Nonnull String targetLanguageCode,
             String sourceText) throws MalformedURLException {
 
-        String params = generateParams(sourceLanguageCode, targetLanguageCode);
-        URL url = new URL(host + path + params);
+        TranslateResponse response;
+        if (targetLanguageCode.equals(sourceLanguageCode)) {
+            //don't call api for translate
+            TranslateResult translateResult =
+                    new TranslateResult.Builder()
+                            .textResult(sourceText)
+                            .sourceLanguageCode(sourceLanguageCode)
+                            .targetLanguageCode(targetLanguageCode)
+                            .build();
+            response = new TranslateResponse();
+            response.setTranslateResult(translateResult);
+            response.setStatus(TranslateResponse.Status.OK);
+        } else {
+            String params = generateParams(sourceLanguageCode, targetLanguageCode);
+            URL url = new URL(host + path + params);
 
-        List<RequestBody> objList = new ArrayList<>();
-        objList.add(new RequestBody(sourceText));
-        String content = new Gson().toJson(objList);
+            List<RequestBody> objList = new ArrayList<>();
+            objList.add(new RequestBody(sourceText));
+            String content = new Gson().toJson(objList);
 
-        String jsonResult = postForTranslate(url, content);
+            String jsonResult = postForTranslate(url, content);
 
-        TranslateResponse response = generateTranslateResponse(jsonResult, sourceLanguageCode, targetLanguageCode);
+            response = generateTranslateResponse(jsonResult, sourceLanguageCode, targetLanguageCode);
+        }
         addToDb(response);
         return response;
+
     }
 
     private TranslateResponse generateTranslateResponse(
@@ -110,10 +125,10 @@ public class TranslateRequestManager {
 
                 TranslateResult translateResult =
                         new TranslateResult.Builder()
-                        .textResult(text)
-                        .sourceLanguageCode(sourceLanguageCode)
-                        .targetLanguageCode(targetLanguageCode)
-                        .build();
+                                .textResult(text)
+                                .sourceLanguageCode(sourceLanguageCode)
+                                .targetLanguageCode(targetLanguageCode)
+                                .build();
 
                 response.setTranslateResult(translateResult);
                 response.setStatus(TranslateResponse.Status.OK);
@@ -198,6 +213,7 @@ public class TranslateRequestManager {
 
     public static class RequestBody {
         String Text;
+
         public RequestBody(String text) {
             this.Text = text;
         }

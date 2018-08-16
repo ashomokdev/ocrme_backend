@@ -67,5 +67,21 @@ public class TranslateRequestManagerTest {
         assert (response2.getTranslateResult().getTextResult().equals("Hi") || response2.getTranslateResult().getTextResult().equals("Hello"));
         assert (response2.getTranslateResult().getSourceLanguageCode().equals("ru"));
         assert (response2.getTranslateResult().getTargetLanguageCode().equals("en"));
+
+        TranslateResponse response3 =
+                manager.translate("ru", "ru", "Приветик");
+        assert (response3.getTranslateResult().getTextResult().length() > 0);
+        assert (response3.getStatus().equals(TranslateResponse.Status.OK));
+        assert (response3.getTranslateResult().getTextResult().equals("Приветик"));
+        assert (response3.getTranslateResult().getSourceLanguageCode().equals("ru"));
+        assert (response3.getTranslateResult().getTargetLanguageCode().equals("ru"));
+
+        TranslateResponse response4 =
+                manager.translate(null, "ru", "Приветик");
+        assert (response4.getTranslateResult().getTextResult().length() > 0);
+        assert (response4.getStatus().equals(TranslateResponse.Status.OK));
+        assert (response4.getTranslateResult().getTextResult().equals("Приветик"));
+        assert (response4.getTranslateResult().getSourceLanguageCode().equals("ru"));
+        assert (response4.getTranslateResult().getTargetLanguageCode().equals("ru"));
     }
 }
