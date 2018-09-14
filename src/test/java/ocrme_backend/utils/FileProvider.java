@@ -36,9 +36,7 @@ public class FileProvider {
         return defaultFont;
     }
 
-    public static String getImageUri(){
-        return gcsUriTestImage;
-    }
+    public static String getImageUri(){ return gcsUriTestImage; }
 
     public static String getEmptyImageUri(){
         return gcsUriTestEmptyImage;
@@ -74,6 +72,14 @@ public class FileProvider {
 
     public static ByteArrayOutputStream getImageAsStream() throws IOException {
         return getFileAsyteArrayOutputStream("test_imgs/img.jpg");
+    }
+
+    public static ByteArrayOutputStream getBigImageAsStream() throws IOException {
+        return getFileAsyteArrayOutputStream("test_imgs/big_image.jpg");
+    }
+
+    public static ByteArrayOutputStream getSmallImageAsStream() throws IOException {
+        return getFileAsyteArrayOutputStream("test_imgs/rus.jpg");
     }
 
     public static ByteArrayOutputStream getPdfAsStream() throws IOException {

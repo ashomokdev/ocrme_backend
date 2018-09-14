@@ -1,11 +1,13 @@
 package ocrme_backend.servlets.ocr;
 
+import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
 import ocrme_backend.utils.FileProvider;
 import ocrme_backend.utils.PdfBuilderInputDataProvider;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderInputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData;
 import ocrme_backend.file_builder.pdfbuilder.PdfBuilderOutputData.Status;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,8 +50,14 @@ public class PdfBuilderSyncTaskTest {
 
         when(mockServletContext.getInitParameter(PdfBuilderSyncTask.BUCKET_FOR_PDFS_PARAMETER)).
                 thenReturn("bucket-for-pdf-test");
+        when(mockServletContext.getInitParameter(PdfBuilderSyncTask.DIRECTORY_FOR_PDFS_PARAMETER)).
+                thenReturn("dir-for-pdf-test");
     }
 
+    @After
+    public void tearDown() {
+      new CloudStorageHelper().clearBucket("bucket-for-pdf-test");
+    }
 
     @Test
     public void testExecute() {

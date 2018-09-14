@@ -30,10 +30,16 @@ class PdfBuilderSyncTask {
     private static Logger logger;
     @Nonnull
     private HttpSession session;
+
+
+
+    //Use PdfBuilderInputData(pdf with searchable text) OR String gcsImageUri(image pdf)
     @Nullable
     private PdfBuilderInputData data;
     @Nullable
     private String gcsImageUri;
+
+
 
     PdfBuilderSyncTask(PdfBuilderInputData data, HttpSession session) {
         this.data = data;

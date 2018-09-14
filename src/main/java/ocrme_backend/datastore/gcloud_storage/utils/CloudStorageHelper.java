@@ -25,12 +25,15 @@ import com.google.cloud.storage.*;
 import com.google.cloud.storage.Acl.Role;
 import com.google.cloud.storage.Acl.User;
 import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -158,27 +161,23 @@ public class CloudStorageHelper {
 
     @Nullable
     public byte[] downloadFile(String gcsUri) throws IOException {
-        Blob blob = getBlob(gcsUri);
 
+        Blob blob = getBlob(gcsUri);
         ReadChannel reader;
         byte[] result = null;
         if (blob != null) {
             reader = blob.reader();
-            ByteBuffer bytes = ByteBuffer.allocate(64 * 1024);
-
-            while (reader.read(bytes) > 0) {
-                bytes.flip();
-                result = bytes.array();
-                bytes.clear();
-            }
+            InputStream inputStream = Channels.newInputStream(reader);
+           result = IOUtils.toByteArray(inputStream);
         }
         return result;
     }
 
+
     @Nullable
     Blob getBlob(String gcsUri) {
         //gcsUri is "gs://" + blob.getBucket() + "/" + blob.getName(),
-        //example "gs://ocrme-77a2b.appspot.com/ocr_request_images/000c121b-357d-4ac0-a3f2-24e0f6d5cea185dffb40-e754-478f-b5b7-850fab211438.jpg"
+        //example "gs://myapp.appspot.com/ocr_request_images/000c121b-357d-4ac0-a3f2-24e0f6d5cea185dffb40-e754-478f-b5b7-850fab211438.jpg"
 
         String bucketName = parseGcsUriForBucketName(gcsUri);
         String fileName = parseGcsUriForFilename(gcsUri);
@@ -297,6 +296,19 @@ public class CloudStorageHelper {
         Page<Blob> blobs = bucket.list();
         for (Blob blob : blobs.iterateAll()) {
             blob.delete();
+        }
+    }
+
+    /**
+     * delete all blobs in bucket
+     */
+    public void clearBucket(String bucketName) {
+        Bucket bucket = storage.get(bucketName, Storage.BucketGetOption.fields());
+
+        //if exists
+        if (bucket != null) {
+            clearBucket(bucket);
+            logger.log(Level.INFO, "Bucket %s cleaned.%n", bucketName);
         }
     }
 
