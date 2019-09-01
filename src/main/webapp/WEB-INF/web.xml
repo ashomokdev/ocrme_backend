@@ -5,77 +5,77 @@
          http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1" id="data-fabric-web-tool">
 
-  <servlet>
-    <servlet-name>ListOCRRequestsServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.list_ocr_requests.ListOCRRequestsServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>ListOCRRequestsServlet</servlet-name>
-    <url-pattern>/list_ocr_requests</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>ListOCRRequestsServlet</servlet-name>
+        <servlet-class>ocrme_backend.servlets.list_ocr_requests.ListOCRRequestsServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ListOCRRequestsServlet</servlet-name>
+        <url-pattern>/list_ocr_requests</url-pattern>
+    </servlet-mapping>
 
-  <servlet>
-    <servlet-name>OcrServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.ocr.OcrServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>OcrServlet</servlet-name>
-    <url-pattern>/ocr_request</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>OcrServlet</servlet-name>
+        <servlet-class>ocrme_backend.servlets.ocr.OcrServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OcrServlet</servlet-name>
+        <url-pattern>/ocr_request</url-pattern>
+    </servlet-mapping>
 
-  <servlet>
-    <servlet-name>TranslateServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.translate.translate.TranslateServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TranslateServlet</servlet-name>
-    <url-pattern>/translate</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>TranslateServlet</servlet-name>
+        <servlet-class>ocrme_backend.servlets.translate.translate.TranslateServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TranslateServlet</servlet-name>
+        <url-pattern>/translate</url-pattern>
+    </servlet-mapping>
 
-  <servlet>
-    <servlet-name>SupportedLanguagesServlet</servlet-name>
-    <servlet-class>ocrme_backend.servlets.translate.supported_languages.SupportedLanguagesServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>SupportedLanguagesServlet</servlet-name>
-    <url-pattern>/supported_languages</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>SupportedLanguagesServlet</servlet-name>
+        <servlet-class>ocrme_backend.servlets.translate.supported_languages.SupportedLanguagesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SupportedLanguagesServlet</servlet-name>
+        <url-pattern>/supported_languages</url-pattern>
+    </servlet-mapping>
 
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-  </welcome-file-list>
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 
-  <context-param>
-    <param-name>ocrme.dir.pdf</param-name>
-    <param-value>${ocrme.dir.pdf}</param-value>
-  </context-param>
+    <context-param>
+        <param-name>ocrme.dir.pdf</param-name>
+        <param-value>${ocrme.dir.pdf}</param-value>
+    </context-param>
 
-  <context-param>
-    <param-name>ocrme.bucket</param-name>
-    <param-value>${ocrme.bucket}</param-value>
-  </context-param>
+    <context-param>
+        <param-name>ocrme.bucket</param-name>
+        <param-value>${ocrme.bucket}</param-value>
+    </context-param>
 
-  <context-param>
-    <param-name>ocrme.bucket.request_images</param-name>
-    <param-value>${ocrme.bucket.request_images}</param-value>
-  </context-param>
+    <context-param>
+        <param-name>ocrme.bucket.request_images</param-name>
+        <param-value>${ocrme.bucket.request_images}</param-value>
+    </context-param>
 
-  <context-param>
-    <param-name>font.path</param-name>
-    <param-value>${font.path}</param-value>
-  </context-param>
+    <context-param>
+        <param-name>font.path</param-name>
+        <param-value>${font.path}</param-value>
+    </context-param>
 
-  <context-param>
-    <param-name>secret.key.filepath</param-name>
-    <param-value>${secret.key.filepath}</param-value>
-  </context-param>
+    <context-param>
+        <param-name>secret.key.filepath</param-name>
+        <param-value>${secret.key.filepath}</param-value>
+    </context-param>
 
-  <context-param>
-    <param-name>bing.key.parameter</param-name>
-    <param-value>${bing.key.parameter}</param-value>
-  </context-param>
+    <context-param>
+        <param-name>bing.key.parameter</param-name>
+        <param-value>${bing.key.parameter}</param-value>
+    </context-param>
 </web-app>
