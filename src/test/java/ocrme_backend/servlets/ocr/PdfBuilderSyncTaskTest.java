@@ -32,6 +32,7 @@ public class PdfBuilderSyncTaskTest {
     private PdfBuilderInputData data;
     private HttpSession session;
     private String simpleChinaText = "简单的文字中国";
+    String bucketName = System.getProperty("bucket-for-tests");
 
     @Before
     public void init() throws Exception {
@@ -49,14 +50,16 @@ public class PdfBuilderSyncTaskTest {
         when(mockServletContext.getResourceAsStream(anyString())).thenReturn(getFontAsStream(defaultFont));
 
         when(mockServletContext.getInitParameter(PdfBuilderSyncTask.BUCKET_FOR_PDFS_PARAMETER)).
-                thenReturn("bucket-for-pdf-test");
+                thenReturn(bucketName);
+
+        String dirName = System.getProperty("dir-for-pdf-tests");
         when(mockServletContext.getInitParameter(PdfBuilderSyncTask.DIRECTORY_FOR_PDFS_PARAMETER)).
-                thenReturn("dir-for-pdf-test");
+                thenReturn(dirName);
     }
 
     @After
     public void tearDown() {
-      new CloudStorageHelper().clearBucket("bucket-for-pdf-test");
+        new CloudStorageHelper().clearBucket(bucketName);
     }
 
     @Test

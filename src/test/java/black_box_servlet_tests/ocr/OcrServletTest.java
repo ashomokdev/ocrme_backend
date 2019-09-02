@@ -1,32 +1,26 @@
 package black_box_servlet_tests.ocr;
 
 import com.google.gson.Gson;
+import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
 import ocrme_backend.servlets.ocr.OcrRequestBean;
 import ocrme_backend.servlets.ocr.OcrResponse;
+import ocrme_backend.utils.FileProvider;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static ocrme_backend.servlets.ocr.OcrResponse.Status.OK;
-import static ocrme_backend.utils.FileProvider.getImageUri;
+import static ocrme_backend.utils.FileUtils.toInputStream;
 
 /**
  * Created by iuliia on 5/22/17.
@@ -40,6 +34,8 @@ public class OcrServletTest {
 
     public static final String localHttpPost = "http://localhost:8080/ocr_request";
     public static final String remoteHttpPost = "https://3-dot-ocrme-77a2b.appspot.com/ocr_request";
+    private String imgUri;
+    private String bucketName = System.getProperty("bucket-for-tests");
 
     @Test
     public void testServletLocal() throws IOException {
@@ -51,13 +47,20 @@ public class OcrServletTest {
         testServlet(remoteHttpPost);
     }
 
+    @Before
+    public void uploadFilesToStorage() throws IOException {
+        ByteArrayOutputStream imageAsStream = FileProvider.getSmallRuImageAsStream();
+        CloudStorageHelper helper = new CloudStorageHelper();
+        imgUri = helper.uploadFileForUri(toInputStream(imageAsStream), "filename.jpg", bucketName);
+    }
+
     private void testServlet(String url) throws IOException {
         HttpPost httppost = new HttpPost(url);
         Gson gson = new Gson();
         HttpClient httpClient = HttpClientBuilder.create().build();
 
         OcrRequestBean ocrRequestBean = new OcrRequestBean();
-        ocrRequestBean.setGcsImageUri(getImageUri());
+        ocrRequestBean.setGcsImageUri(imgUri);
 
         StringEntity postingString = new StringEntity(gson.toJson(ocrRequestBean));
         httppost.setEntity(postingString);

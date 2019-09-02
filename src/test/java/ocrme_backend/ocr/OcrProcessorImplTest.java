@@ -1,6 +1,7 @@
 package ocrme_backend.ocr;
 
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
+import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
 import ocrme_backend.file_builder.pdfbuilder.TextUnit;
 import ocrme_backend.servlets.ocr.OcrData;
 import ocrme_backend.utils.FileProvider;
@@ -8,11 +9,13 @@ import ocrme_backend.utils.ImageFile;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ocrme_backend.utils.FileUtils.toInputStream;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -21,6 +24,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class OcrProcessorImplTest {
     private OcrProcessorImpl ocrProcessor;
+
 
     @Before
     public void init() throws IOException, GeneralSecurityException {
@@ -55,7 +59,11 @@ public class OcrProcessorImplTest {
 
     @Test
     public void ocrFromUri() throws Exception {
-        String imgUri = FileProvider.getImageUri();
+        String bucketName = System.getProperty("bucket-for-tests");
+        ByteArrayOutputStream imageAsStream = FileProvider.getSmallRuImageAsStream();
+        CloudStorageHelper helper = new CloudStorageHelper();
+        String imgUri = helper.uploadFileForUri(toInputStream(imageAsStream), "filename.jpg", bucketName);
+
         BatchAnnotateImagesResponse data = ocrProcessor.ocrForResponse(imgUri, null);
         assertTrue(ocrProcessor.extractData(data).size() > 0);
     }

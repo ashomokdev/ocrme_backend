@@ -22,8 +22,7 @@ import java.nio.file.Paths;
 public class FileProvider {
     public static String pathToSecretKeys = "secret_data/secret.properties";
 
-    private static final String gcsUriTestImage = "gs://ocrme-77a2b.appspot.com/test/ru.jpg";
-    private static final String gcsUriTestEmptyImage = "gs://ocrme-77a2b.appspot.com/test/Blank.jpg";
+    private static final String gcsUriTestImage = "gs://bucket-for-tests/test_imgs/ru.jpg";
     private static final String defaultFont = "FreeSans.ttf";
 
     public static String getTestImageByName(String filename) {
@@ -37,10 +36,6 @@ public class FileProvider {
     }
 
     public static String getImageUri(){ return gcsUriTestImage; }
-
-    public static String getEmptyImageUri(){
-        return gcsUriTestEmptyImage;
-    }
 
     public static ImageFile getRusImageFile() throws Exception {
         URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/rus.jpg");
@@ -78,7 +73,11 @@ public class FileProvider {
         return getFileAsyteArrayOutputStream("test_imgs/big_image.jpg");
     }
 
-    public static ByteArrayOutputStream getSmallImageAsStream() throws IOException {
+    public static ByteArrayOutputStream getBlankImageAsStream() throws IOException {
+        return getFileAsyteArrayOutputStream("test_imgs/blank.jpg");
+    }
+
+    public static ByteArrayOutputStream getSmallRuImageAsStream() throws IOException {
         return getFileAsyteArrayOutputStream("test_imgs/rus.jpg");
     }
 

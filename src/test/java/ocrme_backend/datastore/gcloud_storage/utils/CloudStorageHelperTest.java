@@ -7,14 +7,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.UUID;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -200,7 +196,7 @@ public class CloudStorageHelperTest {
         //crete mock blob
         helper.createBucket(bucketName);
 
-        ByteArrayOutputStream stream = FileProvider.getSmallImageAsStream();
+        ByteArrayOutputStream stream = FileProvider.getSmallRuImageAsStream();
         String url = helper.uploadFile(toInputStream(stream), "filename.jpg", bucketName);
         Blob mockBlob = helper.uploadFileForBlob(
                 stream.toByteArray(), "filename.jpg", "test", bucketName);

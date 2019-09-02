@@ -12,7 +12,11 @@ import org.junit.Test;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import static ocrme_backend.utils.FileProvider.getFontAsStream;
+import static ocrme_backend.utils.FileUtils.toInputStream;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,17 +24,15 @@ import static org.mockito.Mockito.when;
 /**
  * Created by iuliia on 7/14/17.
  */
-
-//todo clean bucket when finished
 public class OcrRequestManagerTest {
 
     private final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
-    String imgUri;
-    String emptyImgUri;
-    HttpSession session;
-
+    private String imgUri;
+    private String emptyImgUri;
+    private HttpSession session;
+    private String bucketName = System.getProperty("bucket-for-tests");
 
     @Before
     public void init() {
@@ -43,23 +45,31 @@ public class OcrRequestManagerTest {
         when(mockServletContext.getResourceAsStream(anyString())).thenReturn(getFontAsStream(defaultFont));
 
         when(mockServletContext.getInitParameter(PdfBuilderSyncTask.BUCKET_FOR_PDFS_PARAMETER)).
-                thenReturn("bucket-for-pdf-test");
+                thenReturn(bucketName);
 
+        String dirName = System.getProperty("dir-for-pdf-tests");
         when(mockServletContext.getInitParameter(PdfBuilderSyncTask.DIRECTORY_FOR_PDFS_PARAMETER)).
-                thenReturn("dir-for-pdf-test");
+                thenReturn(dirName);
+    }
 
-        imgUri = FileProvider.getImageUri();
-        emptyImgUri = FileProvider.getEmptyImageUri();
+    @Before
+    public void uploadFilesToStorage() throws IOException {
+        ByteArrayOutputStream imageAsStream = FileProvider.getSmallRuImageAsStream();
+        CloudStorageHelper helper = new CloudStorageHelper();
+        imgUri = helper.uploadFileForUri(toInputStream(imageAsStream), "filename.jpg", bucketName);
+
+        ByteArrayOutputStream blankImageAsStream = FileProvider.getBlankImageAsStream();
+        emptyImgUri = helper.uploadFileForUri(toInputStream(blankImageAsStream), "filename.jpg", bucketName);
     }
 
     @After
     public void tearDown() {
         helper.tearDown();
-        new CloudStorageHelper().clearBucket("bucket-for-pdf-test");
+        new CloudStorageHelper().clearBucket(bucketName);
     }
 
     @Test
-    public void testOcr1() {
+    public void testOcr() {
         OcrRequestManager managerImageUri =
                 new OcrRequestManager(null, imgUri, new String[]{"ru"}, session);
 
@@ -89,14 +99,5 @@ public class OcrRequestManagerTest {
         OcrResponse response = managerImageUri.process();
         Assert.assertNull(response.getOcrResult());
         Assert.assertEquals(response.getStatus(), OcrResponse.Status.TEXT_NOT_FOUND);
-    }
-
-    @Test
-    public void testOcrInvalidLanguage() {
-        OcrRequestManager managerImageUri =
-                new OcrRequestManager(null, imgUri, new String[]{"az", "bn", "bg"}, session);
-        OcrResponse response = managerImageUri.process();
-        Assert.assertNull(response.getOcrResult());
-        Assert.assertEquals(response.getStatus(), OcrResponse.Status.INVALID_LANGUAGE_HINTS);
     }
 }
