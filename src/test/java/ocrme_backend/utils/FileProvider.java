@@ -2,6 +2,7 @@ package ocrme_backend.utils;
 
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+import ocrme_backend.datastore.gcloud_storage.utils.CloudStorageHelper;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -17,15 +18,11 @@ import java.nio.file.Paths;
 /**
  * Created by iuliia on 6/23/17.
  */
-
-//todo refactoring needs -provide secret file, font file with simple get to this class
 public class FileProvider {
     public static String pathToSecretKeys = "secret_data/secret.properties";
-
-    private static final String gcsUriTestImage = "gs://bucket-for-tests/test_imgs/ru.jpg";
     private static final String defaultFont = "FreeSans.ttf";
 
-    public static String getTestImageByName(String filename) {
+    public static String getTestImageFullPathByFileName(String filename) {
         URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/" + filename);
         assert url != null;
         return url.getPath();
@@ -35,7 +32,15 @@ public class FileProvider {
         return defaultFont;
     }
 
-    public static String getImageUri(){ return gcsUriTestImage; }
+    /**
+     * get Google Cloud URI of test image, example gs://bucket-for-tests/2019-09-11-18-50-52-854-rus.jpg
+     * @return Google Cloud URI of test image, example gs://bucket-for-tests/2019-09-11-18-50-52-854-rus.jpg
+     */
+    public static String uploadTestImageForGsUri(String fileName){
+        String bucketName = System.getProperty("bucket-for-tests");
+        return new CloudStorageHelper().uploadFileForUri(
+                FileProvider.getFileAsInputStream("test_imgs/" + fileName), fileName, bucketName);
+    }
 
     public static ImageFile getRusImageFile() throws Exception {
         URL url = Thread.currentThread().getContextClassLoader().getResource("test_imgs/rus.jpg");
@@ -85,7 +90,6 @@ public class FileProvider {
         return getFileAsyteArrayOutputStream("pdfs/ru.pdf");
     }
 
-
     /**
      * parse pdf and check does it contains text
      *
@@ -130,7 +134,6 @@ public class FileProvider {
     }
 
     public static InputStream getFileAsInputStream(String filePath) {
-        return Thread.currentThread()
-                .getContextClassLoader().getResourceAsStream(filePath);
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath);
     }
 }

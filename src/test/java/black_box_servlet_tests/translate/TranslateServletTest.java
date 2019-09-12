@@ -1,9 +1,6 @@
 package black_box_servlet_tests.translate;
 
 import com.google.gson.Gson;
-import ocrme_backend.datastore.gcloud_datastore.daos.TranslateRequestDaoImpl;
-import ocrme_backend.servlets.ocr.OcrRequestBean;
-import ocrme_backend.servlets.ocr.OcrResponse;
 import ocrme_backend.servlets.translate.translate.TranslateRequestBean;
 import ocrme_backend.servlets.translate.translate.TranslateResponse;
 import org.apache.http.HttpEntity;
@@ -19,7 +16,6 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static ocrme_backend.servlets.translate.translate.TranslateResponse.Status.OK;
-import static ocrme_backend.utils.FileProvider.getImageUri;
 
 public class TranslateServletTest {
 

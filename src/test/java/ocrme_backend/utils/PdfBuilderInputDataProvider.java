@@ -17,7 +17,7 @@ public class PdfBuilderInputDataProvider {
 
     public static OcrData ocrForData(String fileName, @Nullable List<String> languages) throws Exception {
 
-        String filePath = FileProvider.getTestImageByName(fileName);
+        String filePath = FileProvider.getTestImageFullPathByFileName(fileName);
         Path path = Paths.get(filePath);
         byte[] imageBytes = Files.readAllBytes(path);
 
