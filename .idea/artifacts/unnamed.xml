@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact name="unnamed">
-    <output-path>$PROJECT_DIR$/classes/artifacts/unnamed</output-path>
-    <root id="root">
-      <element id="library" level="project" name="marvin_1.5.5" />
-    </root>
-  </artifact>
-</component>
